@@ -38,7 +38,7 @@
         <div>
           <span class="study-kicker">Propuesta educativa</span>
           <h1>Plan de estudios</h1>
-          <p>La escuela secundaria se organiza en dos etapas: un <strong>Ciclo Básico común de 1º a 3º año</strong> y un <strong>Ciclo Orientado de 4º a 6º año</strong>. Durante los tres primeros años, todos los estudiantes comparten la misma formación, independientemente de la orientación que elijan después.</p>
+          <p>La escuela secundaria se organiza en dos etapas: un <strong>Ciclo Básico común de 1º a 3º año</strong> y un <strong>Ciclo Orientado de 4º a 6º año</strong>. Durante los tres primeros años, todos los estudiantes comparten la misma formación; desde 4º año el recorrido cambia según la orientación elegida.</p>
         </div>
         <aside class="cycle-summary" aria-label="Estructura del nivel secundario">
           <div><strong>1º · 2º · 3º</strong><span>Ciclo Básico común</span></div>
@@ -110,14 +110,52 @@
         <div class="study-heading study-heading--light">
           <span>Segunda etapa</span>
           <h2>Ciclo Orientado · 4º a 6º año</h2>
-          <p>Desde 4º año el recorrido se diferencia según la orientación elegida. Las materias específicas de cada año se incorporarán en esta misma sección.</p>
+          <p>Elegí una orientación para ver las materias de cada año. Las cuatro propuestas comparten la formación general y suman espacios propios de cada recorrido.</p>
         </div>
 
-        <div class="oriented-grid">
-          <article><span>01</span><h3>Comunicación</h3><p>4º · 5º · 6º año</p><small>Materias próximamente</small></article>
-          <article><span>02</span><h3>Ciencias Sociales</h3><p>4º · 5º · 6º año</p><small>Materias próximamente</small></article>
-          <article><span>03</span><h3>Lenguas Extranjeras</h3><p>4º · 5º · 6º año</p><small>Materias próximamente</small></article>
-          <article><span>04</span><h3>Ciencias Naturales</h3><p>4º · 5º · 6º año</p><small>Materias próximamente</small></article>
+        <nav class="orientation-jump" aria-label="Orientaciones">
+          <a href="#comunicacion">Comunicación</a>
+          <a href="#sociales">Ciencias Sociales</a>
+          <a href="#lenguas">Lenguas Extranjeras</a>
+          <a href="#naturales">Ciencias Naturales</a>
+        </nav>
+
+        <div class="orientation-study-list">
+          <details class="orientation-study" id="comunicacion" open>
+            <summary><span class="orientation-study__number">01</span><span><small>Orientación</small><strong>Comunicación</strong></span><span class="orientation-study__action">Ver materias</span></summary>
+            <div class="orientation-years">
+              <article class="oriented-year"><h3>4º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>NTICX</li><li>Salud y Adolescencia</li><li>Introducción a la Física</li><li>Biología</li><li>Historia</li><li>Geografía</li><li>Psicología</li><li>Introducción a la Comunicación</li></ul></article>
+              <article class="oriented-year"><h3>5º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Política y Ciudadanía</li><li>Introducción a la Química</li><li>Historia</li><li>Geografía</li><li>Comunicación y Culturas del Consumo</li><li>Observatorio de Comunicación, Cultura y Sociedad</li><li>Observatorio de Medios</li></ul></article>
+              <article class="oriented-year"><h3>6º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Trabajo y Ciudadanía</li><li>Arte</li><li>Filosofía</li><li>Comunicación y Transformaciones Socioculturales del Siglo XXI</li><li>Taller de Comunicación Institucional y Comunitaria</li><li>Taller de Producción en Lenguajes</li></ul></article>
+            </div>
+          </details>
+
+          <details class="orientation-study" id="sociales">
+            <summary><span class="orientation-study__number">02</span><span><small>Orientación</small><strong>Ciencias Sociales</strong></span><span class="orientation-study__action">Ver materias</span></summary>
+            <div class="orientation-years">
+              <article class="oriented-year"><h3>4º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>NTICX</li><li>Salud y Adolescencia</li><li>Introducción a la Física</li><li>Biología</li><li>Historia</li><li>Geografía</li><li>Psicología</li></ul></article>
+              <article class="oriented-year"><h3>5º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Política y Ciudadanía</li><li>Introducción a la Química</li><li>Historia</li><li>Geografía</li><li>Comunicación, Cultura y Sociedad</li><li>Economía Política</li><li>Sociología</li></ul></article>
+              <article class="oriented-year"><h3>6º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Trabajo y Ciudadanía</li><li>Filosofía</li><li>Arte</li><li>Historia</li><li>Geografía</li><li>Proyecto de Investigación en Ciencias Sociales</li></ul></article>
+            </div>
+          </details>
+
+          <details class="orientation-study" id="lenguas">
+            <summary><span class="orientation-study__number">03</span><span><small>Orientación</small><strong>Lenguas Extranjeras</strong></span><span class="orientation-study__action">Ver materias</span></summary>
+            <div class="orientation-years">
+              <article class="oriented-year"><h3>4º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>NTICX</li><li>Salud y Adolescencia</li><li>Introducción a la Física</li><li>Biología</li><li>Historia</li><li>Geografía</li><li>Portugués I</li><li>Francés I</li></ul></article>
+              <article class="oriented-year"><h3>5º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Política y Ciudadanía</li><li>Introducción a la Química</li><li>Historia</li><li>Estudios Interculturales en Inglés</li><li>Portugués II</li><li>Francés II</li></ul></article>
+              <article class="oriented-year"><h3>6º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Trabajo y Ciudadanía</li><li>Arte</li><li>Filosofía</li><li>Estudios Interculturales en Inglés</li><li>Portugués III</li><li>Francés III</li></ul></article>
+            </div>
+          </details>
+
+          <details class="orientation-study" id="naturales">
+            <summary><span class="orientation-study__number">04</span><span><small>Orientación</small><strong>Ciencias Naturales</strong></span><span class="orientation-study__action">Ver materias</span></summary>
+            <div class="orientation-years">
+              <article class="oriented-year"><h3>4º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>NTICX</li><li>Salud y Adolescencia</li><li>Introducción a la Física</li><li>Biología</li><li>Historia</li><li>Geografía</li><li>Introducción a la Química</li></ul></article>
+              <article class="oriented-year"><h3>5º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Política y Ciudadanía</li><li>Historia</li><li>Geografía</li><li>Arte</li><li>Fundamentos de la Química</li><li>Biología</li><li>Física</li><li>Ciencias de la Tierra</li></ul></article>
+              <article class="oriented-year"><h3>6º año</h3><ul class="subject-list"><li>Literatura</li><li>Matemática – Ciclo Superior</li><li>Educación Física</li><li>Inglés</li><li>Trabajo y Ciudadanía</li><li>Filosofía e Historia de la Ciencia y la Tecnología</li><li>Química del Carbono</li><li>Biología, Genética y Sociedad</li><li>Física Clásica y Moderna</li><li>Ambiente, Desarrollo y Sociedad</li></ul></article>
+            </div>
+          </details>
         </div>
       </div>
     </section>
