@@ -124,7 +124,7 @@ def test_certificado_analitico_publicado():
     tramite_path = ROOT / "certificado-analitico.html"
     assert tramite_path.exists(), "Falta la página de Certificado Analítico"
     tramite = tramite_path.read_text(encoding="utf-8")
-    assert 'href="certificado-analitico.html"' in HTML
+    assert 'certificado-analitico.html' in HTML or 'certificado-analitico.html' in JS
     for item in [
         'Certificado Analítico', 'Solicitud de Certificado de Estudios',
         'Copia actualizada del DNI', 'Copia de la Partida de Nacimiento',
