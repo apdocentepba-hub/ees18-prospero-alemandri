@@ -2,6 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HTML = ROOT.joinpath("index.html").read_text(encoding="utf-8")
+JS = ROOT.joinpath("assets/js/main.js").read_text(encoding="utf-8")
 
 
 def require(text):
@@ -66,6 +67,40 @@ def test_ciclo_orientado_completo():
         'Biología, Genética y Sociedad', 'Física Clásica y Moderna'
     ]:
         assert subject in plan, f"Falta materia del ciclo orientado: {subject}"
+
+
+def test_portada_reorganizada():
+    require('id="comunidad"')
+    require('class="current-grid"')
+    require('href="plan-estudios.html"')
+    require('href="assets/css/home-layout.css"')
+    require('Propuesta educativa')
+    require('Comunidad educativa')
+    require('Actualidad y agenda')
+
+    nav_start = HTML.index('<nav class="primary-nav"')
+    nav_end = HTML.index('</nav>', nav_start)
+    nav = HTML[nav_start:nav_end]
+    assert 'href="#institucion"' in nav
+    assert 'href="#orientaciones"' in nav
+    assert 'href="#tramites"' in nav
+    assert 'href="#comunidad"' in nav
+    assert 'href="#calendario"' in nav
+    assert 'href="#contacto"' in nav
+    assert 'href="#estudiantes"' not in nav
+    assert 'href="#familias"' not in nav
+    assert 'href="#docentes"' not in nav
+
+
+def test_plan_no_se_duplica_desde_javascript():
+    assert 'study-plan-cta' not in JS
+    assert 'plan-estudios.css' not in JS
+
+
+def test_contacto_institucional():
+    require('secundaria18avellaneda@abc.gob.ar')
+    require('Lunes a viernes · 9:00 a 11:00')
+    require('Lunes a viernes · 14:00 a 16:00')
 
 
 def test_accesibilidad_minima():
