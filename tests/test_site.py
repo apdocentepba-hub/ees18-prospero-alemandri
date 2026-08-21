@@ -73,19 +73,17 @@ def test_orientaciones_arrancan_todas_cerradas():
     plan = ROOT.joinpath("plan-estudios.html").read_text(encoding="utf-8")
     assert plan.count('class="orientation-study"') == 4
     assert 'class="orientation-study" id="comunicacion" open' not in plan
-    assert '<details class="orientation-study" id="comunicacion">' in plan
-    assert '<details class="orientation-study" id="sociales">' in plan
-    assert '<details class="orientation-study" id="lenguas">' in plan
-    assert '<details class="orientation-study" id="naturales">' in plan
+    for orientation_id in ['comunicacion', 'sociales', 'lenguas', 'naturales']:
+        assert f'<details class="orientation-study" id="{orientation_id}">' in plan
 
 
 def test_logo_y_titulo_siempre_vuelven_a_inicio():
     plan = ROOT.joinpath("plan-estudios.html").read_text(encoding="utf-8")
     tramite = ROOT.joinpath("certificado-analitico.html").read_text(encoding="utf-8")
-    assert '<a class="brand" href="index.html"' in HTML
+    assert "document.querySelector('.brand')" in JS
+    assert "brandLink.setAttribute('href', 'index.html')" in JS
     assert '<a class="study-brand" href="index.html"' in plan
     assert '<a class="procedure-brand" href="index.html"' in tramite
-    assert '<a class="brand" href="#inicio"' not in HTML
 
 
 def test_portada_reorganizada():
