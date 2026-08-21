@@ -68,6 +68,28 @@ def test_ciclo_orientado_completo():
         assert subject in plan, f"Falta materia del ciclo orientado: {subject}"
 
 
+def test_portada_reorganizada():
+    require('id="comunidad"')
+    require('class="current-grid"')
+    require('href="plan-estudios.html"')
+    require('Propuesta educativa')
+    require('Comunidad educativa')
+    require('Actualidad y agenda')
+
+    nav_start = HTML.index('<nav class="primary-nav"')
+    nav_end = HTML.index('</nav>', nav_start)
+    nav = HTML[nav_start:nav_end]
+    assert 'href="#institucion"' in nav
+    assert 'href="#orientaciones"' in nav
+    assert 'href="#tramites"' in nav
+    assert 'href="#comunidad"' in nav
+    assert 'href="#calendario"' in nav
+    assert 'href="#contacto"' in nav
+    assert 'href="#estudiantes"' not in nav
+    assert 'href="#familias"' not in nav
+    assert 'href="#docentes"' not in nav
+
+
 def test_accesibilidad_minima():
     require('href="#contenido"')
     require('aria-controls="primary-nav"')
