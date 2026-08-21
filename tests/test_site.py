@@ -90,6 +90,10 @@ def test_portada_reorganizada():
     assert 'href="#docentes"' not in nav
 
 
+def test_contacto_institucional():
+    require('secundaria18avellaneda@abc.gob.ar')
+
+
 def test_accesibilidad_minima():
     require('href="#contenido"')
     require('aria-controls="primary-nav"')
