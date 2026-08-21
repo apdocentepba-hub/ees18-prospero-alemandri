@@ -120,6 +120,20 @@ def test_espacios_institucionales():
         require(item)
 
 
+def test_certificado_analitico_publicado():
+    tramite_path = ROOT / "certificado-analitico.html"
+    assert tramite_path.exists(), "Falta la página de Certificado Analítico"
+    tramite = tramite_path.read_text(encoding="utf-8")
+    assert 'href="certificado-analitico.html"' in HTML
+    for item in [
+        'Certificado Analítico', 'Solicitud de Certificado de Estudios',
+        'Copia actualizada del DNI', 'Copia de la Partida de Nacimiento',
+        'Constancia de solicitud de vacante', 'Analítico Parcial',
+        'NO SE RECIBE documentación incompleta', 'NO SE INICIA el trámite'
+    ]:
+        assert item in tramite, f"Falta requisito del trámite: {item}"
+
+
 def test_accesibilidad_minima():
     require('href="#contenido"')
     require('aria-controls="primary-nav"')
