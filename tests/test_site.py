@@ -105,11 +105,12 @@ def test_contacto_institucional():
 
 def test_autoridades_institucionales():
     for item in [
-        'Ana Lanni', 'Caceres Adriana Celeste', 'Centurion Anabella',
+        'Lanni Ana', 'Caceres Adriana Celeste', 'Centurion Anabella',
         'Dimola Maria de los Angeles', 'Vicedirección · Turno tarde',
         'A confirmar'
     ]:
         require(item)
+    assert 'Ana Lanni' not in HTML
 
 
 def test_espacios_institucionales():
@@ -120,11 +121,12 @@ def test_espacios_institucionales():
         require(item)
 
 
-def test_certificado_analitico_publicado():
+def test_certificado_analitico_publicado_y_enlazado_en_html():
     tramite_path = ROOT / "certificado-analitico.html"
     assert tramite_path.exists(), "Falta la página de Certificado Analítico"
     tramite = tramite_path.read_text(encoding="utf-8")
-    assert 'certificado-analitico.html' in HTML or 'certificado-analitico.html' in JS
+    assert 'href="certificado-analitico.html"' in HTML, "El trámite debe tener enlace visible en el HTML de la portada"
+    assert 'analyticCard' not in JS, "El enlace no debe depender de JavaScript"
     for item in [
         'Certificado Analítico', 'Solicitud de Certificado de Estudios',
         'Copia actualizada del DNI', 'Copia de la Partida de Nacimiento',
