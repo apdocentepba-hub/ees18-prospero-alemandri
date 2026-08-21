@@ -37,6 +37,21 @@ def test_tramites_basicos_presentes():
         require(item)
 
 
+def test_ciclo_basico_comun():
+    require('id="plan-estudios"')
+    require('Ciclo Básico común')
+    require('1º año')
+    require('2º año')
+    require('3º año')
+    for item in [
+        'Ciencias Naturales', 'Ciencias Sociales', 'Educación Artística',
+        'Educación Física', 'Inglés', 'Matemática', 'Prácticas del Lenguaje',
+        'Construcción de Ciudadanía', 'Biología', 'Físico-Química',
+        'Geografía', 'Historia'
+    ]:
+        require(item)
+
+
 def test_accesibilidad_minima():
     require('href="#contenido"')
     require('aria-controls="primary-nav"')
