@@ -8,6 +8,14 @@
 .brand-copy__name { margin-top: 3px; font-size: .84rem; }
 .primary-nav { gap: 15px; font-size: .84rem; }
 
+#tramites,
+#orientaciones,
+#comunidad,
+#institucion,
+#contacto,
+#calendario,
+#novedades { scroll-margin-top: 110px; }
+
 .hero-layout {
   min-height: 570px;
   grid-template-columns: 1.12fr .88fr;
