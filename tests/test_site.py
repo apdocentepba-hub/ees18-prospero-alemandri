@@ -92,6 +92,8 @@ def test_portada_reorganizada():
 
 def test_contacto_institucional():
     require('secundaria18avellaneda@abc.gob.ar')
+    require('Lunes a viernes · 9:00 a 11:00')
+    require('Lunes a viernes · 14:00 a 16:00')
 
 
 def test_accesibilidad_minima():
