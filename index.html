@@ -3,76 +3,297 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Sitio institucional de la Escuela de Educación Secundaria Nº 18 Próspero Alemandri, Avellaneda.">
-  <meta name="theme-color" content="#123F5A">
-  <title>E.E.S. Nº 18 “Próspero Alemandri”</title>
+  <meta name="description" content="Sitio institucional de la Escuela de Educación Secundaria Nº 18 “Próspero Alemandri” de Avellaneda. Trámites, orientaciones, agenda y recursos para la comunidad educativa.">
+  <meta name="theme-color" content="#0f3f62">
+  <title>E.E.S. Nº 18 “Próspero Alemandri” · ENSPA</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
   <a class="skip-link" href="#contenido">Saltar al contenido</a>
-  <div class="institutional-bar"><div class="container institutional-bar__inner"><span>Educación Pública · Provincia de Buenos Aires</span><span class="institutional-bar__legacy">Tradición educativa ENSPA</span></div></div>
+
+  <div class="government-bar">
+    <div class="container government-bar__inner">
+      <span>Educación Pública · Provincia de Buenos Aires</span>
+      <span>Avellaneda · Nivel Secundario</span>
+    </div>
+  </div>
+
   <header class="site-header" id="inicio">
     <div class="container header-shell">
       <a class="brand" href="#inicio" aria-label="Inicio - E.E.S. Nº 18 Próspero Alemandri">
-        <span class="brand-mark" aria-hidden="true"><span class="brand-mark__ring"></span><span class="brand-mark__number">18</span><span class="brand-mark__caption">EES</span></span>
-        <span class="brand-copy"><strong>ESCUELA DE EDUCACIÓN SECUNDARIA Nº 18</strong><span>“PRÓSPERO ALEMANDRI”</span></span>
+        <span class="brand-logo">
+          <img class="enspa-logo" src="https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg" alt="Logo ENSPA">
+        </span>
+        <span class="brand-copy">
+          <span class="brand-copy__legacy">ENSPA · El Normal de Avellaneda</span>
+          <strong>ESCUELA DE EDUCACIÓN SECUNDARIA Nº 18</strong>
+          <span class="brand-copy__name">“PRÓSPERO ALEMANDRI”</span>
+        </span>
       </a>
-      <button class="menu-toggle" id="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false" aria-label="Abrir menú de navegación"><span></span><span></span><span></span></button>
+
+      <button class="menu-toggle" id="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false" aria-label="Abrir menú de navegación">
+        <span></span><span></span><span></span>
+      </button>
+
       <nav class="primary-nav" id="primary-nav" aria-label="Navegación principal">
-        <a href="#institucion">Institución</a><a href="#orientaciones">Propuesta educativa</a><a href="#comunidad">Comunidad</a><a href="#novedades">Novedades</a><a href="#calendario">Calendario</a><a href="#contacto" class="nav-cta">Contacto</a>
+        <a href="#tramites">Trámites</a>
+        <a href="#estudiantes">Estudiantes</a>
+        <a href="#familias">Familias</a>
+        <a href="#docentes">Docentes</a>
+        <a href="#orientaciones">Orientaciones</a>
+        <a href="#calendario">Agenda</a>
+        <a href="#contacto" class="nav-cta">Contacto</a>
       </nav>
     </div>
   </header>
+
   <main id="contenido">
     <section class="hero" aria-labelledby="hero-title">
-      <div class="hero-orbit hero-orbit--one" aria-hidden="true"></div><div class="hero-orbit hero-orbit--two" aria-hidden="true"></div>
-      <div class="container hero-grid">
+      <div class="hero-grid-pattern" aria-hidden="true"></div>
+      <div class="container hero-layout">
         <div class="hero-copy reveal">
-          <span class="eyebrow">Secundaria · Avellaneda</span><p class="hero-kicker">Una escuela con historia. Una identidad que evoluciona.</p>
-          <h1 id="hero-title">Educación que acompaña, transforma y abre caminos.</h1>
-          <p class="hero-lead">La E.E.S. Nº 18 “Próspero Alemandri” continúa una tradición educativa profundamente ligada a su comunidad, con una propuesta plural, pública y orientada al futuro.</p>
-          <div class="hero-actions"><a href="#orientaciones" class="button button--primary">Conocé nuestra propuesta</a><a href="#novedades" class="button button--ghost">Ver novedades</a></div>
-          <div class="hero-meta" aria-label="Información destacada"><div><strong>4</strong><span>orientaciones</span></div><div><strong>1</strong><span>comunidad educativa</span></div><div><strong>∞</strong><span>oportunidades para aprender</span></div></div>
+          <span class="hero-badge">Escuela secundaria estatal · Avellaneda</span>
+          <p class="hero-overline">Tradición ENSPA · identidad que continúa</p>
+          <h1 id="hero-title">El Normal,<br><span>hoy E.E.S. Nº 18.</span></h1>
+          <p class="hero-lead">Un portal para encontrar rápido lo que la comunidad de la Escuela de Educación Secundaria Nº 18 “Próspero Alemandri” necesita: trámites, agenda, orientaciones, recursos y novedades.</p>
+          <div class="hero-actions">
+            <a href="#tramites" class="button button--primary">Ir a trámites</a>
+            <a href="#orientaciones" class="button button--outline">Conocer orientaciones</a>
+          </div>
+          <div class="hero-facts" aria-label="Información institucional">
+            <span><strong>4</strong> orientaciones</span>
+            <span><strong>ENSPA</strong> identidad histórica</span>
+            <span><strong>311</strong> Av. Belgrano</span>
+          </div>
         </div>
-        <div class="hero-emblem reveal" aria-label="Identidad visual institucional">
-          <div class="emblem-card"><div class="emblem-seal"><div class="emblem-seal__inner"><span class="emblem-seal__small">E.E.S.</span><strong>18</strong><span class="emblem-seal__name">PRÓSPERO<br>ALEMANDRI</span></div></div><div class="emblem-lines" aria-hidden="true"><span></span><span></span><span></span><span></span></div><p>Identidad · Comunidad · Futuro</p></div>
-          <div class="hero-note">Desde la tradición ENSPA hacia una nueva etapa institucional.</div>
+
+        <div class="hero-identity reveal">
+          <div class="identity-card">
+            <div class="identity-card__corner">E.E.S. Nº 18</div>
+            <img class="enspa-logo enspa-logo--hero" src="https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg" alt="Emblema ENSPA">
+            <div class="identity-card__text">
+              <strong>PRÓSPERO ALEMANDRI</strong>
+              <span>Escuela Secundaria</span>
+              <small>Avellaneda · Provincia de Buenos Aires</small>
+            </div>
+          </div>
+          <div class="identity-ribbon">Identidad · Comunidad · Futuro</div>
         </div>
-      </div><div class="hero-wave" aria-hidden="true"></div>
+      </div>
     </section>
-    <section class="quick-access" aria-label="Accesos rápidos"><div class="container quick-grid">
-      <a href="#novedades" class="quick-card reveal"><span class="quick-card__icon">01</span><span><strong>Novedades</strong><small>Comunicados y noticias institucionales</small></span><span class="quick-card__arrow">↗</span></a>
-      <a href="#calendario" class="quick-card reveal"><span class="quick-card__icon">02</span><span><strong>Calendario</strong><small>Fechas y actividades importantes</small></span><span class="quick-card__arrow">↗</span></a>
-      <a href="#documentacion" class="quick-card reveal"><span class="quick-card__icon">03</span><span><strong>Documentación</strong><small>Formularios y enlaces útiles</small></span><span class="quick-card__arrow">↗</span></a>
-      <a href="#contacto" class="quick-card reveal"><span class="quick-card__icon">04</span><span><strong>Contacto</strong><small>Canales de comunicación institucional</small></span><span class="quick-card__arrow">↗</span></a>
-    </div></section>
-    <section class="section section--split" id="institucion"><div class="container split-grid"><div class="section-heading reveal"><span class="eyebrow">Nuestra institución</span><h2>Una escuela pública con memoria, presente y proyecto.</h2></div><div class="split-copy reveal"><p>La E.E.S. Nº 18 “Próspero Alemandri” construye su identidad sobre una historia educativa reconocida en Avellaneda y la tradición ENSPA, proyectándola en una secundaria contemporánea, inclusiva y cercana.</p><p>El sitio web nace como un nuevo punto de encuentro para estudiantes, familias, docentes y toda la comunidad educativa.</p><a class="text-link" href="#comunidad">Conocer la comunidad educativa <span>→</span></a></div></div></section>
-    <section class="section section--blue" id="orientaciones"><div class="container"><div class="section-heading section-heading--light reveal"><span class="eyebrow eyebrow--light">Propuesta educativa</span><h2>Cuatro orientaciones para descubrir, elegir y proyectarse.</h2><p>Cada recorrido propone una mirada distinta del mundo y herramientas para continuar estudios, participar de la sociedad y construir proyectos personales.</p></div><div class="orientation-grid">
-      <article class="orientation-card reveal"><span class="orientation-card__index">01</span><h3>Comunicación</h3><p>Lenguajes, medios, producción cultural y formas contemporáneas de construir sentido.</p><span class="orientation-card__tag">Expresar · Analizar · Crear</span></article>
-      <article class="orientation-card reveal"><span class="orientation-card__index">02</span><h3>Ciencias Sociales</h3><p>Sociedad, historia, ciudadanía y lectura crítica de los procesos que transforman nuestro entorno.</p><span class="orientation-card__tag">Comprender · Debatir · Participar</span></article>
-      <article class="orientation-card reveal"><span class="orientation-card__index">03</span><h3>Lenguas Extranjeras</h3><p>Comunicación intercultural, apertura al mundo y desarrollo de competencias lingüísticas.</p><span class="orientation-card__tag">Comunicar · Conectar · Explorar</span></article>
-      <article class="orientation-card reveal"><span class="orientation-card__index">04</span><h3>Ciencias Naturales</h3><p>Investigación, pensamiento científico, ambiente y comprensión de los fenómenos naturales.</p><span class="orientation-card__tag">Observar · Investigar · Explicar</span></article>
-    </div></div></section>
-    <section class="section" id="novedades"><div class="container"><div class="section-topline reveal"><div class="section-heading"><span class="eyebrow">Actualidad institucional</span><h2>Novedades de la escuela</h2></div><a class="text-link" href="#novedades">Ver todas <span>→</span></a></div><div class="news-grid">
-      <article class="news-card news-card--feature reveal"><div class="news-card__visual news-card__visual--feature"><span class="news-card__badge">Institucional</span><div class="visual-monogram">EES<br><strong>18</strong></div></div><div class="news-card__body"><time datetime="2026-08-21">21 AGO 2026</time><h3>Una nueva etapa para nuestra identidad institucional</h3><p>Presentamos el nuevo espacio digital de la E.E.S. Nº 18 “Próspero Alemandri”, pensado para acercar la escuela a toda la comunidad.</p><a href="#institucion">Leer más <span>→</span></a></div></article>
-      <article class="news-card reveal"><div class="news-card__visual news-card__visual--calendar"><span>CAL</span></div><div class="news-card__body"><time datetime="2026-08-21">PRÓXIMAMENTE</time><h3>Calendario institucional</h3><p>Este espacio reunirá las próximas fechas, jornadas, actos y actividades relevantes.</p></div></article>
-      <article class="news-card reveal"><div class="news-card__visual news-card__visual--community"><span>COM</span></div><div class="news-card__body"><time datetime="2026-08-21">EN PREPARACIÓN</time><h3>Noticias de nuestra comunidad</h3><p>Proyectos, experiencias y producciones de estudiantes y docentes tendrán aquí su lugar.</p></div></article>
-    </div></div></section>
-    <section class="section section--soft" id="calendario"><div class="container calendar-layout"><div class="calendar-intro reveal"><span class="eyebrow">Agenda</span><h2>Lo próximo, en un solo lugar.</h2><p>La agenda institucional mostrará automáticamente las fechas vigentes y dejará atrás los eventos ya finalizados.</p><a class="button button--dark" href="#calendario">Ver calendario completo</a></div><div class="timeline reveal">
-      <article class="timeline-item"><div class="timeline-date"><strong>—</strong><span>AGO</span></div><div><span class="timeline-label">Próximamente</span><h3>Próxima fecha institucional</h3><p>Espacio preparado para cargar la próxima actividad confirmada.</p></div></article>
-      <article class="timeline-item"><div class="timeline-date"><strong>—</strong><span>SEP</span></div><div><span class="timeline-label">Próximamente</span><h3>Actividad de la comunidad</h3><p>Podremos destacar reuniones, jornadas, actos y eventos escolares.</p></div></article>
-      <article class="timeline-item"><div class="timeline-date"><strong>—</strong><span>2026</span></div><div><span class="timeline-label">A confirmar</span><h3>Inscripciones y trámites</h3><p>Información clara y visible cuando las fechas sean oficialmente confirmadas.</p></div></article>
-    </div></div></section>
-    <section class="section" id="comunidad"><div class="container"><div class="section-heading reveal"><span class="eyebrow">Comunidad educativa</span><h2>La escuela se construye entre todos.</h2><p>Espacios de acompañamiento, participación, experimentación y encuentro que forman parte de la vida cotidiana de la institución.</p></div><div class="community-grid">
-      <article class="community-card reveal"><span>EOE</span><h3>Equipo de Orientación Escolar</h3><p>Acompañamiento de trayectorias y cuidado integral de estudiantes.</p></article><article class="community-card reveal"><span>CE</span><h3>Centro de Estudiantes</h3><p>Participación, representación y ciudadanía estudiantil.</p></article><article class="community-card reveal"><span>BIB</span><h3>Biblioteca</h3><p>Lectura, investigación y acceso a recursos para aprender.</p></article><article class="community-card reveal"><span>LAB</span><h3>Laboratorio</h3><p>Experimentación y pensamiento científico en acción.</p></article><article class="community-card reveal"><span>AV</span><h3>Audiovisuales</h3><p>Producción, comunicación y nuevas formas de expresión.</p></article><article class="community-card community-card--accent reveal"><span>+</span><h3>Proyectos</h3><p>Un espacio abierto para mostrar lo que la comunidad crea y comparte.</p></article>
-    </div></div></section>
-    <section class="section documents" id="documentacion"><div class="container documents-shell reveal"><div><span class="eyebrow eyebrow--light">Recursos</span><h2>Documentación y enlaces útiles</h2><p>Un acceso ordenado a formularios, comunicados, normativa y recursos oficiales para estudiantes y familias.</p></div><a class="button button--light" href="#documentacion">Explorar recursos</a></div></section>
-    <section class="section contact-section" id="contacto"><div class="container contact-grid"><div class="section-heading reveal"><span class="eyebrow">Contacto</span><h2>Estamos cerca de nuestra comunidad.</h2><p>Los datos de contacto oficiales se incorporarán aquí una vez confirmados por la institución.</p></div><div class="contact-card reveal"><div class="contact-card__row"><span>Ubicación</span><strong>Avellaneda, Provincia de Buenos Aires</strong></div><div class="contact-card__row"><span>Teléfono</span><strong>A confirmar</strong></div><div class="contact-card__row"><span>Correo institucional</span><strong>A confirmar</strong></div><div class="contact-card__row"><span>Redes oficiales</span><strong>A confirmar</strong></div></div></div></section>
+
+    <section class="service-strip" aria-label="Accesos principales">
+      <div class="container service-strip__grid">
+        <a href="#tramites" class="service-link"><span>01</span><strong>Trámites</strong><small>Requisitos y gestiones</small></a>
+        <a href="#calendario" class="service-link"><span>02</span><strong>Agenda</strong><small>Próximas fechas</small></a>
+        <a href="#novedades" class="service-link"><span>03</span><strong>Novedades</strong><small>Comunicados de la escuela</small></a>
+        <a href="#contacto" class="service-link"><span>04</span><strong>Contacto</strong><small>Canales institucionales</small></a>
+      </div>
+    </section>
+
+    <section class="section section--paper" id="tramites">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Secretaría · Gestión escolar</span>
+          <h2>Trámites frecuentes</h2>
+          <p>Este espacio reúne las gestiones más consultadas del nivel secundario. A medida que la institución confirme requisitos, formularios y canales, los iremos incorporando sin mezclar información de otros niveles.</p>
+        </div>
+
+        <div class="procedure-grid">
+          <article class="procedure-card reveal">
+            <span class="procedure-card__number">01</span>
+            <div><h3>Inscripciones</h3><p>Ingreso a primer año, vacantes y documentación requerida.</p></div>
+            <span class="status-pill">Información en preparación</span>
+          </article>
+          <article class="procedure-card reveal">
+            <span class="procedure-card__number">02</span>
+            <div><h3>Constancias y certificados</h3><p>Alumno regular, certificaciones escolares y otras constancias.</p></div>
+            <span class="status-pill">Información en preparación</span>
+          </article>
+          <article class="procedure-card reveal">
+            <span class="procedure-card__number">03</span>
+            <div><h3>Pases y equivalencias</h3><p>Orientación para estudiantes que ingresan o continúan su trayectoria en otra institución.</p></div>
+            <span class="status-pill">Información en preparación</span>
+          </article>
+          <article class="procedure-card reveal">
+            <span class="procedure-card__number">04</span>
+            <div><h3>Títulos y analíticos</h3><p>Información sobre documentación de egreso y seguimiento de trámites.</p></div>
+            <span class="status-pill">Información en preparación</span>
+          </article>
+          <article class="procedure-card reveal">
+            <span class="procedure-card__number">05</span>
+            <div><h3>Boleto estudiantil</h3><p>Acceso a información oficial y documentación escolar vinculada al trámite.</p></div>
+            <span class="status-pill">Información en preparación</span>
+          </article>
+          <article class="procedure-card procedure-card--accent reveal">
+            <span class="procedure-card__number">06</span>
+            <div><h3>Documentación escolar</h3><p>Formularios, autorizaciones y documentación de uso frecuente.</p></div>
+            <span class="status-pill">Próximamente</span>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section audience-section" aria-labelledby="audience-title">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Comunidad educativa</span>
+          <h2 id="audience-title">Entrá por tu espacio</h2>
+          <p>La información se organiza según quién la necesita para que sea más fácil encontrarla.</p>
+        </div>
+
+        <div class="audience-grid">
+          <article class="audience-card audience-card--students reveal" id="estudiantes">
+            <div class="audience-card__top"><span>EST</span><small>Estudiantes</small></div>
+            <h3>Tu recorrido en la escuela</h3>
+            <ul>
+              <li>Calendario y fechas importantes</li>
+              <li>Orientaciones y propuesta educativa</li>
+              <li>Centro de Estudiantes</li>
+              <li>Biblioteca, laboratorio y audiovisuales</li>
+            </ul>
+            <a href="#calendario">Ver agenda <span>→</span></a>
+          </article>
+
+          <article class="audience-card audience-card--families reveal" id="familias">
+            <div class="audience-card__top"><span>FAM</span><small>Familias</small></div>
+            <h3>Información clara y a mano</h3>
+            <ul>
+              <li>Inscripciones y documentación</li>
+              <li>Comunicados institucionales</li>
+              <li>Trámites y constancias</li>
+              <li>Canales de contacto</li>
+            </ul>
+            <a href="#tramites">Ir a trámites <span>→</span></a>
+          </article>
+
+          <article class="audience-card audience-card--teachers reveal" id="docentes">
+            <div class="audience-card__top"><span>DOC</span><small>Docentes</small></div>
+            <h3>Recursos institucionales</h3>
+            <ul>
+              <li>Calendario institucional</li>
+              <li>Documentación y formularios</li>
+              <li>Comunicaciones internas publicables</li>
+              <li>Proyectos y actividades</li>
+            </ul>
+            <a href="#novedades">Ver novedades <span>→</span></a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--history" id="institucion">
+      <div class="container history-layout">
+        <div class="history-mark reveal" aria-hidden="true">
+          <span>ENSPA</span>
+          <strong>18</strong>
+        </div>
+        <div class="history-copy reveal">
+          <span class="eyebrow eyebrow--light">Nuestra institución</span>
+          <h2>Una identidad reconocida en Avellaneda.</h2>
+          <p>La E.E.S. Nº 18 “Próspero Alemandri” forma parte de una comunidad históricamente identificada con ENSPA y con “El Normal”. El nombre oficial del nivel secundario encabeza hoy esta nueva etapa institucional, conservando esa pertenencia como parte de su identidad.</p>
+          <div class="history-tags">
+            <span>Educación pública</span><span>Nivel secundario</span><span>Comunidad ENSPA</span><span>Avellaneda</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section orientations" id="orientaciones">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Propuesta educativa</span>
+          <h2>Cuatro orientaciones</h2>
+          <p>Recorridos de formación del nivel secundario para profundizar intereses, desarrollar capacidades y proyectar estudios y experiencias futuras.</p>
+        </div>
+
+        <div class="orientation-grid">
+          <article class="orientation-card reveal"><span>01</span><h3>Comunicación</h3><p>Lenguajes, medios, cultura y producción de sentidos.</p></article>
+          <article class="orientation-card reveal"><span>02</span><h3>Ciencias Sociales</h3><p>Sociedad, historia, ciudadanía y pensamiento crítico.</p></article>
+          <article class="orientation-card reveal"><span>03</span><h3>Lenguas Extranjeras</h3><p>Comunicación intercultural y apertura a otros contextos.</p></article>
+          <article class="orientation-card reveal"><span>04</span><h3>Ciencias Naturales</h3><p>Investigación, ambiente y comprensión de fenómenos naturales.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section agenda" id="calendario">
+      <div class="container agenda-layout">
+        <div class="agenda-intro reveal">
+          <span class="eyebrow">Agenda ENSPA secundaria</span>
+          <h2>Lo próximo,<br>sin perderse nada.</h2>
+          <p>Vamos a mostrar acá las próximas fechas institucionales y ocultar automáticamente las que ya hayan pasado.</p>
+        </div>
+        <div class="agenda-list reveal">
+          <article><time>PRÓXIMAMENTE</time><div><h3>Próxima fecha institucional</h3><p>Se publicará cuando sea confirmada por la escuela.</p></div></article>
+          <article><time>A CONFIRMAR</time><div><h3>Reuniones y jornadas</h3><p>Espacio para encuentros con familias, jornadas y actividades.</p></div></article>
+          <article><time>2026</time><div><h3>Inscripciones y trámites</h3><p>Las fechas oficiales se destacarán aquí y en la sección Trámites.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--paper" id="novedades">
+      <div class="container">
+        <div class="section-heading reveal">
+          <span class="eyebrow">Actualidad</span>
+          <h2>Novedades de la secundaria</h2>
+          <p>Comunicados, proyectos y noticias propias de la E.E.S. Nº 18.</p>
+        </div>
+        <div class="news-grid">
+          <article class="news-card news-card--featured reveal">
+            <span class="news-label">Institucional</span>
+            <h3>Nuevo sitio web de la E.E.S. Nº 18</h3>
+            <p>Estamos construyendo un portal para concentrar trámites, agenda, orientaciones y recursos de la comunidad educativa.</p>
+            <small>Agosto 2026</small>
+          </article>
+          <article class="news-card reveal">
+            <span class="news-label">Comunidad</span>
+            <h3>Proyectos y actividades</h3>
+            <p>Este espacio mostrará producciones, propuestas y experiencias de estudiantes y docentes.</p>
+            <small>Próximamente</small>
+          </article>
+          <article class="news-card reveal">
+            <span class="news-label">Información</span>
+            <h3>Comunicados</h3>
+            <p>Las comunicaciones relevantes para estudiantes y familias se publicarán acá.</p>
+            <small>Próximamente</small>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section contact-section" id="contacto">
+      <div class="container contact-layout">
+        <div class="contact-title reveal">
+          <span class="eyebrow eyebrow--light">Contacto</span>
+          <h2>E.E.S. Nº 18<br>“Próspero Alemandri”</h2>
+          <p>Escuela de Educación Secundaria · Avellaneda</p>
+        </div>
+        <div class="contact-panel reveal">
+          <div><span>Dirección</span><strong>Av. Belgrano 311 · Avellaneda</strong></div>
+          <div><span>Teléfono</span><strong>A confirmar</strong></div>
+          <div><span>Correo institucional</span><strong>A confirmar</strong></div>
+          <div><span>Redes oficiales</span><strong>A confirmar</strong></div>
+        </div>
+      </div>
+    </section>
   </main>
-  <footer class="site-footer"><div class="container footer-grid"><div class="footer-brand"><span class="footer-brand__mark">18</span><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><span>Educación pública · Avellaneda</span></div></div><div class="footer-links"><a href="#institucion">Institución</a><a href="#orientaciones">Propuesta educativa</a><a href="#novedades">Novedades</a><a href="#contacto">Contacto</a></div><p class="footer-copy">© <span id="current-year">2026</span> E.E.S. Nº 18. Sitio institucional en construcción.</p></div></footer>
+
+  <footer class="site-footer">
+    <div class="container footer-layout">
+      <div class="footer-brand">
+        <img class="enspa-logo enspa-logo--footer" src="https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg" alt="">
+        <div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><span>Comunidad ENSPA · Avellaneda</span></div>
+      </div>
+      <nav aria-label="Enlaces del pie">
+        <a href="#tramites">Trámites</a><a href="#orientaciones">Orientaciones</a><a href="#calendario">Agenda</a><a href="#contacto">Contacto</a>
+      </nav>
+      <p>© <span id="current-year">2026</span> E.E.S. Nº 18 · Sitio institucional en construcción.</p>
+    </div>
+  </footer>
+
   <script src="assets/js/main.js"></script>
 </body>
 </html>
