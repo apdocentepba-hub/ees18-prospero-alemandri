@@ -52,6 +52,22 @@ def test_ciclo_basico_comun():
         assert item in plan, f"Falta contenido del plan: {item}"
 
 
+def test_ciclo_orientado_completo():
+    plan = ROOT.joinpath("plan-estudios.html").read_text(encoding="utf-8")
+    for orientation in ['Comunicación', 'Ciencias Sociales', 'Lenguas Extranjeras', 'Ciencias Naturales']:
+        assert orientation in plan, f"Falta orientación: {orientation}"
+    for year in ['4º año', '5º año', '6º año']:
+        assert plan.count(year) >= 4, f"Faltan recorridos de {year} en las orientaciones"
+    for subject in [
+        'Introducción a la Comunicación', 'Observatorio de Medios',
+        'Economía Política', 'Sociología', 'Proyecto de Investigación en Ciencias Sociales',
+        'Portugués I', 'Portugués II', 'Portugués III', 'Francés I', 'Francés II', 'Francés III',
+        'Fundamentos de la Química', 'Ciencias de la Tierra', 'Química del Carbono',
+        'Biología, Genética y Sociedad', 'Física Clásica y Moderna'
+    ]:
+        assert subject in plan, f"Falta materia del ciclo orientado: {subject}"
+
+
 def test_accesibilidad_minima():
     require('href="#contenido"')
     require('aria-controls="primary-nav"')
