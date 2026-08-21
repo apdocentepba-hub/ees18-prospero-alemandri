@@ -80,10 +80,11 @@ def test_orientaciones_arrancan_todas_cerradas():
 def test_logo_y_titulo_siempre_vuelven_a_inicio():
     plan = ROOT.joinpath("plan-estudios.html").read_text(encoding="utf-8")
     tramite = ROOT.joinpath("certificado-analitico.html").read_text(encoding="utf-8")
-    assert "document.querySelector('.brand')" in JS
-    assert "brandLink.setAttribute('href', 'index.html')" in JS
+    boleto = ROOT.joinpath("boleto-estudiantil.html").read_text(encoding="utf-8")
+    assert '<a class="brand" href="index.html"' in HTML
     assert '<a class="study-brand" href="index.html"' in plan
     assert '<a class="procedure-brand" href="index.html"' in tramite
+    assert '<a class="procedure-brand" href="index.html"' in boleto
 
 
 def test_portada_reorganizada():
@@ -151,6 +152,21 @@ def test_certificado_analitico_publicado_y_enlazado_en_html():
         'NO SE RECIBE documentación incompleta', 'NO SE INICIA el trámite'
     ]:
         assert item in tramite, f"Falta requisito del trámite: {item}"
+
+
+def test_boleto_estudiantil_publicado_y_enlazado():
+    boleto_path = ROOT / "boleto-estudiantil.html"
+    assert boleto_path.exists(), "Falta la página de Boleto Estudiantil"
+    boleto = boleto_path.read_text(encoding="utf-8")
+    assert 'href="boleto-estudiantil.html"' in HTML
+    for item in [
+        'Boleto Especial Educativo', '18 de febrero de 2026',
+        'CUIL sin guiones', 'Presioná “Siguiente”',
+        'https://www.gba.gob.ar/transporte/boleto_estudiantil',
+        'https://boleto.gba.gob.ar/modulos/boleto/publico.php',
+        'https://denuncias-bes.transporte.gba.gob.ar'
+    ]:
+        assert item in boleto, f"Falta contenido de Boleto Estudiantil: {item}"
 
 
 def test_accesibilidad_minima():
