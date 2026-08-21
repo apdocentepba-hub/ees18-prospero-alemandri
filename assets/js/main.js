@@ -22,6 +22,20 @@ if (menuToggle && primaryNav) {
   });
 }
 
+const analyticCard = [...document.querySelectorAll('.procedure-card')]
+  .find((card) => card.querySelector('h3')?.textContent.trim() === 'Títulos y analíticos');
+
+if (analyticCard) {
+  const status = analyticCard.querySelector('.status-pill');
+  if (status) {
+    const link = document.createElement('a');
+    link.className = 'status-pill';
+    link.href = 'certificado-analitico.html';
+    link.textContent = 'Ver requisitos →';
+    status.replaceWith(link);
+  }
+}
+
 const yearNode = document.getElementById('current-year');
 if (yearNode) yearNode.textContent = String(new Date().getFullYear());
 
