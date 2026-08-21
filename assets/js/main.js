@@ -22,6 +22,21 @@ if (menuToggle && primaryNav) {
   });
 }
 
+const orientationsSection = document.getElementById('orientaciones');
+const orientationGrid = orientationsSection?.querySelector('.orientation-grid');
+
+if (orientationsSection && orientationGrid) {
+  const planCta = document.createElement('div');
+  planCta.className = 'study-plan-cta reveal';
+  planCta.innerHTML = '<div><strong>Plan de estudios año por año</strong><div>Ciclo Básico común y, próximamente, materias de 4º a 6º por orientación.</div></div><a href="plan-estudios.html">Ver plan de estudios →</a>';
+  orientationGrid.insertAdjacentElement('afterend', planCta);
+
+  const styleLink = document.createElement('link');
+  styleLink.rel = 'stylesheet';
+  styleLink.href = 'assets/css/plan-estudios.css';
+  document.head.appendChild(styleLink);
+}
+
 const yearNode = document.getElementById('current-year');
 if (yearNode) yearNode.textContent = String(new Date().getFullYear());
 

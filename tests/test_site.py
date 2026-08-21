@@ -1,6 +1,7 @@
 from pathlib import Path
 
-HTML = Path(__file__).resolve().parents[1].joinpath("index.html").read_text(encoding="utf-8")
+ROOT = Path(__file__).resolve().parents[1]
+HTML = ROOT.joinpath("index.html").read_text(encoding="utf-8")
 
 
 def require(text):
@@ -35,6 +36,36 @@ def test_tramites_basicos_presentes():
         'Títulos y analíticos', 'Boleto estudiantil'
     ]:
         require(item)
+
+
+def test_ciclo_basico_comun():
+    plan_path = ROOT / "plan-estudios.html"
+    assert plan_path.exists(), "Falta la página Plan de estudios"
+    plan = plan_path.read_text(encoding="utf-8")
+    for item in [
+        'Ciclo Básico común', '1º año', '2º año', '3º año',
+        'Ciencias Naturales', 'Ciencias Sociales', 'Educación Artística',
+        'Educación Física', 'Inglés', 'Matemática', 'Prácticas del Lenguaje',
+        'Construcción de Ciudadanía', 'Biología', 'Físico-Química',
+        'Geografía', 'Historia'
+    ]:
+        assert item in plan, f"Falta contenido del plan: {item}"
+
+
+def test_ciclo_orientado_completo():
+    plan = ROOT.joinpath("plan-estudios.html").read_text(encoding="utf-8")
+    for orientation in ['Comunicación', 'Ciencias Sociales', 'Lenguas Extranjeras', 'Ciencias Naturales']:
+        assert orientation in plan, f"Falta orientación: {orientation}"
+    for year in ['4º año', '5º año', '6º año']:
+        assert plan.count(year) >= 4, f"Faltan recorridos de {year} en las orientaciones"
+    for subject in [
+        'Introducción a la Comunicación', 'Observatorio de Medios',
+        'Economía Política', 'Sociología', 'Proyecto de Investigación en Ciencias Sociales',
+        'Portugués I', 'Portugués II', 'Portugués III', 'Francés I', 'Francés II', 'Francés III',
+        'Fundamentos de la Química', 'Ciencias de la Tierra', 'Química del Carbono',
+        'Biología, Genética y Sociedad', 'Física Clásica y Moderna'
+    ]:
+        assert subject in plan, f"Falta materia del ciclo orientado: {subject}"
 
 
 def test_accesibilidad_minima():
