@@ -103,6 +103,23 @@ def test_contacto_institucional():
     require('Lunes a viernes · 14:00 a 16:00')
 
 
+def test_autoridades_institucionales():
+    for item in [
+        'Ana Lanni', 'Adriana Celeste Caceres', 'Anabella Centurion',
+        'Maria de los Angeles Dimola', 'Vicedirección · Turno tarde',
+        'A confirmar'
+    ]:
+        require(item)
+
+
+def test_espacios_institucionales():
+    for item in [
+        'Biblioteca', 'Sala de Audiovisuales', 'EOE', 'Centro de Estudiantes',
+        'SUM', 'Cooperadora', 'Patio para Educación Física'
+    ]:
+        require(item)
+
+
 def test_accesibilidad_minima():
     require('href="#contenido"')
     require('aria-controls="primary-nav"')
