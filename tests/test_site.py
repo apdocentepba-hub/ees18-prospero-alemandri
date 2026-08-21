@@ -2,6 +2,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 HTML = ROOT.joinpath("index.html").read_text(encoding="utf-8")
+JS = ROOT.joinpath("assets/js/main.js").read_text(encoding="utf-8")
 
 
 def require(text):
@@ -72,6 +73,7 @@ def test_portada_reorganizada():
     require('id="comunidad"')
     require('class="current-grid"')
     require('href="plan-estudios.html"')
+    require('href="assets/css/home-layout.css"')
     require('Propuesta educativa')
     require('Comunidad educativa')
     require('Actualidad y agenda')
@@ -88,6 +90,11 @@ def test_portada_reorganizada():
     assert 'href="#estudiantes"' not in nav
     assert 'href="#familias"' not in nav
     assert 'href="#docentes"' not in nav
+
+
+def test_plan_no_se_duplica_desde_javascript():
+    assert 'study-plan-cta' not in JS
+    assert 'plan-estudios.css' not in JS
 
 
 def test_contacto_institucional():
