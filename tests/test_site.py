@@ -105,8 +105,8 @@ def test_contacto_institucional():
 
 def test_autoridades_institucionales():
     for item in [
-        'Ana Lanni', 'Adriana Celeste Caceres', 'Anabella Centurion',
-        'Maria de los Angeles Dimola', 'Vicedirección · Turno tarde',
+        'Ana Lanni', 'Caceres Adriana Celeste', 'Centurion Anabella',
+        'Dimola Maria de los Angeles', 'Vicedirección · Turno tarde',
         'A confirmar'
     ]:
         require(item)
