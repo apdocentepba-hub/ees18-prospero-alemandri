@@ -27,6 +27,26 @@ def test_pases_publica_requisitos_principales():
         assert texto in html
 
 
+def test_pases_muestra_acceso_visible_al_formulario():
+    html = read("pases-equivalencias.html")
+    assert 'href="solicitar-analitico.html"' in html
+    assert "Solicitar Pase / Analítico Parcial" in html
+
+
+def test_formulario_publico_tiene_los_datos_obligatorios():
+    html = read("solicitar-analitico.html")
+    for campo in [
+        'name="apellido"', 'name="nombre"', 'name="dni"',
+        'name="fechaNacimiento"', 'name="localidadNacimiento"',
+        'name="motivo"', 'name="institucionDestino"',
+        'name="telefono"', 'name="email"',
+        'name="dniArchivo"', 'name="partidaArchivo"'
+    ]:
+        assert campo in html
+    assert "No necesitás una cuenta Google" in html
+    assert "todavía no está habilitada" in read("assets/js/tramite-solicitud.js")
+
+
 def test_titulos_queda_diferenciado_del_circuito_de_pases():
     html = read("index.html")
     assert "Títulos y analíticos finales" in html
