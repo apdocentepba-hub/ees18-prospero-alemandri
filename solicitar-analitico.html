@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Solicitud digital de analítico parcial o pase de la E.E.S. Nº 18 Próspero Alemandri.">
+  <meta name="theme-color" content="#0f3f62">
+  <title>Solicitar Analítico / Pase · E.E.S. Nº 18</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/tramites.css">
+  <link rel="stylesheet" href="assets/css/tramite-digital.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <div class="government-bar">
+    <div class="container government-bar__inner">
+      <span>Educación Pública · Provincia de Buenos Aires</span>
+      <span>Avellaneda · Nivel Secundario</span>
+    </div>
+  </div>
+
+  <header class="procedure-header">
+    <div class="container procedure-header__inner">
+      <a class="procedure-brand" href="index.html" aria-label="Volver al inicio de la E.E.S. Nº 18">
+        <img class="enspa-logo" src="https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg" alt="Logo ENSPA">
+        <span><small>ENSPA · El Normal de Avellaneda</small><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong></span>
+      </a>
+      <a class="procedure-back" href="pases-equivalencias.html">← Volver a Pases y equivalencias</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section class="digital-hero">
+      <div class="container">
+        <span class="procedure-kicker">Secretaría · Solicitud digital</span>
+        <h1>Analítico Parcial / Pase</h1>
+        <p>Completá los datos de la persona para quien se solicita la documentación y adjuntá los archivos requeridos. <strong>No necesitás una cuenta Google.</strong> La solicitud queda primero pendiente de revisión: Secretaría verifica el vínculo con la E.E.S. Nº 18 y la documentación antes de iniciar formalmente el trámite.</p>
+      </div>
+    </section>
+
+    <section class="digital-shell">
+      <div class="container digital-layout">
+        <form class="digital-card" id="form-solicitud-analitico" novalidate>
+          <h2>Datos de la solicitud</h2>
+
+          <section class="digital-section">
+            <div class="digital-section__title"><span>1</span><h3>Datos del estudiante</h3></div>
+            <div class="form-grid">
+              <div class="field"><label for="apellido">Apellido *</label><input id="apellido" name="apellido" autocomplete="family-name" required></div>
+              <div class="field"><label for="nombre">Nombre *</label><input id="nombre" name="nombre" autocomplete="given-name" required></div>
+              <div class="field"><label for="dni">DNI *</label><input id="dni" name="dni" inputmode="numeric" pattern="[0-9. ]{6,12}" required></div>
+              <div class="field"><label for="fechaNacimiento">Fecha de nacimiento *</label><input id="fechaNacimiento" name="fechaNacimiento" type="date" required></div>
+              <div class="field field--full"><label for="localidadNacimiento">Lugar / localidad de nacimiento *</label><input id="localidadNacimiento" name="localidadNacimiento" required></div>
+            </div>
+          </section>
+
+          <section class="digital-section">
+            <div class="digital-section__title"><span>2</span><h3>Motivo y destino</h3></div>
+            <div class="form-grid">
+              <div class="field"><label for="motivo">¿Por qué lo solicita? *</label>
+                <select id="motivo" name="motivo" required>
+                  <option value="">Seleccionar</option>
+                  <option value="otra_escuela">Pase a otra escuela</option>
+                  <option value="fines">Para presentar en FINES</option>
+                  <option value="perdida">Perdí un analítico parcial anterior</option>
+                  <option value="reposicion">Necesito una nueva copia / reposición</option>
+                  <option value="otro">Otro motivo</option>
+                </select>
+              </div>
+              <div class="field conditional" id="campo-otro-motivo" hidden><label for="otroMotivo">Indique el otro motivo *</label><input id="otroMotivo" name="otroMotivo"></div>
+              <div class="field field--full"><label for="institucionDestino">Lugar o institución donde necesita presentarlo *</label><input id="institucionDestino" name="institucionDestino" required></div>
+              <div class="field field--full"><label for="localidadDestino">Localidad del destino</label><input id="localidadDestino" name="localidadDestino"></div>
+            </div>
+          </section>
+
+          <section class="digital-section">
+            <div class="digital-section__title"><span>3</span><h3>Cursos realizados en la escuela</h3></div>
+            <p>Marcá los cursos que realizó en la E.E.S. Nº 18 y, si lo recuerda, el año calendario en que cursó cada uno. Esta información es orientativa y Secretaría la verificará con los registros institucionales.</p>
+            <div class="course-grid">
+              <div class="course-item"><label><input type="checkbox" name="curso" value="1"> 1.º año</label><input type="number" name="anioCurso1" min="1950" max="2100" placeholder="Año, si lo recuerda"></div>
+              <div class="course-item"><label><input type="checkbox" name="curso" value="2"> 2.º año</label><input type="number" name="anioCurso2" min="1950" max="2100" placeholder="Año, si lo recuerda"></div>
+              <div class="course-item"><label><input type="checkbox" name="curso" value="3"> 3.º año</label><input type="number" name="anioCurso3" min="1950" max="2100" placeholder="Año, si lo recuerda"></div>
+              <div class="course-item"><label><input type="checkbox" name="curso" value="4"> 4.º año</label><input type="number" name="anioCurso4" min="1950" max="2100" placeholder="Año, si lo recuerda"></div>
+              <div class="course-item"><label><input type="checkbox" name="curso" value="5"> 5.º año</label><input type="number" name="anioCurso5" min="1950" max="2100" placeholder="Año, si lo recuerda"></div>
+              <div class="course-item"><label><input type="checkbox" name="curso" value="6"> 6.º año</label><input type="number" name="anioCurso6" min="1950" max="2100" placeholder="Año, si lo recuerda"></div>
+            </div>
+            <div class="check-row" style="margin-top:14px"><label class="check-option"><input type="checkbox" name="noRecuerdaAnios"> No recuerdo los años</label></div>
+          </section>
+
+          <section class="digital-section">
+            <div class="digital-section__title"><span>4</span><h3>Persona que realiza la solicitud</h3></div>
+            <div class="field field--full">
+              <span style="font-weight:800;color:var(--azul-profundo)">¿La solicitud la realiza el propio estudiante? *</span>
+              <div class="radio-row">
+                <label class="radio-option"><input type="radio" name="solicitanteEsEstudiante" value="si" required> Sí</label>
+                <label class="radio-option"><input type="radio" name="solicitanteEsEstudiante" value="no" required> No</label>
+              </div>
+            </div>
+            <div class="form-grid conditional" id="datos-solicitante-tercero" hidden>
+              <div class="field"><label for="solicitanteNombre">Apellido y nombre de quien solicita *</label><input id="solicitanteNombre" name="solicitanteNombre"></div>
+              <div class="field"><label for="vinculoEstudiante">Vínculo con el estudiante *</label><input id="vinculoEstudiante" name="vinculoEstudiante" placeholder="Madre, padre, tutor, otro"></div>
+            </div>
+            <div class="form-grid" style="margin-top:18px">
+              <div class="field"><label for="telefono">Teléfono de contacto *</label><input id="telefono" name="telefono" type="tel" autocomplete="tel" required></div>
+              <div class="field"><label for="email">Correo electrónico *</label><input id="email" name="email" type="email" autocomplete="email" required></div>
+            </div>
+          </section>
+
+          <section class="digital-section">
+            <div class="digital-section__title"><span>5</span><h3>Documentación</h3></div>
+            <div class="form-grid">
+              <div class="field file-box"><strong>DNI *</strong><label for="dniArchivo">Adjuntar copia o foto legible</label><input id="dniArchivo" name="dniArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png" required><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
+              <div class="field file-box"><strong>Partida de nacimiento *</strong><label for="partidaArchivo">Adjuntar copia o foto legible</label><input id="partidaArchivo" name="partidaArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png" required><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
+              <div class="field file-box conditional" id="campo-documento-destino" hidden><strong>Documento de la institución de destino *</strong><label for="documentoDestinoArchivo">Adjuntar constancia/pase/vacante</label><input id="documentoDestinoArchivo" name="documentoDestinoArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png"><small>El requisito exacto será verificado por Secretaría.</small></div>
+              <div class="field file-box conditional" id="campo-analitico-anterior" hidden><strong>Analítico anterior</strong><label for="analiticoAnteriorArchivo">Adjuntar si conserva una copia</label><input id="analiticoAnteriorArchivo" name="analiticoAnteriorArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
+              <div class="field file-box field--full"><strong>Otra documentación</strong><label for="otraDocumentacionArchivo">Opcional</label><input id="otraDocumentacionArchivo" name="otraDocumentacionArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png"></div>
+            </div>
+          </section>
+
+          <p class="privacy-note">La documentación enviada será utilizada exclusivamente para revisar e iniciar el trámite correspondiente. El envío de este formulario <strong>no significa que el trámite esté aprobado</strong>: Secretaría debe verificar primero la identidad, el vínculo con la institución y la documentación presentada.</p>
+
+          <div class="digital-actions">
+            <button class="digital-button" type="submit">Enviar solicitud</button>
+            <a class="digital-button digital-button--secondary" href="estado-tramite.html">Consultar un trámite</a>
+          </div>
+          <div class="form-status" id="form-status" hidden aria-live="polite"></div>
+        </form>
+
+        <aside class="digital-aside">
+          <span class="eyebrow">Cómo funciona</span>
+          <h2>Primero se revisa, después se inicia.</h2>
+          <ul>
+            <li>La solicitud entra a una bandeja interna de Secretaría.</li>
+            <li>Se verifica que corresponda a un alumno o exalumno de la E.E.S. Nº 18.</li>
+            <li>Se controla que la documentación sea suficiente.</li>
+            <li>Recién después de la validación pasa al seguimiento oficial del analítico/pase.</li>
+          </ul>
+          <p>Si falta algo, la solicitud queda observada y no se incorpora al registro oficial hasta resolverlo.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="procedure-footer"><div class="container"><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><span>Avellaneda</span></div></footer>
+  <script src="assets/js/tramite-config.js"></script>
+  <script src="assets/js/tramite-solicitud.js"></script>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <style>
+    :root{--azul:#1e6fa8;--profundo:#0f3f62;--celeste:#5ab8eb;--linea:#d9e6ed;--papel:#f7fbfd;--texto:#385566}
+    *{box-sizing:border-box}body{margin:0;background:var(--papel);font-family:Arial,sans-serif;color:var(--texto)}.wrap{width:min(760px,calc(100% - 32px));margin:auto}.top{background:var(--profundo);color:#fff;padding:34px 20px}.top small{display:block;color:#9edcf8;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.top h1{margin:8px 0;font-family:Georgia,serif;font-size:clamp(2rem,6vw,3.5rem)}.top p{line-height:1.6;color:#d9eaf2}.card{margin:30px auto;background:#fff;border:1px solid var(--linea);padding:clamp(22px,5vw,38px);box-shadow:0 18px 50px rgba(15,63,98,.08)}.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field{display:flex;flex-direction:column;gap:6px}label{font-weight:700;color:var(--profundo)}input{padding:13px;border:1px solid #aac4d2;font:inherit}input:focus{outline:3px solid rgba(90,184,235,.25);border-color:var(--azul)}button{margin-top:20px;border:0;background:var(--profundo);color:#fff;padding:14px 22px;font:inherit;font-weight:800;cursor:pointer}button[disabled]{opacity:.6}.status{display:none;margin-top:18px;padding:14px;border:1px solid var(--linea)}.status.info{display:block;background:#edf7fc}.status.error{display:block;background:#fff1f1;border-color:#e4b6b6;color:#7b2929}.result{display:none;margin-top:24px;border-top:5px solid var(--celeste);padding:22px;background:#f6fbfd}.result.show{display:block}.result strong{display:block;color:var(--profundo);font-size:1.25rem}.result p{margin:8px 0}.state{margin-top:16px;padding:15px;background:var(--profundo);color:#fff;font-weight:800}@media(max-width:620px){.grid{grid-template-columns:1fr}.wrap{width:min(100% - 20px,760px)}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap"><small>Secretaría · E.E.S. Nº 18 “Próspero Alemandri”</small><h1>Estado del trámite</h1><p>Ingresá el DNI de la persona para quien se solicitó la documentación y el código de seguimiento recibido al enviar la solicitud.</p></div></header>
+  <main class="card wrap">
+    <form id="consulta" onsubmit="consultar(this);return false;">
+      <div class="grid"><div class="field"><label for="dni">DNI *</label><input id="dni" name="dni" inputmode="numeric" pattern="[0-9. ]{6,12}" required></div><div class="field"><label for="codigoSeguimiento">Código de seguimiento *</label><input id="codigoSeguimiento" name="codigoSeguimiento" required placeholder="E18-AB12-CD34" autocomplete="off"></div></div>
+      <button id="buscar" type="submit">Consultar estado</button>
+    </form>
+    <div id="status" class="status" aria-live="polite"></div>
+    <section id="resultado" class="result" aria-live="polite"><strong id="nombre"></strong><p>DNI: <span id="dniResultado"></span></p><div class="state">Estado del trámite: <span id="estado"></span></div></section>
+  </main>
+  <script>
+    function setStatus(message,type){const box=document.getElementById('status');box.textContent=message;box.className='status '+type;}
+    function consultar(form){
+      if(!form.reportValidity())return;
+      document.getElementById('resultado').classList.remove('show');
+      const button=document.getElementById('buscar');button.disabled=true;setStatus('Consultando…','info');
+      google.script.run
+        .withSuccessHandler(result=>{
+          button.disabled=false;
+          if(!result||!result.ok){setStatus(result?.message||'No encontramos un trámite con esos datos.','error');return;}
+          document.getElementById('status').className='status';
+          document.getElementById('nombre').textContent=result.apellidoNombre||'';
+          document.getElementById('dniResultado').textContent=result.dni||'';
+          document.getElementById('estado').textContent=result.estado||'';
+          document.getElementById('resultado').classList.add('show');
+        })
+        .withFailureHandler(error=>{button.disabled=false;setStatus(error?.message||'No se pudo consultar el trámite.','error');})
+        .consultarEstado(form.dni.value,form.codigoSeguimiento.value);
+    }
+  </script>
+</body>
+</html>

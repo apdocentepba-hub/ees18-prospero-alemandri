@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Consulta del estado de una solicitud de analítico o pase de la E.E.S. Nº 18 Próspero Alemandri.">
+  <meta name="theme-color" content="#0f3f62">
+  <title>Estado del trámite · E.E.S. Nº 18</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/tramites.css">
+  <link rel="stylesheet" href="assets/css/tramite-digital.css">
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+  <div class="government-bar">
+    <div class="container government-bar__inner">
+      <span>Educación Pública · Provincia de Buenos Aires</span>
+      <span>Avellaneda · Nivel Secundario</span>
+    </div>
+  </div>
+
+  <header class="procedure-header">
+    <div class="container procedure-header__inner">
+      <a class="procedure-brand" href="index.html" aria-label="Volver al inicio de la E.E.S. Nº 18">
+        <img class="enspa-logo" src="https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg" alt="Logo ENSPA">
+        <span><small>ENSPA · El Normal de Avellaneda</small><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong></span>
+      </a>
+      <a class="procedure-back" href="pases-equivalencias.html">← Volver a Pases y equivalencias</a>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section class="digital-hero">
+      <div class="container">
+        <span class="procedure-kicker">Secretaría · Seguimiento</span>
+        <h1>Estado del trámite</h1>
+        <p>Ingresá el DNI de la persona para quien se solicitó la documentación y el código de seguimiento recibido al enviar la solicitud.</p>
+      </div>
+    </section>
+
+    <section class="digital-shell">
+      <div class="container digital-layout">
+        <div class="digital-card">
+          <h2>Consultar</h2>
+          <form id="form-consulta-estado">
+            <div class="form-grid">
+              <div class="field"><label for="dni">DNI *</label><input id="dni" name="dni" inputmode="numeric" pattern="[0-9. ]{6,12}" required></div>
+              <div class="field"><label for="codigoSeguimiento">Código de seguimiento *</label><input id="codigoSeguimiento" name="codigoSeguimiento" autocomplete="off" required placeholder="Ej.: E18-AB12-CD34"></div>
+            </div>
+            <div class="digital-actions"><button class="digital-button" type="submit">Consultar estado</button><a class="digital-button digital-button--secondary" href="solicitar-analitico.html">Nueva solicitud</a></div>
+            <div class="form-status" id="consulta-status" hidden aria-live="polite"></div>
+          </form>
+
+          <section class="status-result" id="resultado-estado" hidden aria-live="polite">
+            <strong id="resultado-nombre"></strong>
+            <p>DNI: <span id="resultado-dni"></span></p>
+            <div class="status-current">Estado del trámite: <span id="resultado-estado-texto"></span></div>
+          </section>
+        </div>
+
+        <aside class="digital-aside">
+          <span class="eyebrow">Privacidad</span>
+          <h2>Solo mostramos el estado.</h2>
+          <p>La consulta pública devuelve únicamente apellido y nombre, DNI y estado del trámite. La documentación enviada y las observaciones internas de Secretaría no se muestran en la web.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer class="procedure-footer"><div class="container"><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><span>Avellaneda</span></div></footer>
+  <script src="assets/js/tramite-config.js"></script>
+  <script src="assets/js/tramite-estado.js"></script>
+</body>
+</html>
