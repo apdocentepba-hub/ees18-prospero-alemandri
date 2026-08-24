@@ -109,12 +109,14 @@ Los requisitos podrán ajustarse cuando Secretaría confirme el procedimiento de
 Para carga sin cuenta Google:
 
 - aceptar inicialmente PDF, JPG, JPEG y PNG;
-- definir límite de tamaño por archivo y por solicitud;
+- limitar cada archivo a 10 MB en la primera versión;
+- limitar cada solicitud a 40 MB totales;
 - rechazar ejecutables y tipos no permitidos;
-- validar servidor y cliente;
+- validar formato, tamaño y campos tanto en la interfaz como en el servidor;
 - no exponer enlaces internos de Drive al público;
-- no incluir credenciales o IDs sensibles en JavaScript público;
-- limitar la información devuelta por la consulta de estado.
+- no incluir credenciales o secretos en JavaScript público;
+- limitar estrictamente la información devuelta por la consulta de estado;
+- aplicar limitación de frecuencia y controles anti-spam a los endpoints públicos.
 
 ## Organización propuesta en Drive
 
@@ -125,22 +127,21 @@ Agregar dentro de `ENSPA/PASES MARTIN`:
 ```text
 SOLICITUDES WEB
 └── 2026
-    ├── PENDIENTES
-    │   └── DNI - APELLIDO NOMBRE - ID_SOLICITUD
-    │       ├── 01 - DNI
-    │       ├── 02 - PARTIDA NACIMIENTO
-    │       ├── 03 - DOCUMENTO DESTINO
-    │       ├── 04 - ANALITICO ANTERIOR
-    │       └── OTROS
-    ├── OBSERVADAS
-    └── VALIDADAS
+    └── DNI - APELLIDO NOMBRE - ID_SOLICITUD
+        ├── 01 - DNI
+        ├── 02 - PARTIDA NACIMIENTO
+        ├── 03 - DOCUMENTO DESTINO
+        ├── 04 - ANALITICO ANTERIOR
+        └── OTROS
 ```
 
-La carpeta física del trámite puede moverse entre `PENDIENTES`, `OBSERVADAS` y `VALIDADAS`, o mantener una ubicación estable con un estado lógico, según resulte más seguro durante la implementación. Se priorizará evitar romper enlaces internos.
+La carpeta física de cada solicitud permanece siempre en la misma ubicación. El estado `RECIBIDA`, `EN REVISION`, `OBSERVADA`, `VALIDADA` o `RECHAZADA / DUPLICADA` se guarda en la bandeja interna y no se representa moviendo carpetas. Esto evita romper referencias y simplifica la automatización.
 
 ## Bandeja de solicitudes pendientes
 
 Debe existir una base separada del seguimiento oficial para almacenar solicitudes todavía no validadas.
+
+En la primera implementación será una hoja/base interna específica para solicitudes web, independiente de `Seguimiento_Analiticos_y_Pases.xlsx`.
 
 Campos mínimos internos:
 
@@ -153,11 +154,11 @@ Campos mínimos internos:
 - Motivo.
 - Institución/lugar de presentación.
 - Cursos y años declarados.
-- Referencias a archivos recibidos.
+- Referencias internas a los archivos recibidos.
 - Estado de revisión.
 - Documentación faltante/observada.
 - Fecha de validación.
-- Usuario o responsable que valida, si técnicamente resulta viable.
+- Usuario o responsable que valida cuando la plataforma permita identificarlo de forma fiable.
 
 Estados iniciales de esta bandeja:
 
@@ -165,7 +166,7 @@ Estados iniciales de esta bandeja:
 - `EN REVISION`
 - `OBSERVADA`
 - `VALIDADA`
-- `RECHAZADA / DUPLICADA`, si corresponde
+- `RECHAZADA / DUPLICADA`
 
 ## Alta en el seguimiento oficial
 
@@ -220,7 +221,7 @@ Ejemplo:
 
 No se mostrarán archivos, calificaciones, observaciones internas, institución destino, fechas administrativas ni enlaces de Drive.
 
-La implementación deberá evitar que una búsqueda pública simple por DNI revele información de terceros. Se recomienda combinar DNI con un código de seguimiento o mecanismo equivalente, aunque la salida visible siga mostrando únicamente los tres campos acordados.
+Para impedir que conocer solamente el DNI permita consultar trámites de terceros, la búsqueda exigirá `DNI + código de seguimiento`. El código se entrega al registrar la solicitud. La salida visible continúa mostrando únicamente apellido/nombre, DNI y estado, como fue acordado.
 
 ## Generación del analítico
 
@@ -250,17 +251,22 @@ Objetivo posterior: cuando Libro y Folio se registren en el seguimiento oficial,
 
 La web pública sigue alojada en GitHub Pages.
 
-GitHub Pages no debe conectarse directamente a Drive con credenciales. Se utilizará una capa de backend/intermediación para:
+GitHub Pages no se conectará directamente a Drive con credenciales.
 
-- recibir el formulario;
+La primera implementación utilizará **Google Apps Script como capa intermedia y de automatización**, ejecutada bajo una cuenta autorizada de la institución o responsable del sistema. Apps Script tendrá acceso únicamente a las carpetas y archivos necesarios para este circuito.
+
+Responsabilidades de esta capa:
+
+- recibir los datos del formulario;
 - validar datos y archivos;
-- guardar adjuntos;
+- guardar adjuntos en Drive;
 - registrar la solicitud pendiente;
-- consultar estado público;
+- generar el ID/código de seguimiento;
+- consultar el estado público;
 - promover una solicitud validada al seguimiento oficial;
 - ejecutar automatizaciones posteriores.
 
-La tecnología concreta del backend se seleccionará en el plan de implementación priorizando bajo costo, mantenimiento sencillo y compatibilidad con Drive.
+La interfaz seguirá perteneciendo a la web institucional. Para la carga de archivos sin inicio de sesión se utilizará un Web App de Apps Script con acceso anónimo cuando la política de la cuenta que lo aloje lo permita. Si esa política impide acceso anónimo, el plan de contingencia será un endpoint intermediario externo que invoque el mismo módulo de Drive; esta contingencia no modifica el contrato del formulario, la estructura de Drive ni el modelo de datos.
 
 ## Evolución futura
 
@@ -283,7 +289,7 @@ Principio general: `el dato se carga una sola vez y se reutiliza donde correspon
 Hasta confirmar requisitos con Secretaría:
 
 - no automatizar materias o calificaciones;
-- no definir como definitiva la documentación específica para cada excepción;
+- no fijar como definitiva la documentación específica para excepciones todavía no confirmadas;
 - no reemplazar la planilla oficial existente;
 - no mover analíticos actuales;
 - no modificar el dominio personalizado mientras continúe pendiente la delegación;
@@ -298,5 +304,5 @@ La primera versión se considera funcional cuando:
 3. la solicitud aparece en una bandeja interna separada;
 4. Secretaría puede revisarla sin que todavía figure en el seguimiento oficial;
 5. al validarla, el caso pasa al seguimiento oficial sin borrar datos existentes;
-6. el ciudadano puede consultar un estado público limitado a apellido/nombre, DNI y estado;
+6. el ciudadano puede consultar un estado público limitado a apellido/nombre, DNI y estado usando DNI + código de seguimiento como claves de consulta;
 7. la estructura queda preparada para automatizar la generación del analítico y Libro/Folio en etapas posteriores.
