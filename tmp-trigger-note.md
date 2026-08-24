@@ -1,1 +1,0 @@
-Validación TDD de la rama de trámite digital.
