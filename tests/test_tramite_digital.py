@@ -127,6 +127,31 @@ def test_backend_alinea_encabezados_del_seguimiento_real():
     assert "folder.getUrl()" in code
 
 
+def test_libro_folio_se_lee_del_pie_del_analitico_y_se_sincroniza_con_control_de_conflictos():
+    code = read("apps-script/Code.gs")
+    for symbol in [
+        "function leerLibroFolioAnalitico_(spreadsheetId)",
+        "function sincronizarLibroFolioDesdeAnalitico(spreadsheetId)",
+        "function reconstruirIndiceDesdeAnaliticos()",
+        "function registrarConflictoLibroFolio_"
+    ]:
+        assert symbol in code
+    for cell in ["C11", "H12", "D132", "G132"]:
+        assert cell in code
+    assert "INDEX_SPREADSHEET_ID" in code
+    assert "ANALITICOS_FOLDER_ID" in code
+    assert "Libro" in code and "Folio" in code
+    assert "CONFLICTO" in code
+
+
+def test_libro_folio_no_sobrescribe_si_hay_diferencias_y_controla_duplicados():
+    code = read("apps-script/Code.gs")
+    assert "Libro/Folio diferente" in code
+    assert "Libro/Folio ya asignado a otro DNI" in code
+    assert "NO sobrescribe" in code
+    assert "mismo DNI" in code
+
+
 def test_backend_no_hardcodea_ids_privados():
     code = read("apps-script/Code.gs")
     assert "PropertiesService.getScriptProperties()" in code
