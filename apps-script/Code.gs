@@ -7,7 +7,8 @@ function getConfig_() {
     pendingSheetName: props.getProperty('PENDING_SHEET_NAME') || 'Solicitudes',
     requestsFolderId: props.getProperty('REQUESTS_FOLDER_ID'),
     officialSpreadsheetId: props.getProperty('OFFICIAL_SPREADSHEET_ID'),
-    officialSheetName: props.getProperty('OFFICIAL_SHEET_NAME') || 'Seguimiento'
+    officialSheetName: props.getProperty('OFFICIAL_SHEET_NAME') || 'Seguimiento',
+    officialHeaderRow: Number(props.getProperty('OFFICIAL_HEADER_ROW') || '5')
   };
   if (!config.pendingSpreadsheetId || !config.requestsFolderId) {
     throw new Error('Falta configurar PENDING_SPREADSHEET_ID o REQUESTS_FOLDER_ID en Script Properties.');
@@ -76,16 +77,24 @@ function requestId_() {
   return 'SOL-' + year + '-' + shortId;
 }
 
-function getSheetAndHeaders_(spreadsheetId, sheetName) {
+function getSheetAndHeaders_(spreadsheetId, sheetName, headerRow) {
   const ss = SpreadsheetApp.openById(spreadsheetId);
   const sheet = ss.getSheetByName(sheetName);
   if (!sheet) throw new Error('No se encontró la hoja ' + sheetName + '.');
+  const row = Number(headerRow || 1);
   const lastColumn = sheet.getLastColumn();
   if (!lastColumn) throw new Error('La hoja no tiene encabezados.');
-  const headers = sheet.getRange(1, 1, 1, lastColumn).getDisplayValues()[0];
+  const headers = sheet.getRange(row, 1, 1, lastColumn).getDisplayValues()[0];
   const index = {};
   headers.forEach(function(header, i) { index[String(header).trim()] = i; });
-  return { ss: ss, sheet: sheet, headers: headers, index: index };
+  return {
+    ss: ss,
+    sheet: sheet,
+    headers: headers,
+    index: index,
+    headerRow: row,
+    dataStartRow: row + 1
+  };
 }
 
 function requireHeaders_(index, required) {
@@ -103,8 +112,7 @@ function safeFile_(filePayload, prefix) {
   const bytes = Utilities.base64Decode(String(filePayload.base64 || ''));
   if (bytes.length > 10 * 1024 * 1024) throw new Error('Archivo demasiado grande.');
   const original = normalizeText_(filePayload.name, 160).replace(/[\\/:*?"<>|]/g, '_');
-  const blob = Utilities.newBlob(bytes, filePayload.type, prefix + ' - ' + original);
-  return blob;
+  return Utilities.newBlob(bytes, filePayload.type, prefix + ' - ' + original);
 }
 
 function saveFiles_(folder, archivos) {
@@ -119,8 +127,7 @@ function saveFiles_(folder, archivos) {
   definitions.forEach(function(def) {
     const payload = archivos && archivos[def[0]];
     if (!payload) return;
-    const blob = safeFile_(payload, def[1]);
-    const file = folder.createFile(blob);
+    const file = folder.createFile(safeFile_(payload, def[1]));
     refs[def[0]] = file.getId();
   });
   return refs;
@@ -161,7 +168,7 @@ function crearSolicitud(payload) {
     const folder = root.createFolder(safeName);
     const refs = saveFiles_(folder, payload.archivos);
 
-    const pending = getSheetAndHeaders_(config.pendingSpreadsheetId, config.pendingSheetName);
+    const pending = getSheetAndHeaders_(config.pendingSpreadsheetId, config.pendingSheetName, 1);
     requireHeaders_(pending.index, [
       'ID solicitud', 'Fecha recepción', 'Estado revisión', 'Apellido estudiante',
       'Nombre estudiante', 'DNI estudiante', 'Fecha nacimiento', 'Localidad nacimiento',
@@ -171,7 +178,9 @@ function crearSolicitud(payload) {
     ]);
 
     const row = new Array(pending.headers.length).fill('');
-    function set(header, value) { if (pending.index[header] !== undefined) row[pending.index[header]] = value; }
+    function set(header, value) {
+      if (pending.index[header] !== undefined) row[pending.index[header]] = value;
+    }
 
     set('ID solicitud', requestId);
     set('Fecha recepción', new Date());
@@ -186,7 +195,9 @@ function crearSolicitud(payload) {
     set('Institución / lugar de presentación', institucionDestino);
     set('Localidad destino', normalizeText_(payload.localidadDestino, 140));
     set('Cursos declarados', (payload.trayectoria || []).map(function(item) { return item.curso; }).join(', '));
-    set('Años declarados', payload.noRecuerdaAnios ? 'No recuerda' : (payload.trayectoria || []).map(function(item) { return item.curso + 'º: ' + (item.anio || 's/d'); }).join(' | '));
+    set('Años declarados', payload.noRecuerdaAnios
+      ? 'No recuerda'
+      : (payload.trayectoria || []).map(function(item) { return item.curso + 'º: ' + (item.anio || 's/d'); }).join(' | '));
     set('Solicitante es estudiante', solicitante.esEstudiante ? 'Sí' : 'No');
     set('Apellido y nombre solicitante', normalizeText_(solicitante.nombre, 200));
     set('Vínculo con estudiante', normalizeText_(solicitante.vinculo, 120));
@@ -201,7 +212,7 @@ function crearSolicitud(payload) {
     set('Estado documentación', 'PENDIENTE');
     set('Aprobado para iniciar', 'No');
     set('Pasado a seguimiento', 'No');
-    set('Carpeta Drive', folder.getId());
+    set('Carpeta Drive', folder.getUrl());
     set('Código seguimiento hash', trackingHash);
     set('Estado público', PUBLIC_PENDING_STATUS);
 
@@ -212,14 +223,39 @@ function crearSolicitud(payload) {
   }
 }
 
+function findOfficialStatus_(config, dni) {
+  if (!config.officialSpreadsheetId) return null;
+  const official = getSheetAndHeaders_(
+    config.officialSpreadsheetId,
+    config.officialSheetName,
+    config.officialHeaderRow
+  );
+  requireHeaders_(official.index, ['Apellido y nombre', 'DNI', 'Estado del trámite']);
+
+  const lastRow = official.sheet.getLastRow();
+  if (lastRow < official.dataStartRow) return null;
+  const rows = official.sheet
+    .getRange(official.dataStartRow, 1, lastRow - official.dataStartRow + 1, official.headers.length)
+    .getDisplayValues();
+
+  for (let i = 0; i < rows.length; i += 1) {
+    if (String(rows[i][official.index['DNI']]).replace(/\D/g, '') !== dni) continue;
+    return {
+      apellidoNombre: rows[i][official.index['Apellido y nombre']],
+      estado: rows[i][official.index['Estado del trámite']]
+    };
+  }
+  return null;
+}
+
 function consultarEstado(dni, codigoSeguimiento) {
   const config = getConfig_();
   const cleanDni = normalizeDni_(dni);
   const hash = hashTrackingCode_(codigoSeguimiento);
-  const pending = getSheetAndHeaders_(config.pendingSpreadsheetId, config.pendingSheetName);
+  const pending = getSheetAndHeaders_(config.pendingSpreadsheetId, config.pendingSheetName, 1);
   requireHeaders_(pending.index, [
     'Apellido estudiante', 'Nombre estudiante', 'DNI estudiante',
-    'Código seguimiento hash', 'Estado público'
+    'Código seguimiento hash', 'Estado público', 'Pasado a seguimiento'
   ]);
 
   const values = pending.sheet.getDataRange().getDisplayValues();
@@ -227,75 +263,107 @@ function consultarEstado(dni, codigoSeguimiento) {
     const row = values[r];
     if (String(row[pending.index['DNI estudiante']]).replace(/\D/g, '') !== cleanDni) continue;
     if (String(row[pending.index['Código seguimiento hash']]) !== hash) continue;
+
+    const pendingName = (row[pending.index['Apellido estudiante']] + ' ' + row[pending.index['Nombre estudiante']]).trim();
+    let publicName = pendingName;
+    let publicStatus = row[pending.index['Estado público']] || PUBLIC_PENDING_STATUS;
+
+    if (row[pending.index['Pasado a seguimiento']] === 'Sí' && config.officialSpreadsheetId) {
+      try {
+        const officialState = findOfficialStatus_(config, cleanDni);
+        if (officialState) {
+          publicName = officialState.apellidoNombre || pendingName;
+          publicStatus = officialState.estado || publicStatus;
+        }
+      } catch (error) {
+        console.error('No se pudo leer el seguimiento oficial:', error);
+      }
+    }
+
     return {
       ok: true,
-      apellidoNombre: (row[pending.index['Apellido estudiante']] + ' ' + row[pending.index['Nombre estudiante']]).trim(),
+      apellidoNombre: publicName,
       dni: cleanDni,
-      estado: row[pending.index['Estado público']] || PUBLIC_PENDING_STATUS
+      estado: publicStatus
     };
   }
   return { ok: false, message: 'No encontramos un trámite con esos datos.' };
+}
+
+function firstAvailableOfficialRow_(official, dni) {
+  requireHeaders_(official.index, ['Apellido y nombre', 'DNI']);
+  const lastRow = Math.max(official.sheet.getLastRow(), official.dataStartRow);
+  const rowCount = lastRow - official.dataStartRow + 1;
+  const rows = official.sheet.getRange(official.dataStartRow, 1, rowCount, official.headers.length).getDisplayValues();
+  let firstEmptyRow = null;
+
+  for (let i = 0; i < rows.length; i += 1) {
+    const name = String(rows[i][official.index['Apellido y nombre']] || '').trim();
+    const rowDni = String(rows[i][official.index['DNI']] || '').replace(/\D/g, '');
+    if (rowDni && rowDni === dni) throw new Error('Ya existe un registro en seguimiento para este DNI.');
+    if (!name && firstEmptyRow === null) firstEmptyRow = official.dataStartRow + i;
+  }
+  return firstEmptyRow || lastRow + 1;
+}
+
+function setOfficialCell_(official, rowNumber, header, value) {
+  if (official.index[header] === undefined) return;
+  official.sheet.getRange(rowNumber, official.index[header] + 1).setValue(value);
 }
 
 function promoverSolicitudValidada(rowIndex) {
   const config = getConfig_();
   if (!config.officialSpreadsheetId) throw new Error('Falta OFFICIAL_SPREADSHEET_ID.');
 
-  const pending = getSheetAndHeaders_(config.pendingSpreadsheetId, config.pendingSheetName);
+  const pending = getSheetAndHeaders_(config.pendingSpreadsheetId, config.pendingSheetName, 1);
   requireHeaders_(pending.index, [
     'Vínculo EES18', 'Estado documentación', 'Aprobado para iniciar',
     'Pasado a seguimiento', 'DNI estudiante', 'Apellido estudiante', 'Nombre estudiante'
   ]);
 
-  const row = pending.sheet.getRange(Number(rowIndex), 1, 1, pending.headers.length).getDisplayValues()[0];
+  const rowNumber = Number(rowIndex);
+  const row = pending.sheet.getRange(rowNumber, 1, 1, pending.headers.length).getDisplayValues()[0];
   if (row[pending.index['Vínculo EES18']] !== 'VERIFICADO') throw new Error('El vínculo EES18 todavía no está VERIFICADO.');
   if (row[pending.index['Estado documentación']] !== 'VALIDADA') throw new Error('La documentación todavía no está VALIDADA.');
   if (row[pending.index['Aprobado para iniciar']] !== 'Sí') throw new Error('La solicitud todavía no está aprobada para iniciar.');
   if (row[pending.index['Pasado a seguimiento']] === 'Sí') throw new Error('La solicitud ya fue pasada al seguimiento.');
 
-  // El seguimiento oficial actual está almacenado como XLSX. SpreadsheetApp solo puede
-  // escribir de forma segura sobre una hoja nativa de Google Sheets. Esta promoción se
-  // habilita únicamente cuando OFFICIAL_SPREADSHEET_ID apunte a la versión operativa
-  // autorizada por Secretaría; nunca se convierte ni reemplaza el XLSX automáticamente.
-  const official = getSheetAndHeaders_(config.officialSpreadsheetId, config.officialSheetName);
-  requireHeaders_(official.index, ['Apellido y Nombre', 'DNI']);
+  // El archivo operativo actual sigue siendo XLSX. Esta función solo se habilita cuando
+  // OFFICIAL_SPREADSHEET_ID apunta a una versión nativa de Google Sheets autorizada.
+  // Nunca convierte ni reemplaza el XLSX automáticamente.
+  const official = getSheetAndHeaders_(
+    config.officialSpreadsheetId,
+    config.officialSheetName,
+    config.officialHeaderRow
+  );
+  requireHeaders_(official.index, [
+    'Apellido y nombre', 'DNI', 'Escuela destino', 'Localidad',
+    'Fotocopia DNI', 'Partida nacimiento', 'Pase a otra escuela',
+    'Estado documentación', 'Estado del trámite'
+  ]);
 
   const dni = String(row[pending.index['DNI estudiante']]).replace(/\D/g, '');
-  const officialValues = official.sheet.getDataRange().getDisplayValues();
-  for (let r = 1; r < officialValues.length; r += 1) {
-    if (String(officialValues[r][official.index['DNI']]).replace(/\D/g, '') === dni) {
-      throw new Error('Ya existe un registro en seguimiento para este DNI.');
-    }
-  }
+  const targetRow = firstAvailableOfficialRow_(official, dni);
+  const fullName = (row[pending.index['Apellido estudiante']] + ' ' + row[pending.index['Nombre estudiante']]).trim();
 
-  const target = new Array(official.headers.length).fill('');
-  function copy(targetHeader, pendingHeader, fallback) {
-    if (official.index[targetHeader] === undefined) return;
-    target[official.index[targetHeader]] = pending.index[pendingHeader] === undefined ? (fallback || '') : row[pending.index[pendingHeader]];
-  }
+  setOfficialCell_(official, targetRow, 'Apellido y nombre', fullName);
+  setOfficialCell_(official, targetRow, 'DNI', dni);
+  setOfficialCell_(official, targetRow, 'Escuela destino', row[pending.index['Institución / lugar de presentación']] || '');
+  setOfficialCell_(official, targetRow, 'Localidad', row[pending.index['Localidad destino']] || '');
+  setOfficialCell_(official, targetRow, 'Fotocopia DNI', row[pending.index['DNI adjunto']] || 'Sí');
+  setOfficialCell_(official, targetRow, 'Partida nacimiento', row[pending.index['Partida adjunta']] || 'Sí');
+  setOfficialCell_(official, targetRow, 'Pase a otra escuela', row[pending.index['Documento destino']] || '');
+  setOfficialCell_(official, targetRow, 'Estado documentación', 'COMPLETA');
 
-  copy('Apellido y Nombre', 'Apellido estudiante');
-  if (official.index['Apellido y Nombre'] !== undefined) {
-    target[official.index['Apellido y Nombre']] = (row[pending.index['Apellido estudiante']] + ' ' + row[pending.index['Nombre estudiante']]).trim();
-  }
-  copy('DNI', 'DNI estudiante');
-  copy('Escuela destino', 'Institución / lugar de presentación');
-  copy('Localidad', 'Localidad destino');
-  copy('Fotocopia DNI', 'DNI adjunto');
-  copy('Partida de nacimiento', 'Partida adjunta');
-  copy('Pase a otra escuela', 'Documento destino');
-  copy('Estado documentación', 'Estado documentación');
-
-  official.sheet.appendRow(target);
-  pending.sheet.getRange(Number(rowIndex), pending.index['Pasado a seguimiento'] + 1).setValue('Sí');
+  pending.sheet.getRange(rowNumber, pending.index['Pasado a seguimiento'] + 1).setValue('Sí');
   if (pending.index['Fecha aprobación'] !== undefined) {
-    pending.sheet.getRange(Number(rowIndex), pending.index['Fecha aprobación'] + 1).setValue(new Date());
+    pending.sheet.getRange(rowNumber, pending.index['Fecha aprobación'] + 1).setValue(new Date());
   }
   if (pending.index['Referencia seguimiento'] !== undefined) {
-    pending.sheet.getRange(Number(rowIndex), pending.index['Referencia seguimiento'] + 1).setValue('DNI ' + dni);
+    pending.sheet.getRange(rowNumber, pending.index['Referencia seguimiento'] + 1).setValue('Fila ' + targetRow + ' · DNI ' + dni);
   }
   if (pending.index['Estado público'] !== undefined) {
-    pending.sheet.getRange(Number(rowIndex), pending.index['Estado público'] + 1).setValue('Documentación validada. Trámite iniciado.');
+    pending.sheet.getRange(rowNumber, pending.index['Estado público'] + 1).setValue('Documentación validada. Trámite iniciado.');
   }
-  return { ok: true, dni: dni };
+  return { ok: true, dni: dni, filaSeguimiento: targetRow };
 }
