@@ -1,5 +1,5 @@
 function evaluarPosibleDuplicado_(pending, dni) {
-  requireHeaders_(pending.index, ['DNI estudiante', 'Estado revisión']);
+  requireHeaders_(pending.index, ['DNI estudiante', 'Estado revisión', 'Posible duplicado']);
   const lastRow = pending.sheet.getLastRow();
   if (lastRow < pending.dataStartRow) return false;
   const rows = pending.sheet
@@ -10,8 +10,8 @@ function evaluarPosibleDuplicado_(pending, dni) {
     const currentDni = String(row[pending.index['DNI estudiante']] || '').replace(/\D/g, '');
     if (currentDni === dni) coincidencias += 1;
   });
-  // La columna de la planilla también lo calcula por fórmula; este control sirve
-  // para procesos internos y futuras automatizaciones del panel de Secretaría.
+  // La columna "Posible duplicado" de la planilla también se calcula por fórmula;
+  // este control sirve para procesos internos y futuras automatizaciones del panel.
   return coincidencias > 0 ? 'POSIBLE DUPLICADO' : '';
 }
 
@@ -21,7 +21,7 @@ function registrarValidacionSolicitud(rowIndex, datos) {
   requireHeaders_(pending.index, [
     'Estado revisión', 'Vínculo EES18', 'Estado documentación',
     'Fuente verificación EES18', 'Fecha verificación EES18',
-    'Responsable revisión', 'Fecha última actualización'
+    'Responsable revisión', 'Posible duplicado', 'Fecha última actualización'
   ]);
 
   const rowNumber = Number(rowIndex);
@@ -66,6 +66,7 @@ function registrarValidacionSolicitud(rowIndex, datos) {
     ok: true,
     fila: rowNumber,
     estadoRevision: revision,
+    posibleDuplicado: pending.sheet.getRange(rowNumber, pending.index['Posible duplicado'] + 1).getDisplayValue(),
     listoParaAprobar: revision === 'LISTA PARA APROBAR'
   };
 }
