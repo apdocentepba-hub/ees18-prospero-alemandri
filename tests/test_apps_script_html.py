@@ -7,8 +7,12 @@ def read(path):
     return ROOT.joinpath(path).read_text(encoding="utf-8")
 
 
+def read_server_code():
+    return read("apps-script/Code.gs") + "\n" + read("apps-script/HtmlApp.gs")
+
+
 def test_apps_script_tiene_formulario_html_nativo_para_carga_sin_cors():
-    code = read("apps-script/Code.gs")
+    code = read_server_code()
     formulario = read("apps-script/Formulario.html")
     assert "function doGet(e)" in code
     assert "function crearSolicitudDesdeFormulario(formObject)" in code
@@ -26,7 +30,7 @@ def test_apps_script_tiene_formulario_html_nativo_para_carga_sin_cors():
 
 
 def test_apps_script_tiene_consulta_html_nativa():
-    code = read("apps-script/Code.gs")
+    code = read_server_code()
     estado = read("apps-script/Estado.html")
     assert "HtmlService.createTemplateFromFile('Estado')" in code
     assert "google.script.run" in estado
