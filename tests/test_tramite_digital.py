@@ -7,16 +7,12 @@ def read(path):
     return ROOT.joinpath(path).read_text(encoding="utf-8")
 
 
-def test_portada_enlaza_solicitud_y_consulta():
-    html = read("index.html")
-    assert 'href="solicitar-analitico.html"' in html
-    assert 'href="estado-tramite.html"' in html
-
-
-def test_pagina_certificado_enlaza_solicitud_y_consulta():
-    html = read("certificado-analitico.html")
-    assert 'href="solicitar-analitico.html"' in html
-    assert 'href="estado-tramite.html"' in html
+def test_acceso_digital_desde_pagina_de_analiticos():
+    home = read("index.html")
+    tramite = read("certificado-analitico.html")
+    assert 'href="certificado-analitico.html"' in home
+    assert 'href="solicitar-analitico.html"' in tramite
+    assert 'href="estado-tramite.html"' in tramite
 
 
 def test_formulario_solicitud_tiene_datos_obligatorios():
