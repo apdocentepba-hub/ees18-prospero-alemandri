@@ -127,6 +127,24 @@ def test_backend_alinea_encabezados_del_seguimiento_real():
     assert "folder.getUrl()" in code
 
 
+def test_bandeja_detecta_posibles_duplicados_y_guarda_trazabilidad_de_revision():
+    code = read("apps-script/Code.gs")
+    for symbol in [
+        "function evaluarPosibleDuplicado_(pending, dni)",
+        "function registrarValidacionSolicitud(rowIndex, datos)"
+    ]:
+        assert symbol in code
+    for header in [
+        "Fuente verificación EES18",
+        "Fecha verificación EES18",
+        "Responsable revisión",
+        "Posible duplicado",
+        "Fecha última actualización"
+    ]:
+        assert header in code
+    assert "POSIBLE DUPLICADO" in code
+
+
 def test_libro_folio_se_lee_del_pie_del_analitico_y_se_sincroniza_con_control_de_conflictos():
     code = read("apps-script/Code.gs")
     for symbol in [
