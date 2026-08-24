@@ -7,12 +7,24 @@ def read(path):
     return ROOT.joinpath(path).read_text(encoding="utf-8")
 
 
-def test_acceso_digital_desde_pagina_de_analiticos():
+def test_acceso_digital_desde_pases_y_equivalencias():
     home = read("index.html")
-    tramite = read("certificado-analitico.html")
-    assert 'href="certificado-analitico.html"' in home
+    tramite = read("pases-equivalencias.html")
+    assert 'href="pases-equivalencias.html"' in home
     assert 'href="solicitar-analitico.html"' in tramite
     assert 'href="estado-tramite.html"' in tramite
+
+
+def test_pases_y_equivalencias_muestra_requisitos_base():
+    tramite = read("pases-equivalencias.html")
+    for item in [
+        "Copia actualizada del DNI",
+        "Copia de la Partida de Nacimiento",
+        "institución de destino",
+        "Analítico Parcial",
+        "FINES"
+    ]:
+        assert item in tramite
 
 
 def test_formulario_solicitud_tiene_datos_obligatorios():
@@ -76,9 +88,10 @@ def test_paginas_cargan_config_antes_de_scripts_funcionales():
 
 def test_no_se_publican_ids_internos_de_drive():
     public_paths = [
-        "index.html", "certificado-analitico.html", "solicitar-analitico.html",
-        "estado-tramite.html", "assets/js/tramite-config.js",
-        "assets/js/tramite-solicitud.js", "assets/js/tramite-estado.js"
+        "index.html", "pases-equivalencias.html", "certificado-analitico.html",
+        "solicitar-analitico.html", "estado-tramite.html",
+        "assets/js/tramite-config.js", "assets/js/tramite-solicitud.js",
+        "assets/js/tramite-estado.js"
     ]
     text = "\n".join(read(path) for path in public_paths)
     for internal_id in [
