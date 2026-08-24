@@ -15,6 +15,12 @@ def test_acceso_digital_desde_pases_y_equivalencias():
     assert 'href="estado-tramite.html"' in tramite
 
 
+def test_titulos_no_es_la_entrada_al_circuito_de_pases():
+    titulos = read("certificado-analitico.html")
+    assert 'href="solicitar-analitico.html"' not in titulos
+    assert 'href="estado-tramite.html"' not in titulos
+
+
 def test_formulario_y_consulta_vuelven_a_pases_y_equivalencias():
     solicitud = read("solicitar-analitico.html")
     estado = read("estado-tramite.html")
