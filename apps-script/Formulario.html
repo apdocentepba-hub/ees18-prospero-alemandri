@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <style>
+    :root{--azul:#1e6fa8;--profundo:#0f3f62;--celeste:#5ab8eb;--linea:#d9e6ed;--papel:#f7fbfd;--texto:#385566}
+    *{box-sizing:border-box}body{margin:0;background:var(--papel);font-family:Arial,sans-serif;color:var(--texto)}
+    .top{background:var(--profundo);color:#fff;padding:28px 20px}.wrap{width:min(960px,calc(100% - 32px));margin:auto}.top small{display:block;color:#9edcf8;font-weight:700;letter-spacing:.08em;text-transform:uppercase}.top h1{margin:8px 0;font-family:Georgia,serif;font-size:clamp(2rem,6vw,3.6rem)}.top p{max-width:760px;line-height:1.6;color:#d9eaf2}
+    form{margin:28px auto 48px;background:#fff;border:1px solid var(--linea);box-shadow:0 18px 50px rgba(15,63,98,.08);padding:clamp(20px,4vw,38px)}
+    fieldset{border:0;border-top:1px solid var(--linea);padding:26px 0 6px;margin:0}fieldset:first-of-type{border-top:0;padding-top:0}legend{padding:0 0 16px;font-family:Georgia,serif;font-size:1.35rem;color:var(--profundo);font-weight:700}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.full{grid-column:1/-1}.field{display:flex;flex-direction:column;gap:6px}label,.label{font-weight:700;color:var(--profundo)}input,select,textarea{width:100%;padding:12px;border:1px solid #aac4d2;background:#fff;font:inherit;color:#243f4f}input:focus,select:focus,textarea:focus{outline:3px solid rgba(90,184,235,.25);border-color:var(--azul)}
+    .radios,.checks{display:flex;flex-wrap:wrap;gap:12px}.radios label,.checks label{font-weight:600;color:#405d6d;display:flex;gap:7px;align-items:center}.radios input,.checks input{width:auto}
+    .courses{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.course{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;padding:10px;border:1px solid var(--linea)}.course label{display:flex;align-items:center;gap:7px}.course label input{width:auto}
+    .file{padding:14px;background:#f3f9fc;border:1px solid var(--linea)}.file small{display:block;margin-top:6px;color:#617985}
+    .note{padding:16px;border-left:5px solid var(--celeste);background:#edf8fd;line-height:1.55}.actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:24px}button{border:0;background:var(--profundo);color:#fff;padding:14px 22px;font:inherit;font-weight:800;cursor:pointer}button[disabled]{opacity:.55;cursor:wait}.status{margin-top:18px;padding:14px;border:1px solid var(--linea);display:none}.status.ok{display:block;background:#edf9f1;border-color:#a5d8b5;color:#225b34}.status.error{display:block;background:#fff1f1;border-color:#e6b4b4;color:#7b2929}.status.info{display:block;background:#edf7fc;color:#234e68}
+    [hidden]{display:none!important}@media(max-width:680px){.grid,.courses{grid-template-columns:1fr}.course{grid-template-columns:100px 1fr}.wrap{width:min(100% - 20px,960px)}form{margin-top:14px}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap"><small>Secretaría · E.E.S. Nº 18 “Próspero Alemandri”</small><h1>Analítico Parcial / Pase</h1><p>Completá la solicitud y adjuntá la documentación. No necesitás una cuenta Google. El envío queda pendiente de revisión hasta que Secretaría verifique el vínculo con la escuela y la documentación presentada.</p></div></header>
+
+  <form id="solicitud" class="wrap" onsubmit="enviarSolicitud(this);return false;">
+    <fieldset>
+      <legend>1. Datos del estudiante</legend>
+      <div class="grid">
+        <div class="field"><label for="apellido">Apellido *</label><input id="apellido" name="apellido" required></div>
+        <div class="field"><label for="nombre">Nombre *</label><input id="nombre" name="nombre" required></div>
+        <div class="field"><label for="dni">DNI *</label><input id="dni" name="dni" inputmode="numeric" pattern="[0-9. ]{6,12}" required></div>
+        <div class="field"><label for="fechaNacimiento">Fecha de nacimiento *</label><input id="fechaNacimiento" name="fechaNacimiento" type="date" required></div>
+        <div class="field full"><label for="localidadNacimiento">Lugar / localidad de nacimiento *</label><input id="localidadNacimiento" name="localidadNacimiento" required></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Motivo y destino</legend>
+      <div class="grid">
+        <div class="field"><label for="motivo">Motivo *</label><select id="motivo" name="motivo" required onchange="actualizarMotivo()"><option value="">Seleccionar</option><option value="otra_escuela">Pase a otra escuela</option><option value="fines">Para presentar en FINES</option><option value="perdida">Perdí un analítico parcial anterior</option><option value="reposicion">Necesito una nueva copia / reposición</option><option value="otro">Otro motivo</option></select></div>
+        <div class="field" id="otro-wrap" hidden><label for="otroMotivo">Otro motivo *</label><input id="otroMotivo" name="otroMotivo"></div>
+        <div class="field full"><label for="institucionDestino">Lugar o institución donde necesita presentarlo *</label><input id="institucionDestino" name="institucionDestino" required></div>
+        <div class="field full"><label for="localidadDestino">Localidad del destino</label><input id="localidadDestino" name="localidadDestino"></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. Cursos realizados</legend>
+      <p>Marcá los cursos realizados en la E.E.S. Nº 18. El año calendario es orientativo y será verificado por Secretaría.</p>
+      <div class="courses">
+        <div class="course"><label><input type="checkbox" class="curso" value="1"> 1.º año</label><input type="number" class="anio" data-curso="1" min="1950" max="2100" placeholder="Año"></div>
+        <div class="course"><label><input type="checkbox" class="curso" value="2"> 2.º año</label><input type="number" class="anio" data-curso="2" min="1950" max="2100" placeholder="Año"></div>
+        <div class="course"><label><input type="checkbox" class="curso" value="3"> 3.º año</label><input type="number" class="anio" data-curso="3" min="1950" max="2100" placeholder="Año"></div>
+        <div class="course"><label><input type="checkbox" class="curso" value="4"> 4.º año</label><input type="number" class="anio" data-curso="4" min="1950" max="2100" placeholder="Año"></div>
+        <div class="course"><label><input type="checkbox" class="curso" value="5"> 5.º año</label><input type="number" class="anio" data-curso="5" min="1950" max="2100" placeholder="Año"></div>
+        <div class="course"><label><input type="checkbox" class="curso" value="6"> 6.º año</label><input type="number" class="anio" data-curso="6" min="1950" max="2100" placeholder="Año"></div>
+      </div>
+      <div class="checks" style="margin-top:12px"><label><input id="noRecuerdaAnios" name="noRecuerdaAnios" type="checkbox" value="si" onchange="actualizarAnios()"> No recuerdo los años</label></div>
+      <input type="hidden" id="trayectoriaJson" name="trayectoriaJson" value="[]">
+    </fieldset>
+
+    <fieldset>
+      <legend>4. Persona que realiza la solicitud</legend>
+      <div class="field full"><span class="label">¿La solicitud la realiza el propio estudiante? *</span><div class="radios"><label><input type="radio" name="solicitanteEsEstudiante" value="si" required onchange="actualizarSolicitante()"> Sí</label><label><input type="radio" name="solicitanteEsEstudiante" value="no" required onchange="actualizarSolicitante()"> No</label></div></div>
+      <div class="grid" id="tercero" hidden style="margin-top:16px"><div class="field"><label for="solicitanteNombre">Apellido y nombre de quien solicita *</label><input id="solicitanteNombre" name="solicitanteNombre"></div><div class="field"><label for="vinculoEstudiante">Vínculo con el estudiante *</label><input id="vinculoEstudiante" name="vinculoEstudiante" placeholder="Madre, padre, tutor, otro"></div></div>
+      <div class="grid" style="margin-top:16px"><div class="field"><label for="telefono">Teléfono de contacto *</label><input id="telefono" name="telefono" type="tel" required></div><div class="field"><label for="email">Correo electrónico *</label><input id="email" name="email" type="email" required></div></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>5. Documentación</legend>
+      <div class="grid">
+        <div class="field file"><label for="dniArchivo">DNI *</label><input id="dniArchivo" name="dniArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png" required><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
+        <div class="field file"><label for="partidaArchivo">Partida de nacimiento *</label><input id="partidaArchivo" name="partidaArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png" required><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
+        <div class="field file" id="destino-wrap" hidden><label for="documentoDestinoArchivo">Documento de la institución de destino *</label><input id="documentoDestinoArchivo" name="documentoDestinoArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png"><small>Constancia de solicitud de vacante u otra documentación que corresponda.</small></div>
+        <div class="field file" id="anterior-wrap" hidden><label for="analiticoAnteriorArchivo">Analítico anterior</label><input id="analiticoAnteriorArchivo" name="analiticoAnteriorArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png"><small>Opcional si se trata de pérdida o reposición.</small></div>
+        <div class="field file full"><label for="otraDocumentacionArchivo">Otra documentación</label><input id="otraDocumentacionArchivo" name="otraDocumentacionArchivo" type="file" accept=".pdf,.jpg,.jpeg,.png"><small>Opcional.</small></div>
+      </div>
+    </fieldset>
+
+    <p class="note">El envío del formulario no inicia automáticamente el trámite oficial. Secretaría primero verifica que la persona sea alumno/exalumno de la E.E.S. Nº 18 y controla la documentación.</p>
+    <div class="actions"><button id="enviar" type="submit">Enviar solicitud</button><span>Recibirás un código de seguimiento y también se intentará enviar por correo.</span></div>
+    <div id="status" class="status" aria-live="polite"></div>
+  </form>
+
+  <script>
+    const MAX_FILE = 10 * 1024 * 1024;
+    const MAX_TOTAL = 40 * 1024 * 1024;
+    const ALLOWED = new Set(['application/pdf','image/jpeg','image/png']);
+
+    function actualizarMotivo(){
+      const value=document.getElementById('motivo').value;
+      const otro=document.getElementById('otro-wrap');
+      const otroInput=document.getElementById('otroMotivo');
+      const destino=document.getElementById('destino-wrap');
+      const destinoInput=document.getElementById('documentoDestinoArchivo');
+      const anterior=document.getElementById('anterior-wrap');
+      otro.hidden=value!=='otro'; otroInput.required=value==='otro';
+      destino.hidden=value!=='otra_escuela'; destinoInput.required=value==='otra_escuela';
+      anterior.hidden=!['perdida','reposicion'].includes(value);
+    }
+
+    function actualizarSolicitante(){
+      const value=document.querySelector('input[name="solicitanteEsEstudiante"]:checked')?.value;
+      const wrap=document.getElementById('tercero');
+      const third=value==='no'; wrap.hidden=!third;
+      document.getElementById('solicitanteNombre').required=third;
+      document.getElementById('vinculoEstudiante').required=third;
+    }
+
+    function actualizarAnios(){
+      const noRecuerda=document.getElementById('noRecuerdaAnios').checked;
+      document.querySelectorAll('.anio').forEach(input=>{input.disabled=noRecuerda;if(noRecuerda)input.value='';});
+    }
+
+    function prepararTrayectoria(){
+      const noRecuerda=document.getElementById('noRecuerdaAnios').checked;
+      const out=[];
+      document.querySelectorAll('.curso:checked').forEach(check=>{
+        const anio=document.querySelector(`.anio[data-curso="${check.value}"]`);
+        out.push({curso:Number(check.value),anio:noRecuerda?'':(anio?.value||'')});
+      });
+      document.getElementById('trayectoriaJson').value=JSON.stringify(out);
+    }
+
+    function validarArchivos(form){
+      let total=0;
+      form.querySelectorAll('input[type="file"]').forEach(input=>{
+        const file=input.files?.[0]; if(!file)return;
+        if(!ALLOWED.has(file.type))throw new Error(`Formato no permitido: ${file.name}`);
+        if(file.size>MAX_FILE)throw new Error(`${file.name} supera 10 MB.`);
+        total+=file.size;
+      });
+      if(total>MAX_TOTAL)throw new Error('Los archivos superan el máximo total de 40 MB.');
+    }
+
+    function setStatus(message,type){const box=document.getElementById('status');box.textContent=message;box.className='status '+type;}
+
+    function enviarSolicitud(form){
+      if(!form.reportValidity())return;
+      try{validarArchivos(form);prepararTrayectoria();}catch(error){setStatus(error.message,'error');return;}
+      const button=document.getElementById('enviar');button.disabled=true;setStatus('Enviando y guardando la documentación…','info');
+      google.script.run
+        .withSuccessHandler(result=>{
+          button.disabled=false;
+          if(!result||!result.ok){setStatus(result?.message||'No se pudo registrar la solicitud.','error');return;}
+          setStatus(`Solicitud recibida. Código de seguimiento: ${result.codigoSeguimiento}. Guardalo para consultar el estado.`,'ok');
+          form.reset();actualizarMotivo();actualizarSolicitante();actualizarAnios();
+        })
+        .withFailureHandler(error=>{button.disabled=false;setStatus(error?.message||'No se pudo registrar la solicitud.','error');})
+        .crearSolicitudDesdeFormulario(form);
+    }
+
+    actualizarMotivo();actualizarSolicitante();actualizarAnios();
+  </script>
+</body>
+</html>
