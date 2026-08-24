@@ -115,6 +115,18 @@ def test_backend_usa_bandeja_intermedia_y_validacion_manual():
     assert "VALIDADA" in code
 
 
+def test_backend_alinea_encabezados_del_seguimiento_real():
+    code = read("apps-script/Code.gs")
+    assert "OFFICIAL_HEADER_ROW" in code
+    for header in [
+        "Apellido y nombre", "DNI", "Escuela destino", "Localidad",
+        "Fotocopia DNI", "Partida nacimiento", "Pase a otra escuela",
+        "Estado documentación", "Estado del trámite"
+    ]:
+        assert header in code
+    assert "folder.getUrl()" in code
+
+
 def test_backend_no_hardcodea_ids_privados():
     code = read("apps-script/Code.gs")
     assert "PropertiesService.getScriptProperties()" in code
