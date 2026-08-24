@@ -32,13 +32,16 @@ def test_formulario_y_consulta_vuelven_a_pases_y_equivalencias():
     assert 'href="pases-equivalencias.html"' in estado
 
 
-def test_pases_y_equivalencias_muestra_requisitos_base():
+def test_pases_y_equivalencias_muestra_requisitos_base_y_los_ya_publicados():
     tramite = read("pases-equivalencias.html")
     for item in [
+        "Solicitud de Certificado de Estudios",
         "Copia actualizada del DNI",
         "Copia de la Partida de Nacimiento",
+        "Constancia de solicitud de vacante",
         "institución de destino",
         "Analítico Parcial",
+        "Certificado Analítico",
         "FINES"
     ]:
         assert item in tramite
