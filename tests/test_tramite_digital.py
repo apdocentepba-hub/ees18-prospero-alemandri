@@ -7,6 +7,10 @@ def read(path):
     return ROOT.joinpath(path).read_text(encoding="utf-8")
 
 
+def read_apps_script():
+    return read("apps-script/Code.gs") + "\n" + read("apps-script/Validacion.gs")
+
+
 def test_acceso_digital_desde_pases_y_equivalencias():
     home = read("index.html")
     tramite = read("pases-equivalencias.html")
@@ -100,7 +104,7 @@ def test_paginas_cargan_config_antes_de_scripts_funcionales():
 
 
 def test_backend_usa_bandeja_intermedia_y_validacion_manual():
-    code = read("apps-script/Code.gs")
+    code = read_apps_script()
     for symbol in [
         "function doPost(e)",
         "function crearSolicitud(payload)",
@@ -116,7 +120,7 @@ def test_backend_usa_bandeja_intermedia_y_validacion_manual():
 
 
 def test_backend_alinea_encabezados_del_seguimiento_real():
-    code = read("apps-script/Code.gs")
+    code = read_apps_script()
     assert "OFFICIAL_HEADER_ROW" in code
     for header in [
         "Apellido y nombre", "DNI", "Escuela destino", "Localidad",
@@ -128,7 +132,7 @@ def test_backend_alinea_encabezados_del_seguimiento_real():
 
 
 def test_bandeja_detecta_posibles_duplicados_y_guarda_trazabilidad_de_revision():
-    code = read("apps-script/Code.gs")
+    code = read_apps_script()
     for symbol in [
         "function evaluarPosibleDuplicado_(pending, dni)",
         "function registrarValidacionSolicitud(rowIndex, datos)"
@@ -146,7 +150,7 @@ def test_bandeja_detecta_posibles_duplicados_y_guarda_trazabilidad_de_revision()
 
 
 def test_libro_folio_se_lee_del_pie_del_analitico_y_se_sincroniza_con_control_de_conflictos():
-    code = read("apps-script/Code.gs")
+    code = read_apps_script()
     for symbol in [
         "function leerLibroFolioAnalitico_(spreadsheetId)",
         "function sincronizarLibroFolioDesdeAnalitico(spreadsheetId)",
@@ -163,7 +167,7 @@ def test_libro_folio_se_lee_del_pie_del_analitico_y_se_sincroniza_con_control_de
 
 
 def test_libro_folio_no_sobrescribe_si_hay_diferencias_y_controla_duplicados():
-    code = read("apps-script/Code.gs")
+    code = read_apps_script()
     assert "Libro/Folio diferente" in code
     assert "Libro/Folio ya asignado a otro DNI" in code
     assert "NO sobrescribe" in code
@@ -171,7 +175,7 @@ def test_libro_folio_no_sobrescribe_si_hay_diferencias_y_controla_duplicados():
 
 
 def test_backend_no_hardcodea_ids_privados():
-    code = read("apps-script/Code.gs")
+    code = read_apps_script()
     assert "PropertiesService.getScriptProperties()" in code
     for internal_id in [
         "1M8kLoW2IA6pu8z_IrFp8efe0BPWXcW4JqdQFSaK300Y",
