@@ -86,6 +86,33 @@ def test_paginas_cargan_config_antes_de_scripts_funcionales():
     assert estado.index("tramite-config.js") < estado.index("tramite-estado.js")
 
 
+def test_backend_usa_bandeja_intermedia_y_validacion_manual():
+    code = read("apps-script/Code.gs")
+    for symbol in [
+        "function doPost(e)",
+        "function crearSolicitud(payload)",
+        "function consultarEstado(dni, codigoSeguimiento)",
+        "function promoverSolicitudValidada(rowIndex)"
+    ]:
+        assert symbol in code
+    assert "Vínculo EES18" in code
+    assert "Estado documentación" in code
+    assert "Aprobado para iniciar" in code
+    assert "VERIFICADO" in code
+    assert "VALIDADA" in code
+
+
+def test_backend_no_hardcodea_ids_privados():
+    code = read("apps-script/Code.gs")
+    assert "PropertiesService.getScriptProperties()" in code
+    for internal_id in [
+        "1M8kLoW2IA6pu8z_IrFp8efe0BPWXcW4JqdQFSaK300Y",
+        "1Ms43-LM-TwzNbHETCY2-XrElUlcAGIYg",
+        "1ctdZBXvTTW8mxXhjCGbsi7GGJ3sEy55M"
+    ]:
+        assert internal_id not in code
+
+
 def test_no_se_publican_ids_internos_de_drive():
     public_paths = [
         "index.html", "pases-equivalencias.html", "certificado-analitico.html",
