@@ -1,6 +1,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzcsTW4uWja9zVi83a441jgjbBz0j9WDjX_LXQzm6gdnR2FTsUXPDIunWfvKtlbWxEN/exec"
 
 
 def read(path):
@@ -27,24 +28,17 @@ def test_pases_publica_requisitos_principales():
         assert texto in html
 
 
-def test_pases_muestra_acceso_visible_al_formulario():
+def test_pases_enlaza_al_webapp_operativo():
     html = read("pases-equivalencias.html")
-    assert 'href="solicitar-analitico.html"' in html
+    assert f'href="{WEBAPP_URL}"' in html
     assert "Solicitar Pase / Analítico Parcial" in html
 
 
-def test_formulario_publico_tiene_los_datos_obligatorios():
+def test_ruta_anterior_redirige_al_webapp():
     html = read("solicitar-analitico.html")
-    for campo in [
-        'name="apellido"', 'name="nombre"', 'name="dni"',
-        'name="fechaNacimiento"', 'name="localidadNacimiento"',
-        'name="motivo"', 'name="institucionDestino"',
-        'name="telefono"', 'name="email"',
-        'name="dniArchivo"', 'name="partidaArchivo"'
-    ]:
-        assert campo in html
-    assert "No necesitás una cuenta Google" in html
-    assert "todavía no está habilitada" in read("assets/js/tramite-solicitud.js")
+    assert WEBAPP_URL in html
+    assert 'http-equiv="refresh"' in html
+    assert "Abrir formulario de solicitud" in html
 
 
 def test_titulos_queda_diferenciado_del_circuito_de_pases():
