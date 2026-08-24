@@ -1,13 +1,16 @@
 function doGet(e) {
   const view = normalizeText_(e && e.parameter && e.parameter.view, 30).toLowerCase();
-  const file = view === 'estado' ? 'Estado' : 'Formulario';
-  const title = view === 'estado'
-    ? 'Estado del trámite · E.E.S. Nº 18'
-    : 'Analítico Parcial / Pase · E.E.S. Nº 18';
+  if (view === 'estado') {
+    return HtmlService
+      .createTemplateFromFile('Estado')
+      .evaluate()
+      .setTitle('Estado del trámite · E.E.S. Nº 18')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
   return HtmlService
-    .createTemplateFromFile(file)
+    .createTemplateFromFile('Formulario')
     .evaluate()
-    .setTitle(title)
+    .setTitle('Analítico Parcial / Pase · E.E.S. Nº 18')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
 }
 
