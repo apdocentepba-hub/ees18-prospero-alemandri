@@ -15,6 +15,13 @@ def test_acceso_digital_desde_pases_y_equivalencias():
     assert 'href="estado-tramite.html"' in tramite
 
 
+def test_formulario_y_consulta_vuelven_a_pases_y_equivalencias():
+    solicitud = read("solicitar-analitico.html")
+    estado = read("estado-tramite.html")
+    assert 'href="pases-equivalencias.html"' in solicitud
+    assert 'href="pases-equivalencias.html"' in estado
+
+
 def test_pases_y_equivalencias_muestra_requisitos_base():
     tramite = read("pases-equivalencias.html")
     for item in [
