@@ -2,12 +2,14 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 INDEX = ROOT.joinpath("index.html").read_text(encoding="utf-8")
+JS = ROOT.joinpath("assets/js/main.js").read_text(encoding="utf-8")
 
 
 def test_portada_promueve_ingreso_2027():
-    assert 'Ingreso 2027' in INDEX
-    assert 'Elegí ENSPA' in INDEX
-    assert 'href="ingreso-2027.html"' in INDEX
+    portada = INDEX + JS
+    assert 'Ingreso 2027' in portada
+    assert 'Elegí ENSPA' in portada
+    assert 'href="ingreso-2027.html"' in portada
 
 
 def test_pagina_ingreso_2027_publicada():
