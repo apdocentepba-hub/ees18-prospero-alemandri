@@ -1,15 +1,12 @@
 name: Test public site
 
 on:
-  push:
-    branches:
-      - fix/pases-equivalencias-publico
   pull_request:
     branches:
       - main
 
 jobs:
-  pytest:
+  site-tests:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,5 +17,7 @@ jobs:
           python-version: '3.12'
       - name: Install pytest
         run: python -m pip install pytest
-      - name: Run tests
-        run: pytest tests/test_pases_publico.py -q
+      - name: Run Python tests
+        run: pytest -q
+      - name: Check JavaScript syntax
+        run: node --check assets/js/main.js
