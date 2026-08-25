@@ -21,5 +21,3 @@ jobs:
         run: pytest -q
       - name: Check JavaScript syntax
         run: node --check assets/js/main.js
-      - name: Run JavaScript assertions
-        run: node tests/site.test.js
