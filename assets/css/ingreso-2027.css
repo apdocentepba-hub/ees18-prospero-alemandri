@@ -1,0 +1,194 @@
+/* Campaña Ingreso 2027 · E.E.S. Nº 18 ENSPA */
+
+.ingreso-campaign {
+  position: relative;
+  overflow: hidden;
+  padding: 76px 0;
+  color: #fff;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(97, 190, 225, .22), transparent 30%),
+    linear-gradient(135deg, #0f3f62 0%, #175f8d 58%, #0f3f62 100%);
+}
+.ingreso-campaign::after {
+  content: "ENSPA";
+  position: absolute;
+  right: -24px;
+  bottom: -52px;
+  color: rgba(255,255,255,.055);
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: clamp(6rem, 16vw, 13rem);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+}
+.ingreso-campaign__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(280px, .8fr);
+  gap: 54px;
+  align-items: center;
+}
+.ingreso-campaign__eyebrow,
+.ingreso-page__eyebrow {
+  display: inline-flex;
+  margin-bottom: 14px;
+  color: #9edaf0;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.ingreso-campaign h2 {
+  max-width: 760px;
+  margin: 0;
+  color: #fff;
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: clamp(2.45rem, 5vw, 4.5rem);
+  line-height: 1.04;
+}
+.ingreso-campaign h2 span { color: #9edaf0; }
+.ingreso-campaign__lead {
+  max-width: 720px;
+  margin: 22px 0 0;
+  color: #dcecf4;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+.ingreso-campaign__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+.ingreso-campaign__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 48px;
+  padding: 0 20px;
+  border: 1px solid rgba(255,255,255,.35);
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+}
+.ingreso-campaign__button--primary {
+  color: #0f3f62;
+  background: #fff;
+  border-color: #fff;
+}
+.ingreso-campaign__facts {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.ingreso-campaign__facts li {
+  padding: 17px 18px;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.13);
+  backdrop-filter: blur(4px);
+}
+.ingreso-campaign__facts strong { display: block; color: #fff; }
+.ingreso-campaign__facts span { display: block; margin-top: 3px; color: #cce4ef; font-size: .9rem; }
+
+.ingreso-page-hero {
+  padding: 86px 0 78px;
+  color: #fff;
+  background:
+    radial-gradient(circle at 78% 22%, rgba(99, 190, 226, .22), transparent 28%),
+    linear-gradient(135deg, #0f3f62, #175f8d);
+}
+.ingreso-page-hero__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+  gap: 54px;
+  align-items: center;
+}
+.ingreso-page-hero h1 {
+  max-width: 820px;
+  margin: 0;
+  color: #fff;
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  line-height: 1.02;
+}
+.ingreso-page-hero h1 span { color: #9edaf0; }
+.ingreso-page-hero p {
+  max-width: 760px;
+  margin: 22px 0 0;
+  color: #dcecf4;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+.ingreso-page-hero__badge {
+  padding: 28px;
+  background: rgba(255,255,255,.09);
+  border: 1px solid rgba(255,255,255,.17);
+}
+.ingreso-page-hero__badge small { color: #9edaf0; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.ingreso-page-hero__badge strong { display: block; margin-top: 9px; color: #fff; font-family: "Libre Baskerville", Georgia, serif; font-size: 1.75rem; line-height: 1.2; }
+.ingreso-page-hero__badge span { display: block; margin-top: 12px; color: #d8e8f0; line-height: 1.55; }
+
+.ingreso-page-section { padding: 78px 0; }
+.ingreso-page-section--soft { background: #f5f9fb; }
+.ingreso-page-heading { max-width: 850px; margin-bottom: 34px; }
+.ingreso-page-heading span { color: #175f8d; font-size: .75rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+.ingreso-page-heading h2 { margin: 8px 0 0; color: #0f3f62; font-family: "Libre Baskerville", Georgia, serif; font-size: clamp(2rem, 4vw, 3.25rem); }
+.ingreso-page-heading p { margin: 15px 0 0; color: #617887; line-height: 1.7; }
+.ingreso-orientation-grid,
+.ingreso-reason-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+.ingreso-orientation-card,
+.ingreso-reason-card {
+  min-width: 0;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #dfe9ee;
+  box-shadow: 0 14px 34px rgba(15,63,98,.07);
+}
+.ingreso-orientation-card span { color: #2b7da9; font-size: .72rem; font-weight: 800; letter-spacing: .1em; }
+.ingreso-orientation-card h3,
+.ingreso-reason-card h3 { margin: 12px 0 8px; color: #0f3f62; font-family: "Libre Baskerville", Georgia, serif; font-size: 1.25rem; }
+.ingreso-orientation-card p,
+.ingreso-reason-card p { margin: 0; color: #637b89; line-height: 1.6; }
+.ingreso-page-cta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 30px;
+  align-items: center;
+  padding: 34px;
+  color: #fff;
+  background: #0f3f62;
+}
+.ingreso-page-cta h2 { margin: 0; color: #fff; font-family: "Libre Baskerville", Georgia, serif; }
+.ingreso-page-cta p { margin: 10px 0 0; color: #d6e6ee; }
+.ingreso-page-cta__links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.ingreso-page-cta a { display: inline-flex; min-height: 46px; align-items: center; padding: 0 18px; color: #0f3f62; background: #fff; font-weight: 800; text-decoration: none; }
+.ingreso-page-cta a:last-child { color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.35); }
+
+@media (max-width: 980px) {
+  .ingreso-campaign__grid,
+  .ingreso-page-hero__grid,
+  .ingreso-page-cta { grid-template-columns: 1fr; }
+  .ingreso-orientation-grid,
+  .ingreso-reason-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+  .ingreso-page-cta__links { justify-content: flex-start; }
+}
+
+@media (max-width: 620px) {
+  .ingreso-campaign,
+  .ingreso-page-hero { padding-block: 58px; }
+  .ingreso-page-section { padding-block: 58px; }
+  .ingreso-orientation-grid,
+  .ingreso-reason-grid { grid-template-columns: 1fr; }
+  .ingreso-campaign__actions { flex-direction: column; align-items: stretch; }
+  .ingreso-campaign__button { width: 100%; }
+  .ingreso-page-cta { padding: 26px 22px; }
+  .ingreso-page-cta__links { flex-direction: column; }
+  .ingreso-page-cta a { justify-content: center; }
+}
