@@ -21,3 +21,5 @@ jobs:
         run: pytest -q
       - name: Check JavaScript syntax
         run: node --check assets/js/main.js
+      - name: Run JavaScript structure checks
+        run: node tests/site.test.js
