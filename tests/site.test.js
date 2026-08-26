@@ -5,7 +5,9 @@ const assert = require('assert');
 const root = path.resolve(__dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
-assert(fs.existsSync(path.join(root, 'index.html')), 'index.html must exist');
+['index.html','ingreso-2027.html','visitas-enspa.html','enspa-en-accion.html','comunicados.html','404.html'].forEach((file) => {
+  assert(fs.existsSync(path.join(root, file)), `${file} must exist`);
+});
 assert(fs.existsSync(path.join(root, 'assets/css/styles.css')), 'styles.css must exist');
 assert(fs.existsSync(path.join(root, 'assets/js/main.js')), 'main.js must exist');
 
@@ -23,8 +25,11 @@ assert(html.includes('assets/js/main.js'), 'script must be linked');
 assert(/id=["']menu-toggle["']/.test(html), 'mobile menu button must exist');
 assert(/aria-expanded=["']false["']/.test(html), 'mobile menu must expose aria-expanded');
 assert(/id=["']primary-nav["']/.test(html), 'primary nav must have an id');
-assert(css.includes('--sky:'), 'institutional sky color token must exist');
+assert(css.includes('--celeste:'), 'institutional celeste color token must exist');
 assert(css.includes('@media'), 'responsive rules must exist');
 assert(js.includes('aria-expanded'), 'menu behavior must update aria-expanded');
 assert(js.includes('prefers-reduced-motion'), 'motion preferences must be respected');
+assert(js.includes('visitas-enspa.html'), 'campaign must link to visits page');
+assert(html.includes('enspa-en-accion.html'), 'home must link to ENSPA en acción');
+assert(html.includes('comunicados.html'), 'home must link to official communications');
 console.log('site.test.js: all assertions passed');
