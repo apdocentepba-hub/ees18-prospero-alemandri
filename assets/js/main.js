@@ -43,6 +43,14 @@ if (serviceStrip && !document.getElementById('ingreso-2027-campaign')) {
   `);
 }
 
+const currentBriefs = document.querySelectorAll('.current-briefs article');
+if (currentBriefs[0]) {
+  currentBriefs[0].innerHTML = '<a href="enspa-en-accion.html"><strong>ENSPA en acción</strong><span>Proyectos y actividades →</span></a>';
+}
+if (currentBriefs[1]) {
+  currentBriefs[1].innerHTML = '<a href="comunicados.html"><strong>Comunicados oficiales</strong><span>Información institucional →</span></a>';
+}
+
 if (menuToggle && primaryNav) {
   const setMenu = (open) => {
     menuToggle.setAttribute('aria-expanded', String(open));
