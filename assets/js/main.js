@@ -9,11 +9,10 @@ if (!ingresoStylesheet) {
   document.head.appendChild(stylesheet);
 }
 
-if (primaryNav && !primaryNav.querySelector('[data-ingreso-link]')) {
+if (primaryNav && !primaryNav.querySelector('a[href="ingreso-2027.html"]')) {
   const ingresoNavLink = document.createElement('a');
   ingresoNavLink.href = 'ingreso-2027.html';
   ingresoNavLink.textContent = 'Ingreso 2027';
-  ingresoNavLink.dataset.ingresoLink = 'true';
   const contactLink = primaryNav.querySelector('a[href="#contacto"]');
   primaryNav.insertBefore(ingresoNavLink, contactLink || null);
 }
@@ -29,26 +28,18 @@ if (serviceStrip && !document.getElementById('ingreso-2027-campaign')) {
           <p class="ingreso-campaign__lead">Una escuela pública con más de 100 años de historia en Avellaneda, Ciclo Básico común y cuatro orientaciones para construir tu recorrido.</p>
           <div class="ingreso-campaign__actions">
             <a class="ingreso-campaign__button ingreso-campaign__button--primary" href="ingreso-2027.html">Conocer Ingreso 2027</a>
-            <a class="ingreso-campaign__button" href="plan-estudios.html">Ver plan de estudios</a>
+            <a class="ingreso-campaign__button" href="visitas-enspa.html">Vení a conocer ENSPA</a>
           </div>
         </div>
         <ul class="ingreso-campaign__facts reveal" aria-label="Características de la propuesta ENSPA">
           <li><strong>4 orientaciones</strong><span>Comunicación · Sociales · Lenguas · Naturales</span></li>
           <li><strong>Ciclo Básico común</strong><span>1º, 2º y 3º año</span></li>
           <li><strong>Comunidad ENSPA</strong><span>Biblioteca · EOE · Audiovisuales · Centro de Estudiantes</span></li>
-          <li><strong>Avellaneda centro</strong><span>Av. Belgrano 311</span></li>
+          <li><strong>Turnos mañana y tarde</strong><span>Una propuesta secundaria en Avellaneda</span></li>
         </ul>
       </div>
     </section>
   `);
-}
-
-const currentBriefs = document.querySelectorAll('.current-briefs article');
-if (currentBriefs[0]) {
-  currentBriefs[0].innerHTML = '<a href="enspa-en-accion.html"><strong>ENSPA en acción</strong><span>Proyectos y actividades →</span></a>';
-}
-if (currentBriefs[1]) {
-  currentBriefs[1].innerHTML = '<a href="comunicados.html"><strong>Comunicados oficiales</strong><span>Información institucional →</span></a>';
 }
 
 if (menuToggle && primaryNav) {
