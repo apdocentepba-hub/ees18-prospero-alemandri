@@ -123,12 +123,11 @@ def test_contacto_institucional():
 
 def test_autoridades_institucionales():
     for item in [
-        'Lanni Ana', 'Caceres Adriana Celeste', 'Centurion Anabella',
-        'Dimola Maria de los Angeles', 'Vicedirección · Turno tarde',
+        'Ana Lanni', 'Adriana Celeste Caceres', 'Anabella Centurión',
+        'María de los Ángeles Dimola', 'Vicedirección · Turno tarde',
         'A confirmar'
     ]:
         require(item)
-    assert 'Ana Lanni' not in HTML
 
 
 def test_espacios_institucionales():
