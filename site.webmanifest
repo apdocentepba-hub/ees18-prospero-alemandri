@@ -1,0 +1,11 @@
+{
+  "name": "E.E.S. Nº 18 Próspero Alemandri · ENSPA",
+  "short_name": "ENSPA EES18",
+  "start_url": "/ees18-prospero-alemandri/",
+  "scope": "/ees18-prospero-alemandri/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f3f62",
+  "lang": "es-AR",
+  "description": "Sitio institucional de la E.E.S. Nº 18 Próspero Alemandri de Avellaneda."
+}
