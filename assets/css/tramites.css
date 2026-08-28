@@ -3,7 +3,8 @@
 .procedure-brand{display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--azul-profundo)}
 .procedure-brand .enspa-logo{width:58px;height:58px;object-fit:contain}
 .procedure-brand span{display:flex;flex-direction:column;gap:3px}
-.procedure-brand small{font-size:.72rem;font-weight:700;color:#6a8596;text-transform:uppercase;letter-spacing:.06em}
+.procedure-brand small{font-size:0;font-weight:700;color:#6a8596;text-transform:uppercase;letter-spacing:.06em}
+.procedure-brand small::after{content:"Escuela secundaria estatal · Avellaneda";font-size:.72rem}
 .procedure-brand strong{font-size:.88rem;letter-spacing:.02em}
 .procedure-back{font-weight:800;color:var(--azul);text-decoration:none}
 .procedure-hero{padding:76px 0;background:linear-gradient(145deg,#edf7fb,#fff)}
