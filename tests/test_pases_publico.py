@@ -44,3 +44,23 @@ def test_ruta_anterior_redirige_al_webapp():
 def test_titulos_queda_diferenciado_del_circuito_de_pases():
     html = read("index.html")
     assert "Títulos y analíticos finales" in html
+
+
+def test_pases_ofrece_progreso_y_consulta_de_estado():
+    html = read("pases-equivalencias.html")
+    assert "Progreso del estado de Pase / Analítico" in html
+    assert 'href="consultar-estado.html"' in html
+    assert "Consultar estado" in html
+
+
+def test_consulta_estado_usa_codigo_y_no_dni():
+    html = read("consultar-estado.html")
+    assert "Código de seguimiento" in html
+    assert 'name="dni"' not in html.lower()
+    for texto in [
+        "Solicitud recibida",
+        "Documentación en revisión",
+        "Analítico en confección",
+        "Trámite finalizado",
+    ]:
+        assert texto in html
