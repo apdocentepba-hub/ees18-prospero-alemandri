@@ -3,7 +3,8 @@
 .study-brand { display: flex; align-items: center; gap: 14px; min-width: 0; }
 .study-brand .enspa-logo { width: 60px; height: 60px; object-fit: contain; border-radius: 50%; flex: 0 0 auto; }
 .study-brand span { display: flex; flex-direction: column; line-height: 1.2; min-width: 0; }
-.study-brand small { color: #2b78a8; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.study-brand small { color: #2b78a8; font-size:0; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.study-brand small::after { content:"Escuela secundaria estatal · Avellaneda"; font-size:.72rem; }
 .study-brand strong { margin-top: 4px; color: #0f3f62; font-family: "Libre Baskerville", Georgia, serif; font-size: 1rem; }
 .study-back { flex: 0 0 auto; padding: 10px 14px; border: 1px solid #bfd8e8; border-radius: 999px; color: #0f3f62; font-weight: 800; }
 
@@ -81,7 +82,7 @@
 
 @media (max-width: 620px) {
   .study-brand .enspa-logo { width: 48px; height: 48px; }
-  .study-brand small { font-size: .6rem; }
+  .study-brand small::after { font-size: .6rem; }
   .study-brand strong { font-size: .78rem; }
   .study-header__inner { min-height: 70px; }
   .study-hero { padding: 58px 0 50px; }
