@@ -26,19 +26,19 @@ def test_ingreso_has_faq_visits_and_whatsapp_share():
     ingreso = read("ingreso-2027.html")
     assert '<details' in ingreso
     assert 'Preguntas frecuentes' in ingreso
-    assert 'href="visitas-enspa.html"' in ingreso
+    assert 'href="visitas-ees18.html"' in ingreso
     assert 'wa.me/?text=' in ingreso
     assert 'mailto:secundaria18avellaneda@abc.gob.ar' in ingreso
-    visitas = ROOT / "visitas-enspa.html"
+    visitas = ROOT / "visitas-ees18.html"
     assert visitas.exists()
-    visitas_html = read("visitas-enspa.html")
-    assert 'Vení a conocer ENSPA' in visitas_html
+    visitas_html = read("visitas-ees18.html")
+    assert 'Vení a conocer la E.E.S. Nº 18' in visitas_html
     assert 'fecha a confirmar' in visitas_html.lower()
     assert 'secundaria18avellaneda@abc.gob.ar' in visitas_html
 
 
 def test_reputation_pages_have_publishable_structure():
-    accion = read("enspa-en-accion.html")
+    accion = read("vida-escolar.html")
     comunicados = read("comunicados.html")
     for category in ["Proyectos", "Ciencias", "Comunicación", "Lenguas", "Sociales", "Cultura y deporte"]:
         assert category in accion
