@@ -1,0 +1,37 @@
+name: Rebuild RE image
+
+on:
+  push:
+    branches:
+      - feat/reorganizacion-multipagina
+    paths:
+      - 'tools/re-image-chunks/**'
+      - '.github/workflows/rebuild-re-image.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: feat/reorganizacion-multipagina
+          fetch-depth: 0
+      - name: Rebuild JPEG from chunks
+        run: |
+          cat tools/re-image-chunks/part-*.b64 | base64 --decode > assets/img/re-bonaerense-2024.jpg
+          test "$(stat -c%s assets/img/re-bonaerense-2024.jpg)" -gt 20000
+          file assets/img/re-bonaerense-2024.jpg | grep -q 'JPEG image data'
+      - name: Commit rebuilt image
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add assets/img/re-bonaerense-2024.jpg
+          if git diff --cached --quiet; then
+            echo 'Image already up to date.'
+            exit 0
+          fi
+          git commit -m 'fix: restaurar imagen RE Bonaerense'
+          git push origin HEAD:feat/reorganizacion-multipagina
