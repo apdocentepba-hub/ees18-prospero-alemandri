@@ -24,17 +24,17 @@ if (serviceStrip && !document.getElementById('ingreso-2027-campaign')) {
       <div class="container ingreso-campaign__grid">
         <div class="reveal">
           <span class="ingreso-campaign__eyebrow">Ingreso 2027 · E.E.S. Nº 18</span>
-          <h2 id="ingreso-2027-title">Elegí ENSPA.<br><span>Conocé tu próxima secundaria.</span></h2>
-          <p class="ingreso-campaign__lead">Una escuela pública con más de 100 años de historia en Avellaneda, Ciclo Básico común y cuatro orientaciones para construir tu recorrido.</p>
+          <h2 id="ingreso-2027-title">Elegí E.E.S. Nº 18.<br><span>Conocé tu próxima secundaria.</span></h2>
+          <p class="ingreso-campaign__lead">Una escuela pública con más de 100 años de trayectoria educativa en Avellaneda, Ciclo Básico común y cuatro orientaciones para construir tu recorrido.</p>
           <div class="ingreso-campaign__actions">
             <a class="ingreso-campaign__button ingreso-campaign__button--primary" href="ingreso-2027.html">Conocer Ingreso 2027</a>
-            <a class="ingreso-campaign__button" href="visitas-enspa.html">Vení a conocer ENSPA</a>
+            <a class="ingreso-campaign__button" href="visitas-ees18.html">Vení a conocer la E.E.S. Nº 18</a>
           </div>
         </div>
-        <ul class="ingreso-campaign__facts reveal" aria-label="Características de la propuesta ENSPA">
+        <ul class="ingreso-campaign__facts reveal" aria-label="Características de la propuesta de la E.E.S. Nº 18">
           <li><strong>4 orientaciones</strong><span>Comunicación · Sociales · Lenguas · Naturales</span></li>
           <li><strong>Ciclo Básico común</strong><span>1º, 2º y 3º año</span></li>
-          <li><strong>Comunidad ENSPA</strong><span>Biblioteca · EOE · Audiovisuales · Centro de Estudiantes</span></li>
+          <li><strong>Comunidad educativa</strong><span>Biblioteca · EOE · Audiovisuales · Centro de Estudiantes</span></li>
           <li><strong>Turnos mañana y tarde</strong><span>Una propuesta secundaria en Avellaneda</span></li>
         </ul>
       </div>
