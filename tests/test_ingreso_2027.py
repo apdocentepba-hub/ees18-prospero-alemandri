@@ -8,7 +8,7 @@ JS = ROOT.joinpath("assets/js/main.js").read_text(encoding="utf-8")
 def test_portada_promueve_ingreso_2027():
     portada = INDEX + JS
     assert 'Ingreso 2027' in portada
-    assert 'Elegí ENSPA' in portada
+    assert 'Elegí E.E.S. Nº 18' in portada
     assert 'href="ingreso-2027.html"' in portada
 
 

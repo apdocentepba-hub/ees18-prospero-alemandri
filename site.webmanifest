@@ -1,6 +1,6 @@
 {
-  "name": "E.E.S. Nº 18 Próspero Alemandri · ENSPA",
-  "short_name": "ENSPA EES18",
+  "name": "E.E.S. Nº 18 Próspero Alemandri",
+  "short_name": "EES18",
   "start_url": "/ees18-prospero-alemandri/",
   "scope": "/ees18-prospero-alemandri/",
   "display": "standalone",

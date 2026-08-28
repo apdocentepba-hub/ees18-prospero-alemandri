@@ -5,7 +5,7 @@ const assert = require('assert');
 const root = path.resolve(__dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
-['index.html','ingreso-2027.html','visitas-enspa.html','enspa-en-accion.html','comunicados.html','404.html'].forEach((file) => {
+['index.html','ingreso-2027.html','visitas-ees18.html','vida-escolar.html','historia.html','comunicados.html','404.html'].forEach((file) => {
   assert(fs.existsSync(path.join(root, file)), `${file} must exist`);
 });
 assert(fs.existsSync(path.join(root, 'assets/css/styles.css')), 'styles.css must exist');
@@ -29,7 +29,8 @@ assert(css.includes('--celeste:'), 'institutional celeste color token must exist
 assert(css.includes('@media'), 'responsive rules must exist');
 assert(js.includes('aria-expanded'), 'menu behavior must update aria-expanded');
 assert(js.includes('prefers-reduced-motion'), 'motion preferences must be respected');
-assert(js.includes('visitas-enspa.html'), 'campaign must link to visits page');
-assert(html.includes('enspa-en-accion.html'), 'home must link to ENSPA en acción');
+assert(js.includes('visitas-ees18.html'), 'campaign must link to visits page');
+assert(html.includes('vida-escolar.html'), 'home must link to Vida escolar');
+assert(html.includes('historia.html'), 'home must link to institutional history');
 assert(html.includes('comunicados.html'), 'home must link to official communications');
 console.log('site.test.js: all assertions passed');

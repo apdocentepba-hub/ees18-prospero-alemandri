@@ -9,7 +9,7 @@ def require(text):
     assert text in HTML, f"Falta contenido requerido: {text}"
 
 
-def test_portal_secundario_enspa():
+def test_portal_secundario_ees18():
     require('class="enspa-logo"')
     require('id="tramites"')
     require('id="estudiantes"')
@@ -19,7 +19,7 @@ def test_portal_secundario_enspa():
     require('id="calendario"')
     require('E.E.S. Nº 18')
     require('PRÓSPERO ALEMANDRI')
-    require('Av. Belgrano 311')
+    require('Av. Belgrano 355')
 
 
 def test_no_contenido_terciario():
