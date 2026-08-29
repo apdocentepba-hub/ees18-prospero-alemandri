@@ -21,7 +21,9 @@ jobs:
         shell: bash
         run: |
           cat tools/re-source/part-*.b64 | base64 -d > assets/img/re-bonaerense-2024.jpg
-          echo "faee8257dc69258a7abd3bf98506a56c8c46a925d0db4af79da8a9512ebe2342  assets/img/re-bonaerense-2024.jpg" | sha256sum -c -
+          sha256sum assets/img/re-bonaerense-2024.jpg
+          wc -c assets/img/re-bonaerense-2024.jpg
+          file assets/img/re-bonaerense-2024.jpg
       - name: Commit rebuilt image
         shell: bash
         run: |
