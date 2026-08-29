@@ -12,7 +12,19 @@ def test_re_bonaerense_es_jpeg_valido_y_no_un_archivo_roto():
 
     with Image.open(IMAGE_PATH) as image:
         assert image.format == "JPEG"
-        width, height = image.size
-        assert width >= 280, f"Ancho insuficiente: {width}px"
-        assert height >= 420, f"Alto insuficiente: {height}px"
+        assert image.size == (280, 420)
         image.verify()
+
+
+def test_re_bonaerense_se_muestra_a_resolucion_nativa():
+    index = (ROOT / "index.html").read_text(encoding="utf-8")
+    vida = (ROOT / "vida-escolar.html").read_text(encoding="utf-8")
+    css = (ROOT / "assets" / "css" / "multipage.css").read_text(encoding="utf-8")
+
+    for html in (index, vida):
+        assert 'src="assets/img/re-bonaerense-2024.jpg"' in html
+        assert 'width="280" height="420"' in html
+        assert 'summary_large_image' not in html
+
+    assert '.home-news__image img{display:block;width:280px;max-width:100%;height:auto' in css
+    assert '.feature-story img{display:block;width:280px;max-width:100%;height:auto' in css
