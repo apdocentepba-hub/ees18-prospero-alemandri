@@ -1,0 +1,1 @@
+window.EES18_RESERVAS_API_URL = '';
