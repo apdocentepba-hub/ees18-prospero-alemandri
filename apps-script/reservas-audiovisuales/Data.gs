@@ -85,7 +85,9 @@ function buildReservationRecordFromValues_(headers, values, rowNumber) {
     syncState: String(valueForHeader_(map, values, 'Estado sincronización') || '').trim(),
     groupId: String(valueForHeader_(map, values, 'ID grupo') || '').trim(),
     slots: String(valueForHeader_(map, values, 'Módulos') || '').trim(),
-    cancellationHash: String(valueForHeader_(map, values, 'Hash cancelación') || '').trim()
+    cancellationHash: String(valueForHeader_(map, values, 'Hash cancelación') || '').trim(),
+    cancellationDate: valueForHeader_(map, values, 'Fecha cancelación') || '',
+    syncError: String(valueForHeader_(map, values, 'Último error sincronización') || '').trim()
   };
 }
 
@@ -159,4 +161,97 @@ function getCalendarIdFromConfiguration_() {
   }
 
   throw new Error('MISSING_CALENDAR_ID');
+}
+
+function reservationDateDisplay_(isoDate) {
+  var match = String(isoDate || '').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return String(isoDate || '');
+  return match[3] + '/' + match[2] + '/' + match[1];
+}
+
+function assignRowValueByHeader_(row, map, headerName, value) {
+  var index = map[normalizeHeader_(headerName)];
+  if (typeof index === 'number') row[index] = value;
+}
+
+function appendReservationRecord_(record) {
+  ensureReservationColumns_();
+  var sheet = getRequiredSheet_(RESERVAS_SETTINGS_.RESERVAS_SHEET);
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var map = buildHeaderMap_(headers);
+  var row = new Array(headers.length).fill('');
+  var now = new Date();
+
+  assignRowValueByHeader_(row, map, 'ID', record.id);
+  assignRowValueByHeader_(row, map, 'Fecha de carga', now);
+  assignRowValueByHeader_(row, map, 'Estado', record.state || 'Confirmada');
+  assignRowValueByHeader_(row, map, 'Fecha de reserva', reservationDateDisplay_(record.date));
+  assignRowValueByHeader_(row, map, 'Hora desde', record.start);
+  assignRowValueByHeader_(row, map, 'Hora hasta', record.end);
+  assignRowValueByHeader_(row, map, 'Profesor/a', record.teacher);
+  assignRowValueByHeader_(row, map, 'Correo docente', record.email);
+  assignRowValueByHeader_(row, map, 'Curso', record.course);
+  assignRowValueByHeader_(row, map, 'Materia / espacio curricular', record.subject);
+  assignRowValueByHeader_(row, map, 'Turno', record.shift);
+  assignRowValueByHeader_(row, map, 'Usa cañón', yesNoReservation_(record.resources && record.resources.projector));
+  assignRowValueByHeader_(row, map, 'Usa parlantes', yesNoReservation_(record.resources && record.resources.speakers));
+  assignRowValueByHeader_(row, map, 'Usa notebook escuela', yesNoReservation_(record.resources && record.resources.schoolNotebook));
+  assignRowValueByHeader_(row, map, 'Necesita internet', yesNoReservation_(record.resources && record.resources.internet));
+  assignRowValueByHeader_(row, map, 'Observaciones', record.observations || '');
+  assignRowValueByHeader_(row, map, 'Responsable que confirma', 'Sistema web');
+  assignRowValueByHeader_(row, map, 'ID evento calendario', record.calendarEventId || '');
+  assignRowValueByHeader_(row, map, 'Aviso enviado', 'No');
+  assignRowValueByHeader_(row, map, 'Última actualización', now);
+  assignRowValueByHeader_(row, map, 'ID grupo', record.groupId || '');
+  assignRowValueByHeader_(row, map, 'Módulos', (record.slotIds || []).join(','));
+  assignRowValueByHeader_(row, map, 'Tipo correo', record.emailType || '');
+  assignRowValueByHeader_(row, map, 'Hash cancelación', record.cancellationHash || '');
+  assignRowValueByHeader_(row, map, 'Fecha cancelación', record.cancellationDate || '');
+  assignRowValueByHeader_(row, map, 'Estado sincronización', record.syncState || 'PENDIENTE_CALENDAR');
+  assignRowValueByHeader_(row, map, 'Último error sincronización', record.syncError || '');
+
+  sheet.appendRow(row);
+  record.rowNumber = sheet.getLastRow();
+  return record;
+}
+
+function findReservationRecordById_(reservationId) {
+  var records = readReservationRecords_();
+  for (var i = 0; i < records.length; i += 1) {
+    if (records[i].id === reservationId) return records[i];
+  }
+  return null;
+}
+
+function updateReservationFieldsById_(reservationId, fields) {
+  var record = findReservationRecordById_(reservationId);
+  if (!record || !record.rowNumber) throw new Error('RESERVATION_NOT_FOUND');
+
+  var sheet = getRequiredSheet_(RESERVAS_SETTINGS_.RESERVAS_SHEET);
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var map = buildHeaderMap_(headers);
+  var aliases = {
+    state: 'Estado',
+    calendarEventId: 'ID evento calendario',
+    cancellationHash: 'Hash cancelación',
+    cancellationDate: 'Fecha cancelación',
+    syncState: 'Estado sincronización',
+    syncError: 'Último error sincronización',
+    mailSent: 'Aviso enviado'
+  };
+
+  Object.keys(fields || {}).forEach(function (key) {
+    var headerName = aliases[key] || key;
+    var columnIndex = map[normalizeHeader_(headerName)];
+    if (typeof columnIndex === 'number') {
+      sheet.getRange(record.rowNumber, columnIndex + 1).setValue(fields[key]);
+    }
+  });
+
+  var updatedIndex = map[normalizeHeader_('Última actualización')];
+  if (typeof updatedIndex === 'number') {
+    sheet.getRange(record.rowNumber, updatedIndex + 1).setValue(new Date());
+  }
+
+  return findReservationRecordById_(reservationId);
 }
