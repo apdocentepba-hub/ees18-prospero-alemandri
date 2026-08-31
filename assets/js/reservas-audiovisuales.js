@@ -143,3 +143,217 @@
     buildWeeklyDates
   });
 });
+
+(function initBookingUi() {
+  'use strict';
+
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+
+  const rules = window.EES18ReservasRules;
+  const calendar = document.getElementById('booking-calendar');
+  if (!rules || !calendar) return;
+
+  const monthLabel = document.getElementById('calendar-month-label');
+  const prevButton = document.getElementById('calendar-prev');
+  const nextButton = document.getElementById('calendar-next');
+  const selectedDateTitle = document.getElementById('selected-date-title');
+  const dayStatusBadge = document.getElementById('day-status-badge');
+  const dayHelp = document.getElementById('day-help');
+  const morningSlots = document.getElementById('morning-slots');
+  const afternoonSlots = document.getElementById('afternoon-slots');
+  const selectionSummary = document.getElementById('selection-summary');
+  const bookingFields = document.getElementById('booking-fields');
+  const confirmationSummary = document.getElementById('confirmation-summary');
+
+  const today = startOfLocalDay(new Date());
+  const maxDate = addDays(today, 60);
+  const state = {
+    visibleMonth: new Date(today.getFullYear(), today.getMonth(), 1),
+    selectedDate: '',
+    selectedSlotIds: [],
+    occupiedSlotIds: []
+  };
+
+  function startOfLocalDay(date) {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  function addDays(date, amount) {
+    const result = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    result.setDate(result.getDate() + amount);
+    return result;
+  }
+
+  function toIsoLocal(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
+  function formatLongDate(isoDate) {
+    const [year, month, day] = isoDate.split('-').map(Number);
+    return new Intl.DateTimeFormat('es-AR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }).format(new Date(year, month - 1, day));
+  }
+
+  function isWeekend(date) {
+    return date.getDay() === 0 || date.getDay() === 6;
+  }
+
+  function dateState(date) {
+    if (date < today || date > maxDate || isWeekend(date)) return 'blocked';
+    return 'available';
+  }
+
+  function renderCalendar() {
+    calendar.replaceChildren();
+
+    const year = state.visibleMonth.getFullYear();
+    const month = state.visibleMonth.getMonth();
+    monthLabel.textContent = new Intl.DateTimeFormat('es-AR', {
+      month: 'long',
+      year: 'numeric'
+    }).format(state.visibleMonth);
+
+    const firstDay = new Date(year, month, 1);
+    const mondayOffset = (firstDay.getDay() + 6) % 7;
+    for (let index = 0; index < mondayOffset; index += 1) {
+      const empty = document.createElement('span');
+      empty.className = 'calendar-day is-empty';
+      empty.setAttribute('aria-hidden', 'true');
+      calendar.appendChild(empty);
+    }
+
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    for (let day = 1; day <= daysInMonth; day += 1) {
+      const date = new Date(year, month, day);
+      const isoDate = toIsoLocal(date);
+      const status = dateState(date);
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = `calendar-day is-${status}`;
+      button.dataset.date = isoDate;
+      button.setAttribute('role', 'gridcell');
+      button.setAttribute('aria-label', `${formatLongDate(isoDate)} · ${status === 'blocked' ? 'No disponible' : 'Disponible'}`);
+
+      const number = document.createElement('strong');
+      number.textContent = String(day);
+      const caption = document.createElement('small');
+      caption.textContent = status === 'blocked' ? 'Bloqueado' : 'Disponible';
+      button.append(number, caption);
+
+      if (status === 'blocked') button.disabled = true;
+      if (state.selectedDate === isoDate) button.classList.add('is-selected');
+      button.addEventListener('click', () => selectDate(isoDate));
+      calendar.appendChild(button);
+    }
+
+    const minMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const maxMonth = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
+    prevButton.disabled = state.visibleMonth <= minMonth;
+    nextButton.disabled = state.visibleMonth >= maxMonth;
+  }
+
+  function renderSlotList(container, slots) {
+    container.replaceChildren();
+
+    slots.forEach((slot) => {
+      const occupied = state.occupiedSlotIds.includes(slot.id);
+      const selected = state.selectedSlotIds.includes(slot.id);
+      const label = document.createElement('label');
+      label.className = `slot-option${occupied ? ' is-occupied' : ''}${selected ? ' is-selected' : ''}`;
+
+      const input = document.createElement('input');
+      input.type = 'checkbox';
+      input.value = slot.id;
+      input.checked = selected;
+      input.disabled = occupied || !state.selectedDate;
+      input.setAttribute('aria-label', `${slot.start} a ${slot.end}`);
+      input.addEventListener('change', () => toggleSlot(slot.id, input.checked));
+
+      const time = document.createElement('strong');
+      time.textContent = `${slot.start}–${slot.end}`;
+      const status = document.createElement('small');
+      status.textContent = occupied ? 'Ocupado' : 'Disponible';
+      label.append(input, time, status);
+      container.appendChild(label);
+    });
+  }
+
+  function renderSlots() {
+    renderSlotList(morningSlots, rules.SLOTS.MANANA);
+    renderSlotList(afternoonSlots, rules.SLOTS.TARDE);
+  }
+
+  function selectDate(isoDate) {
+    state.selectedDate = isoDate;
+    state.selectedSlotIds = [];
+    state.occupiedSlotIds = [];
+    selectedDateTitle.textContent = formatLongDate(isoDate);
+    dayStatusBadge.textContent = 'Disponible';
+    dayStatusBadge.dataset.state = 'available';
+    dayHelp.textContent = 'Marcá uno o varios módulos consecutivos del mismo turno.';
+    bookingFields.disabled = true;
+    renderCalendar();
+    renderSlots();
+    renderSelectionSummary();
+  }
+
+  function toggleSlot(slotId, checked) {
+    const previous = [...state.selectedSlotIds];
+    if (checked) {
+      state.selectedSlotIds = [...previous, slotId];
+    } else {
+      state.selectedSlotIds = previous.filter((id) => id !== slotId);
+    }
+
+    if (state.selectedSlotIds.length > 0) {
+      try {
+        rules.buildContinuousRange(state.selectedSlotIds);
+      } catch (error) {
+        state.selectedSlotIds = previous;
+        selectionSummary.classList.add('is-error');
+        selectionSummary.innerHTML = '<strong>Seleccioná módulos consecutivos del mismo turno.</strong><span>Si necesitás horarios separados, hacé reservas distintas.</span>';
+        renderSlots();
+        return;
+      }
+    }
+
+    renderSlots();
+    renderSelectionSummary();
+  }
+
+  function renderSelectionSummary() {
+    selectionSummary.classList.remove('is-error');
+
+    if (!state.selectedDate || state.selectedSlotIds.length === 0) {
+      selectionSummary.innerHTML = '<strong>Todavía no seleccionaste horarios.</strong><span>Podés marcar uno o varios módulos consecutivos del mismo turno.</span>';
+      bookingFields.disabled = true;
+      confirmationSummary.innerHTML = '<strong>Revisá fecha y horario antes de confirmar.</strong>';
+      return;
+    }
+
+    const range = rules.buildContinuousRange(state.selectedSlotIds);
+    selectionSummary.innerHTML = `<strong>${range.start} a ${range.end} · ${range.count} ${range.count === 1 ? 'módulo' : 'módulos'}</strong><span>Turno ${range.shift.toLowerCase()} · ${formatLongDate(state.selectedDate)}</span>`;
+    bookingFields.disabled = false;
+    confirmationSummary.innerHTML = `<strong>${formatLongDate(state.selectedDate)}</strong><br>${range.start} a ${range.end} · ${range.count} ${range.count === 1 ? 'módulo' : 'módulos'}`;
+  }
+
+  prevButton.addEventListener('click', () => {
+    state.visibleMonth = new Date(state.visibleMonth.getFullYear(), state.visibleMonth.getMonth() - 1, 1);
+    renderCalendar();
+  });
+
+  nextButton.addEventListener('click', () => {
+    state.visibleMonth = new Date(state.visibleMonth.getFullYear(), state.visibleMonth.getMonth() + 1, 1);
+    renderCalendar();
+  });
+
+  renderCalendar();
+  renderSlots();
+})();
