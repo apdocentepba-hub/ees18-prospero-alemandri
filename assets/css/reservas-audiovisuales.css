@@ -64,8 +64,20 @@
 .booking-confirm-box { margin-top: 1.35rem; display: flex; gap: 1rem; justify-content: space-between; align-items: center; padding: 1rem; border-radius: 15px; background: #f4f8fb; }
 .booking-submit { border: 0; border-radius: 12px; background: #0f5f86; color: #fff; padding: .82rem 1.1rem; font: inherit; font-weight: 800; cursor: pointer; white-space: nowrap; }
 .booking-submit:disabled { opacity: .55; cursor: wait; }
-.booking-result { margin-top: 1rem; padding: 1rem; border-radius: 14px; background: #eef9f2; border: 1px solid rgba(47,133,90,.22); }
-.calendar-day:focus-visible, .calendar-nav:focus-visible, .slot-option:focus-within, .booking-submit:focus-visible, .booking-form input:focus-visible, .booking-form textarea:focus-visible { outline: 3px solid rgba(43,143,190,.3); outline-offset: 2px; }
+.booking-result { margin-top: 1rem; padding: 1rem; border-radius: 14px; background: #eef9f2; border: 1px solid rgba(47,133,90,.22); display: grid; gap: .25rem; }
+.booking-cancel-shell { max-width: 760px; }
+.booking-panel { background: #fff; border: 1px solid rgba(15,63,98,.12); border-radius: 20px; box-shadow: 0 14px 38px rgba(15,63,98,.08); }
+.booking-cancel-card { margin-top: 1rem; padding: clamp(1.25rem, 3vw, 2rem); }
+.booking-cancel-card h2 { margin: .25rem 0 1rem; }
+.booking-cancel-details { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .75rem; margin: 1rem 0 1.35rem; }
+.booking-cancel-details div { padding: .85rem; border-radius: 12px; background: #f5f8fa; }
+.booking-cancel-details dt { color: #647582; font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .04em; }
+.booking-cancel-details dd { margin: .25rem 0 0; font-weight: 800; color: #173e57; }
+.booking-cancel-card .button { border: 0; border-radius: 12px; padding: .8rem 1rem; font: inherit; font-weight: 800; cursor: pointer; }
+.booking-cancel-card .button--primary { background: #9b2c2c; color: #fff; }
+.booking-cancel-card .button:disabled { opacity: .5; cursor: not-allowed; }
+.booking-back-link { margin-top: 1rem; }
+.calendar-day:focus-visible, .calendar-nav:focus-visible, .slot-option:focus-within, .booking-submit:focus-visible, .booking-form input:focus-visible, .booking-form textarea:focus-visible, .booking-cancel-card .button:focus-visible { outline: 3px solid rgba(43,143,190,.3); outline-offset: 2px; }
 @media (max-width: 900px) { .booking-layout { grid-template-columns: 1fr; } }
 @media (max-width: 760px) {
   .booking-calendar-card, .booking-day-card, .booking-form-shell { border-radius: 16px; }
@@ -77,5 +89,6 @@
   .resource-grid { grid-template-columns: 1fr; }
   .booking-confirm-box { align-items: stretch; flex-direction: column; }
   .booking-submit { width: 100%; }
+  .booking-cancel-details { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { .calendar-day, .booking-submit, .calendar-nav { transition: none !important; } }
