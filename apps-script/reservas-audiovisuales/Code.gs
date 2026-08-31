@@ -15,15 +15,81 @@ function doGet(e) {
       return publicReservationOutput_(getMonthAvailability(params.year, params.month), params.callback);
     }
 
+    if (action === 'create') {
+      var payload = parsePublicReservationPayload_(params.payload);
+      return publicReservationOutput_(createReservation(payload), params.callback);
+    }
+
+    if (action === 'cancelLookup') {
+      return publicReservationOutput_(getReservationByCancelToken(String(params.token || '')), params.callback);
+    }
+
+    if (action === 'cancel') {
+      return publicReservationOutput_(cancelReservation(String(params.token || '')), params.callback);
+    }
+
     return publicReservationOutput_({ ok: false, code: 'UNKNOWN_ACTION' }, params.callback);
   } catch (error) {
     console.error('Reservas Web App error', error);
     return publicReservationOutput_({
       ok: false,
-      code: 'REQUEST_ERROR',
-      message: 'No se pudo procesar la consulta de disponibilidad.'
+      code: publicReservationErrorCode_(error),
+      message: 'No se pudo procesar la solicitud.'
     }, params.callback);
   }
+}
+
+function doPost(e) {
+  var params = (e && e.parameter) || {};
+  var callback = params.callback;
+
+  try {
+    var body = {};
+    if (e && e.postData && e.postData.contents) {
+      body = JSON.parse(e.postData.contents);
+    }
+
+    var action = String(body.action || params.action || '').trim();
+    if (action === 'create') {
+      return publicReservationOutput_(createReservation(body.payload || {}), callback);
+    }
+    if (action === 'cancel') {
+      return publicReservationOutput_(cancelReservation(String(body.token || '')), callback);
+    }
+
+    return publicReservationOutput_({ ok: false, code: 'UNKNOWN_ACTION' }, callback);
+  } catch (error) {
+    console.error('Reservas Web App POST error', error);
+    return publicReservationOutput_({
+      ok: false,
+      code: publicReservationErrorCode_(error),
+      message: 'No se pudo procesar la solicitud.'
+    }, callback);
+  }
+}
+
+function parsePublicReservationPayload_(rawPayload) {
+  var text = String(rawPayload || '').trim();
+  if (!text) throw new Error('INVALID_PAYLOAD');
+  if (text.length > 6000) throw new Error('PAYLOAD_TOO_LARGE');
+
+  var payload = JSON.parse(text);
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('INVALID_PAYLOAD');
+  }
+  return payload;
+}
+
+function publicReservationErrorCode_(error) {
+  var code = String(error && error.message ? error.message : error || 'REQUEST_ERROR');
+  var allowed = [
+    'INVALID_PAYLOAD', 'PAYLOAD_TOO_LARGE', 'INVALID_DATE', 'DATE_OUT_OF_RANGE',
+    'INVALID_TEACHER', 'INVALID_EMAIL', 'INVALID_COURSE', 'INVALID_SUBJECT',
+    'EMPTY_SELECTION', 'INVALID_SLOT_SELECTION', 'MIXED_SHIFT_SELECTION',
+    'NON_CONTIGUOUS_SELECTION', 'INVALID_REPEAT_RANGE', 'REPEAT_WINDOW_EXCEEDED',
+    'CONFLICT', 'INVALID_TOKEN', 'ALREADY_CANCELLED'
+  ];
+  return allowed.indexOf(code) >= 0 ? code : 'REQUEST_ERROR';
 }
 
 function publicReservationOutput_(payload, callback) {
