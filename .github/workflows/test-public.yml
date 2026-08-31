@@ -34,5 +34,3 @@ jobs:
           node tests/apps-script-reservas.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
-      - name: One-time pilot reservation write probe
-        run: python tests/probe_reservas_write_once.py
