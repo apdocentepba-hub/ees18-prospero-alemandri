@@ -45,3 +45,15 @@ def test_public_reservation_page_does_not_expose_private_booking_fields():
 def test_docentes_keeps_current_form_during_pilot():
     html = read("docentes.html")
     assert "1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform" in html
+
+
+def test_cancel_page_hides_booking_data_until_token_validation():
+    html = read("cancelar-reserva.html")
+    assert 'id="cancel-loading"' in html
+    assert 'id="cancel-details"' in html
+    assert 'id="cancel-confirm"' in html
+    assert 'id="cancel-result"' in html
+    assert 'id="cancel-details" hidden' in html
+    assert 'id="cancel-confirm"' in html and "disabled" in html
+    assert "Profesor/a" not in html
+    assert "Correo docente" not in html
