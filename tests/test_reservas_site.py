@@ -26,6 +26,7 @@ def test_reservas_page_is_integrated_under_docentes():
     assert 'href="docentes.html" aria-current="page"' in html
     assert "Sistema nuevo en etapa de prueba" in html
     assert "assets/css/reservas-audiovisuales.css" in html
+    assert "assets/js/reservas-config.js" in html
     assert "assets/js/reservas-audiovisuales.js" in html
 
 
@@ -45,6 +46,15 @@ def test_public_reservation_page_does_not_expose_private_booking_fields():
 def test_docentes_keeps_current_form_during_pilot():
     html = read("docentes.html")
     assert "1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform" in html
+    assert 'href="reservas-audiovisuales.html"' in html
+    assert "Probar nuevo sistema de reservas" in html
+    assert "Sistema actual" in html
+
+
+def test_reservas_config_starts_disabled_until_real_web_app_exists():
+    config = read("assets/js/reservas-config.js")
+    assert "window.EES18_RESERVAS_API_URL = '';" in config
+    assert "script.google.com" not in config
 
 
 def test_cancel_page_hides_booking_data_until_token_validation():
