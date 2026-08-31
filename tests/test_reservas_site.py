@@ -51,10 +51,11 @@ def test_docentes_keeps_current_form_during_pilot():
     assert "Sistema actual" in html
 
 
-def test_reservas_config_starts_disabled_until_real_web_app_exists():
+def test_reservas_config_uses_deployed_https_web_app():
     config = read("assets/js/reservas-config.js")
-    assert "window.EES18_RESERVAS_API_URL = '';" in config
-    assert "script.google.com" not in config
+    assert "window.EES18_RESERVAS_API_URL = 'https://script.google.com/macros/s/" in config
+    assert "/exec';" in config
+    assert "EES18_RESERVAS_API_URL = '';" not in config
 
 
 def test_cancel_page_hides_booking_data_until_token_validation():
