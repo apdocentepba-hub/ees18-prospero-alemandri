@@ -27,7 +27,7 @@ const context = vm.createContext({
   }
 });
 
-for (const file of ['Config.gs', 'Data.gs', 'Availability.gs']) {
+for (const file of ['Config.gs', 'Data.gs', 'Availability.gs', 'Reservations.gs']) {
   const source = fs.readFileSync(path.join(backendDir, file), 'utf8');
   vm.runInContext(source, context, { filename: file });
 }
@@ -116,5 +116,76 @@ assert.strictEqual(weekend.free, 0);
 const tooFar = context.buildAvailabilityForDate_('2026-11-01', '2026-08-31', [], []);
 assert.strictEqual(tooFar.status, 'blocked');
 assert.strictEqual(tooFar.reason, 'Fuera de la ventana de reserva');
+
+const normalizedPayload = context.normalizeReservationPayload_({
+  mode: 'weekly',
+  date: '2026-09-01',
+  repeatUntil: '2026-09-29',
+  slotIds: ['M2', 'M3'],
+  start: '00:00',
+  end: '23:59',
+  teacher: 'Luciano Leal',
+  email: 'facutronge27@gmail.com',
+  course: '5to 2da',
+  subject: 'Geografía',
+  resources: { projector: true, speakers: false, schoolNotebook: true, internet: true },
+  observations: 'Clase con mapas.'
+}, '2026-08-31');
+
+assert.strictEqual(normalizedPayload.start, '08:30', 'el servidor debe recalcular hora inicial desde slotIds');
+assert.strictEqual(normalizedPayload.end, '10:50', 'el servidor debe recalcular hora final desde slotIds');
+assert.strictEqual(normalizedPayload.shift, 'Mañana');
+assert.strictEqual(normalizedPayload.emailType, 'externo');
+
+assert.deepStrictEqual(
+  Array.from(context.expandReservationDates_(normalizedPayload)),
+  ['2026-09-01', '2026-09-08', '2026-09-15', '2026-09-22', '2026-09-29']
+);
+
+const occupiedSep15 = {
+  id: 'ocupada',
+  state: 'Confirmada',
+  date: '2026-09-15',
+  start: '08:30',
+  end: '10:50',
+  syncState: 'OK'
+};
+
+const plan = context.planReservationDates_(
+  normalizedPayload,
+  '2026-08-31',
+  [occupiedSep15],
+  []
+);
+
+assert.deepStrictEqual(
+  Array.from(plan.confirmedDates),
+  ['2026-09-01', '2026-09-08', '2026-09-22', '2026-09-29'],
+  'una serie semanal debe conservar las fechas libres'
+);
+assert.deepStrictEqual(
+  Array.from(plan.conflicts.map((conflict) => conflict.date)),
+  ['2026-09-15'],
+  'la fecha ocupada debe informarse sin rechazar toda la serie'
+);
+assert.strictEqual(JSON.stringify(plan).includes('Luciano Leal'), false, 'el plan de conflictos no debe exponer titulares previos');
+
+const singleConflict = context.planReservationDates_(
+  context.normalizeReservationPayload_({
+    mode: 'single',
+    date: '2026-09-15',
+    slotIds: ['M2'],
+    teacher: 'Prueba',
+    email: 'prueba@abc.gob.ar',
+    course: '4° 1°',
+    subject: 'Historia',
+    resources: {}
+  }, '2026-08-31'),
+  '2026-08-31',
+  [occupiedSep15],
+  []
+);
+assert.strictEqual(singleConflict.confirmedDates.length, 0);
+assert.strictEqual(singleConflict.conflicts.length, 1);
 
 console.log('apps-script-reservas.test.js: all assertions passed');
