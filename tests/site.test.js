@@ -62,11 +62,16 @@ const expectedNavLinks = [
   'contacto.html'
 ];
 
-for (const page of [...principalPages, ...detailPages]) {
+for (const page of principalPages) {
   const source = read(page);
   for (const href of expectedNavLinks) {
     assert(source.includes(`href="${href}"`), `${page} must link to ${href}`);
   }
+  assert(!source.includes('target="_blank"'), `${page} must not open links in a new tab`);
+}
+
+for (const page of detailPages) {
+  const source = read(page);
   assert(!source.includes('target="_blank"'), `${page} must not open links in a new tab`);
 }
 
@@ -91,6 +96,10 @@ assert(docentes.includes('Reserva del Salón de Audiovisuales'), 'teacher hub mu
 assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must use current audiovisual form');
 assert(docentes.includes('Carro Tecnológico'), 'teacher hub must expose technological cart access');
 assert(!docentes.includes('Continuidad pedagógica por curso - ENSPA'), 'teacher hub must not expose internal spreadsheet names');
+
+const tramites = read('tramites.html');
+assert(tramites.includes('estudiantes-familias.html'), 'procedures must be nested under students and families');
+assert(tramites.includes('docentes.html'), 'procedures page must keep the new primary navigation');
 
 const vida = read('vida-escolar.html');
 assert(vida.includes('2.º Encuentro de RE Bonaerense'), 'Vida escolar must contain RE Bonaerense');
