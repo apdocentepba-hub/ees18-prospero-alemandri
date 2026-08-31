@@ -48,23 +48,7 @@
 </main>
 <footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Avellaneda · Provincia de Buenos Aires</span></div><nav><a href="index.html">Inicio</a><a href="docentes.html">Docentes</a><a href="contacto.html">Contacto</a></nav><span>© <span id="current-year">2026</span></span></div></footer>
 <script src="assets/js/main.js"></script>
-<script>
-(function () {
-  var loading = document.getElementById('cancel-loading');
-  var result = document.getElementById('cancel-result');
-  var button = document.getElementById('cancel-confirm');
-  if (!loading || !result || !button) return;
-
-  var token = new URLSearchParams(window.location.search).get('token') || '';
-  loading.hidden = true;
-  result.hidden = false;
-  if (!token) {
-    result.innerHTML = '<strong>El enlace de cancelación no es válido.</strong><span>Usá el enlace completo recibido en el correo de confirmación.</span>';
-    return;
-  }
-
-  result.innerHTML = '<strong>Sistema de cancelación en preparación.</strong><span>La reserva no fue modificada. La validación en línea se habilitará cuando finalice el piloto.</span>';
-})();
-</script>
+<script src="assets/js/reservas-config.js"></script>
+<script src="assets/js/cancelar-reserva.js"></script>
 </body>
 </html>
