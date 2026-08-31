@@ -135,12 +135,68 @@
     return dates;
   }
 
+  function requiredText(value, errorCode) {
+    const normalized = String(value || '').trim();
+    if (!normalized) throw new Error(errorCode);
+    return normalized;
+  }
+
+  function buildReservationPayload(data, bookingState) {
+    const input = data || {};
+    const state = bookingState || {};
+
+    const teacher = requiredText(input.teacher, 'INVALID_TEACHER');
+    const email = requiredText(input.email, 'INVALID_EMAIL');
+    if (!isValidEmail(email)) throw new Error('INVALID_EMAIL');
+
+    const course = requiredText(input.course, 'INVALID_COURSE');
+    const subject = requiredText(input.subject, 'INVALID_SUBJECT');
+    const date = requiredText(state.selectedDate, 'INVALID_DATE');
+    parseIsoDate(date);
+
+    const slotIds = Array.isArray(state.selectedSlotIds)
+      ? [...state.selectedSlotIds]
+      : [];
+    const range = buildContinuousRange(slotIds);
+
+    const mode = input.mode === 'weekly' ? 'weekly' : 'single';
+    let repeatUntil = '';
+
+    if (mode === 'weekly') {
+      repeatUntil = requiredText(input.repeatUntil, 'INVALID_REPEAT_RANGE');
+      buildWeeklyDates(date, repeatUntil);
+    }
+
+    return {
+      mode,
+      date,
+      repeatUntil,
+      slotIds,
+      start: range.start,
+      end: range.end,
+      teacher,
+      email,
+      emailType: isInstitutionalEmail(email) ? 'institucional' : 'externo',
+      course,
+      subject,
+      shift: range.shift,
+      resources: {
+        projector: Boolean(input.projector),
+        speakers: Boolean(input.speakers),
+        schoolNotebook: Boolean(input.schoolNotebook),
+        internet: Boolean(input.internet)
+      },
+      observations: String(input.observations || '').trim().slice(0, 500)
+    };
+  }
+
   return Object.freeze({
     SLOTS,
     buildContinuousRange,
     isInstitutionalEmail,
     isValidEmail,
-    buildWeeklyDates
+    buildWeeklyDates,
+    buildReservationPayload
   });
 });
 
@@ -162,8 +218,15 @@
   const morningSlots = document.getElementById('morning-slots');
   const afternoonSlots = document.getElementById('afternoon-slots');
   const selectionSummary = document.getElementById('selection-summary');
+  const bookingForm = document.getElementById('booking-form');
   const bookingFields = document.getElementById('booking-fields');
   const confirmationSummary = document.getElementById('confirmation-summary');
+  const teacherEmail = document.getElementById('teacher-email');
+  const emailKind = document.getElementById('email-kind');
+  const repeatUntilWrap = document.getElementById('repeat-until-wrap');
+  const repeatUntilInput = document.getElementById('repeat-until');
+  const bookingSubmit = document.getElementById('booking-submit');
+  const bookingResult = document.getElementById('booking-result');
 
   const today = startOfLocalDay(new Date());
   const maxDate = addDays(today, 60);
@@ -299,6 +362,9 @@
     dayStatusBadge.dataset.state = 'available';
     dayHelp.textContent = 'Marcá uno o varios módulos consecutivos del mismo turno.';
     bookingFields.disabled = true;
+    bookingResult.hidden = true;
+    repeatUntilInput.min = isoDate;
+    repeatUntilInput.max = toIsoLocal(maxDate);
     renderCalendar();
     renderSlots();
     renderSelectionSummary();
@@ -341,7 +407,95 @@
     const range = rules.buildContinuousRange(state.selectedSlotIds);
     selectionSummary.innerHTML = `<strong>${range.start} a ${range.end} · ${range.count} ${range.count === 1 ? 'módulo' : 'módulos'}</strong><span>Turno ${range.shift.toLowerCase()} · ${formatLongDate(state.selectedDate)}</span>`;
     bookingFields.disabled = false;
-    confirmationSummary.innerHTML = `<strong>${formatLongDate(state.selectedDate)}</strong><br>${range.start} a ${range.end} · ${range.count} ${range.count === 1 ? 'módulo' : 'módulos'}`;
+    updateConfirmationSummary();
+  }
+
+  function updateEmailKind() {
+    const email = teacherEmail.value.trim();
+    emailKind.className = '';
+
+    if (!email) {
+      emailKind.textContent = '';
+      return;
+    }
+
+    if (!rules.isValidEmail(email)) {
+      emailKind.textContent = 'Revisá el correo.';
+      emailKind.dataset.state = 'error';
+      return;
+    }
+
+    if (rules.isInstitutionalEmail(email)) {
+      emailKind.textContent = 'Correo institucional @abc.gob.ar';
+      emailKind.dataset.state = 'institutional';
+    } else {
+      emailKind.textContent = 'Correo válido externo';
+      emailKind.dataset.state = 'external';
+    }
+  }
+
+  function selectedMode() {
+    const checked = bookingForm.querySelector('input[name="mode"]:checked');
+    return checked ? checked.value : 'single';
+  }
+
+  function updateModeUi() {
+    const weekly = selectedMode() === 'weekly';
+    repeatUntilWrap.hidden = !weekly;
+    repeatUntilInput.required = weekly;
+    if (!weekly) repeatUntilInput.value = '';
+    updateConfirmationSummary();
+  }
+
+  function updateConfirmationSummary() {
+    if (!state.selectedDate || state.selectedSlotIds.length === 0) {
+      confirmationSummary.innerHTML = '<strong>Revisá fecha y horario antes de confirmar.</strong>';
+      return;
+    }
+
+    const range = rules.buildContinuousRange(state.selectedSlotIds);
+    const mode = selectedMode();
+    let recurrence = 'Reserva para una fecha.';
+
+    if (mode === 'weekly') {
+      recurrence = repeatUntilInput.value
+        ? `Repetición semanal hasta ${formatLongDate(repeatUntilInput.value)}.`
+        : 'Elegí hasta qué fecha querés repetir semanalmente.';
+    }
+
+    confirmationSummary.innerHTML = `<strong>${formatLongDate(state.selectedDate)}</strong><br>${range.start} a ${range.end} · ${range.count} ${range.count === 1 ? 'módulo' : 'módulos'}<br><span>${recurrence}</span>`;
+  }
+
+  function readFormData() {
+    const data = new FormData(bookingForm);
+    return {
+      teacher: data.get('teacher'),
+      email: data.get('email'),
+      course: data.get('course'),
+      subject: data.get('subject'),
+      mode: data.get('mode'),
+      repeatUntil: data.get('repeatUntil'),
+      projector: data.has('projector'),
+      speakers: data.has('speakers'),
+      schoolNotebook: data.has('schoolNotebook'),
+      internet: data.has('internet'),
+      observations: data.get('observations')
+    };
+  }
+
+  function errorMessage(error) {
+    const code = error && error.message;
+    const messages = {
+      INVALID_TEACHER: 'Ingresá apellido y nombre.',
+      INVALID_EMAIL: 'Ingresá un correo válido.',
+      INVALID_COURSE: 'Ingresá el curso.',
+      INVALID_SUBJECT: 'Ingresá la materia o espacio curricular.',
+      INVALID_DATE: 'Elegí una fecha válida.',
+      EMPTY_SELECTION: 'Elegí al menos un módulo.',
+      INVALID_REPEAT_RANGE: 'Elegí una fecha final válida para la repetición.',
+      REPEAT_WINDOW_EXCEEDED: 'La repetición no puede superar los 60 días.'
+    };
+    return messages[code] || 'Revisá los datos de la reserva.';
   }
 
   prevButton.addEventListener('click', () => {
@@ -354,6 +508,36 @@
     renderCalendar();
   });
 
+  teacherEmail.addEventListener('input', updateEmailKind);
+  bookingForm.querySelectorAll('input[name="mode"]').forEach((input) => {
+    input.addEventListener('change', updateModeUi);
+  });
+  repeatUntilInput.addEventListener('change', updateConfirmationSummary);
+
+  bookingForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    bookingResult.hidden = true;
+
+    try {
+      const payload = rules.buildReservationPayload(readFormData(), state);
+      const dates = payload.mode === 'weekly'
+        ? rules.buildWeeklyDates(payload.date, payload.repeatUntil)
+        : [payload.date];
+
+      bookingSubmit.disabled = true;
+      bookingResult.hidden = false;
+      bookingResult.dataset.state = 'pilot';
+      bookingResult.innerHTML = `<strong>La selección está lista.</strong><br>Preparaste ${dates.length} ${dates.length === 1 ? 'fecha' : 'fechas'} de ${payload.start} a ${payload.end}. La confirmación automática se habilitará cuando conectemos el Web App de reservas; por ahora este prototipo no modifica la planilla ni Google Calendar.`;
+    } catch (error) {
+      bookingResult.hidden = false;
+      bookingResult.dataset.state = 'error';
+      bookingResult.innerHTML = `<strong>No pudimos preparar la reserva.</strong><br>${errorMessage(error)}`;
+    } finally {
+      bookingSubmit.disabled = false;
+    }
+  });
+
   renderCalendar();
   renderSlots();
+  updateModeUi();
 })();
