@@ -132,14 +132,14 @@ function selectedSlotsAreAvailable_(availability, slotIds) {
   return true;
 }
 
-function planReservationDates_(normalizedPayload, todayIso, reservationRecords, blockedDays) {
+function planReservationDates_(normalizedPayload, todayIso, reservationRecords, blockedDays, currentTimeText) {
   var requestedDates = expandReservationDates_(normalizedPayload);
   var confirmedDates = [];
   var conflicts = [];
 
   for (var i = 0; i < requestedDates.length; i += 1) {
     var date = requestedDates[i];
-    var availability = buildAvailabilityForDate_(date, todayIso, reservationRecords, blockedDays);
+    var availability = buildAvailabilityForDate_(date, todayIso, reservationRecords, blockedDays, currentTimeText);
 
     if (availability.status === 'blocked') {
       conflicts.push({ date: date, code: 'BLOCKED', reason: availability.reason || 'Fecha bloqueada' });
@@ -147,7 +147,7 @@ function planReservationDates_(normalizedPayload, todayIso, reservationRecords, 
     }
 
     if (!selectedSlotsAreAvailable_(availability, normalizedPayload.slotIds)) {
-      conflicts.push({ date: date, code: 'CONFLICT', reason: 'Uno o más módulos ya están ocupados' });
+      conflicts.push({ date: date, code: 'CONFLICT', reason: 'Uno o más módulos ya están ocupados o ya comenzaron' });
       continue;
     }
 
@@ -224,7 +224,8 @@ function publicCreatedReservation_(record) {
 }
 
 function createReservation(payload) {
-  var todayIso = todayReservationIso_();
+  var clock = reservationClock_();
+  var todayIso = clock.date;
   var normalized = normalizeReservationPayload_(payload, todayIso);
   var lock = LockService.getScriptLock();
   lock.waitLock(10000);
@@ -236,7 +237,7 @@ function createReservation(payload) {
     ensureReservationColumns_();
     var reservations = readReservationRecords_();
     var blockedDays = readBlockedDays_();
-    plan = planReservationDates_(normalized, todayIso, reservations, blockedDays);
+    plan = planReservationDates_(normalized, todayIso, reservations, blockedDays, clock.time);
 
     if (plan.confirmedDates.length === 0) {
       return {
