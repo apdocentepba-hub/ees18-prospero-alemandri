@@ -151,6 +151,9 @@ function readBlockedDays_() {
 }
 
 function getCalendarIdFromConfiguration_() {
+  var propertyId = PropertiesService.getScriptProperties().getProperty('RESERVAS_CALENDAR_ID');
+  if (propertyId) return String(propertyId).trim();
+
   var sheet = getRequiredSheet_(RESERVAS_SETTINGS_.CONFIG_SHEET);
   var values = sheet.getDataRange().getValues();
 
