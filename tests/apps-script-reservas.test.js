@@ -2,9 +2,11 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const vm = require('vm');
+const crypto = require('crypto');
 
 const root = path.resolve(__dirname, '..');
 const backendDir = path.join(root, 'apps-script', 'reservas-audiovisuales');
+let uuidCounter = 0;
 
 const context = vm.createContext({
   console,
@@ -18,16 +20,38 @@ const context = vm.createContext({
   Boolean,
   RegExp,
   Error,
+  encodeURIComponent,
   Utilities: {
+    DigestAlgorithm: { SHA_256: 'SHA_256' },
+    Charset: { UTF_8: 'UTF_8' },
     formatDate(date, _timeZone, pattern) {
       if (pattern === 'yyyy-MM-dd') return date.toISOString().slice(0, 10);
       if (pattern === 'HH:mm') return date.toISOString().slice(11, 16);
       throw new Error(`Unsupported format in test: ${pattern}`);
+    },
+    getUuid() {
+      uuidCounter += 1;
+      return `00000000-0000-4000-8000-${String(uuidCounter).padStart(12, '0')}`;
+    },
+    computeDigest(_algorithm, value) {
+      const bytes = crypto.createHash('sha256').update(String(value), 'utf8').digest();
+      return Array.from(bytes, (byte) => (byte > 127 ? byte - 256 : byte));
+    },
+    base64EncodeWebSafe(bytes) {
+      return Buffer.from(bytes.map((byte) => (byte < 0 ? byte + 256 : byte))).toString('base64url');
     }
   }
 });
 
-for (const file of ['Config.gs', 'Data.gs', 'Availability.gs', 'Reservations.gs']) {
+for (const file of [
+  'Config.gs',
+  'Data.gs',
+  'Availability.gs',
+  'AdminSetup.gs',
+  'Reservations.gs',
+  'CalendarSync.gs',
+  'Mail.gs'
+]) {
   const source = fs.readFileSync(path.join(backendDir, file), 'utf8');
   vm.runInContext(source, context, { filename: file });
 }
@@ -187,5 +211,16 @@ const singleConflict = context.planReservationDates_(
 );
 assert.strictEqual(singleConflict.confirmedDates.length, 0);
 assert.strictEqual(singleConflict.conflicts.length, 1);
+
+const tokenHash1 = context.hashCancellationToken_('token-de-prueba');
+const tokenHash2 = context.hashCancellationToken_('token-de-prueba');
+assert.strictEqual(tokenHash1, tokenHash2, 'el hash del token debe ser determinista');
+assert.notStrictEqual(tokenHash1, 'token-de-prueba', 'la base nunca debe guardar el token crudo');
+assert.strictEqual(tokenHash1.length, 64, 'SHA-256 hexadecimal debe tener 64 caracteres');
+
+assert.strictEqual(
+  context.reservationResourcesText_({ projector: true, speakers: false, schoolNotebook: true, internet: true }),
+  'Cañón/proyector, Notebook de la escuela, Internet'
+);
 
 console.log('apps-script-reservas.test.js: all assertions passed');
