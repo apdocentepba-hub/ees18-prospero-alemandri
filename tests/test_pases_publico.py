@@ -84,3 +84,10 @@ def test_consulta_estado_apunta_al_webapp_publico_desplegado():
     config = read("assets/js/status-config.js")
     assert STATUS_WEBAPP_URL in config
     assert "window.EES18_STATUS_API_URL" in config
+
+
+def test_estado_publico_no_inyecta_respuesta_del_backend_como_html():
+    js = read("assets/js/estado-publico.js")
+    assert "setSuccessResult" in js
+    assert "textContent = estado" in js
+    assert "textContent = `Última actualización: ${fechaActualizacion}`" in js
