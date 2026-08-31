@@ -94,7 +94,7 @@ Para evitar que dos personas reserven el mismo módulo simultáneamente:
 
 1. el frontend consulta disponibilidad;
 2. el docente selecciona módulos;
-3. al presionar Confirmar, el backend adquiere un bloqueo de corta duración;
+3. al presionar Confirmar, el backend adquiere un `LockService` de Google Apps Script;
 4. vuelve a consultar las reservas confirmadas para esa fecha;
 5. si alguna franja dejó de estar libre, se rechaza únicamente esa confirmación y se devuelve la disponibilidad actualizada;
 6. si todas continúan libres, se registra la reserva y recién después se libera el bloqueo.
@@ -106,6 +106,7 @@ La disponibilidad mostrada en pantalla nunca se considera garantía hasta el mom
 Campos mínimos:
 
 - ID de reserva
+- ID de grupo recurrente, cuando corresponda
 - Fecha de creación
 - Estado
 - Fecha de reserva
@@ -124,7 +125,7 @@ Campos mínimos:
 - Necesita internet
 - Observaciones
 - ID de evento de Google Calendar
-- Token seguro de cancelación o hash asociado
+- Hash de token seguro de cancelación
 - Fecha de cancelación, si corresponde
 - Última actualización
 
@@ -146,7 +147,8 @@ El sistema evalúa cada fecha individualmente:
 
 - confirma las fechas disponibles;
 - omite las que tengan conflicto;
-- informa claramente el resultado.
+- informa claramente el resultado;
+- asigna un mismo ID de grupo a las reservas creadas en esa operación.
 
 Ejemplo: `6 fechas solicitadas · 5 confirmadas · 1 no disponible`.
 
@@ -162,18 +164,20 @@ Al cancelar:
 
 - el estado pasa a `Cancelada`;
 - el registro histórico no se elimina;
-- se cancela/elimina el evento correspondiente de Google Calendar;
+- se elimina el evento correspondiente de Google Calendar;
 - las franjas vuelven a quedar disponibles en la web;
 - se registra fecha y hora de cancelación;
 - se envía correo de confirmación.
 
+El token enviado por correo se guarda únicamente como hash en la base. Una vez cancelada la reserva, el mismo enlace no puede volver a modificarla.
+
 No se permite editar una reserva existente en la primera versión. Para cambiar fecha u horario, el docente cancela y crea una nueva.
 
-## 12. Vista administrativa
+## 12. Administración
 
-La administración contará con una vista separada de la experiencia docente.
+La primera versión no tendrá un panel administrativo público en la web institucional.
 
-Funciones mínimas:
+La administración se realiza desde la planilla de Google Sheets protegida por los permisos de Google Drive. Se incorporará una pestaña `Administración` con funciones operativas para:
 
 - ver reservas con datos completos;
 - filtrar por fecha, docente, curso, turno y estado;
@@ -184,7 +188,7 @@ Funciones mínimas:
 - consultar conflictos o errores de sincronización;
 - abrir el evento correspondiente en Google Calendar cuando exista.
 
-La vista administrativa no será pública ni se enlazará desde navegación abierta sin un mecanismo de acceso apropiado.
+Esto evita agregar autenticación administrativa a la web pública en la primera versión. Un panel web protegido puede evaluarse más adelante si resulta necesario.
 
 ## 13. Backend propuesto
 
@@ -198,7 +202,7 @@ Google Calendar existente: `Reservas - Salón Audiovisuales`.
 
 ### API
 
-Un Web App de Google Apps Script separado de la interfaz pública deberá exponer únicamente operaciones controladas, por ejemplo:
+Un Web App de Google Apps Script separado de la interfaz pública expondrá únicamente operaciones docentes controladas:
 
 - `getAvailability(date)`
 - `getMonthAvailability(year, month)`
@@ -206,11 +210,11 @@ Un Web App de Google Apps Script separado de la interfaz pública deberá expone
 - `cancelReservation(token)`
 - `getReservationByCancelToken(token)`
 
-Las operaciones administrativas deben estar separadas de las rutas públicas.
+No se exponen operaciones administrativas en la API pública de la primera versión.
 
 ## 14. Frontend propuesto
 
-Nueva página web dedicada, por ejemplo:
+Nueva página web dedicada:
 
 `reservas-audiovisuales.html`
 
@@ -229,11 +233,22 @@ Componentes principales:
 
 El frontend debe ser responsive y usable desde celular.
 
-## 15. Feriados
+## 15. Feriados y cierres excepcionales
 
-La primera versión debe bloquear automáticamente feriados nacionales aplicables a la Argentina.
+El backend no dependerá de una API externa en tiempo real para decidir si una fecha puede reservarse.
 
-La fuente concreta de feriados se definirá en implementación priorizando una fuente estable y cacheable. Si la consulta externa falla, el backend deberá conservar una lista/caché vigente para evitar habilitar accidentalmente un feriado conocido.
+Se agregará una pestaña `Días bloqueados` en la base con:
+
+- fecha;
+- tipo: `FERIADO` o `CIERRE ESCOLAR`;
+- descripción;
+- activo Sí/No.
+
+Durante la puesta en marcha se cargará la lista oficial de feriados nacionales correspondiente al período alcanzado por la ventana de reservas, tomando como referencia el calendario oficial del Estado argentino. La administración podrá agregar cierres escolares extraordinarios desde la misma pestaña.
+
+La disponibilidad considera bloqueada cualquier fecha activa de esa tabla, además de sábados y domingos.
+
+Como la ventana máxima es de 60 días, basta mantener cargados los feriados del ciclo lectivo vigente y del inicio del siguiente cuando corresponda.
 
 ## 16. Manejo de errores
 
@@ -248,9 +263,11 @@ Casos previstos:
 - token de cancelación inválido o ya utilizado;
 - repetición semanal con algunas fechas en conflicto.
 
-Una reserva no debe mostrarse como Confirmada si el guardado de la reserva falla.
+Una reserva no debe mostrarse como Confirmada si el guardado principal falla.
 
 Si el registro se guardó correctamente pero falla un servicio secundario como el correo, la reserva continúa válida y se registra el error para reintento/seguimiento.
+
+Si falla la creación del evento de Calendar después de guardar la reserva, la fila queda marcada con un estado de sincronización pendiente y se reintenta sin liberar el horario, para evitar una doble reserva.
 
 ## 17. Migración
 
@@ -291,5 +308,6 @@ El sistema estará listo para reemplazar al formulario actual cuando:
 - recurrencias quincenales o reglas complejas;
 - reservas de múltiples espacios físicos;
 - login obligatorio de docentes;
+- panel administrativo público;
 - exposición pública de datos personales de reservas;
 - reemplazo inmediato del sistema vigente sin etapa paralela de prueba.
