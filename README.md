@@ -24,5 +24,5 @@ La consulta pública de trámites usa un Web App de Google Apps Script independi
 La integración continua ejecuta:
 
 - pruebas Python con `pytest`;
-- verificación de sintaxis JavaScript;
+- verificación de sintaxis JavaScript del cliente principal y de la consulta pública;
 - controles estructurales del sitio.
