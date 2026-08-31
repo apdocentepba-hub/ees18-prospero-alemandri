@@ -9,13 +9,15 @@ const principalPages = [
   'index.html',
   'nuestra-escuela.html',
   'propuesta-educativa.html',
-  'tramites.html',
+  'estudiantes-familias.html',
+  'docentes.html',
   'vida-escolar.html',
   'ingreso-2027.html',
   'contacto.html'
 ];
 
 const detailPages = [
+  'tramites.html',
   'historia.html',
   'plan-estudios.html',
   'comunicados.html',
@@ -53,13 +55,14 @@ const expectedNavLinks = [
   'index.html',
   'nuestra-escuela.html',
   'propuesta-educativa.html',
-  'tramites.html',
+  'estudiantes-familias.html',
+  'docentes.html',
   'vida-escolar.html',
   'ingreso-2027.html',
   'contacto.html'
 ];
 
-for (const page of [...principalPages, ...detailPages]) {
+for (const page of principalPages) {
   const source = read(page);
   for (const href of expectedNavLinks) {
     assert(source.includes(`href="${href}"`), `${page} must link to ${href}`);
@@ -67,12 +70,36 @@ for (const page of [...principalPages, ...detailPages]) {
   assert(!source.includes('target="_blank"'), `${page} must not open links in a new tab`);
 }
 
+for (const page of detailPages) {
+  const source = read(page);
+  assert(!source.includes('target="_blank"'), `${page} must not open links in a new tab`);
+}
+
 assert(html.includes('2.º Encuentro de RE Bonaerense'), 'home must feature RE Bonaerense');
 assert(html.includes('assets/img/re-bonaerense-2024.jpg'), 'home must show RE Bonaerense image');
 assert(html.includes('vida-escolar.html'), 'home must visibly link to Vida escolar');
-assert(html.includes('tramites.html'), 'home must link to the procedures hub');
+assert(html.includes('estudiantes-familias.html'), 'home must link to Estudiantes y familias');
+assert(html.includes('docentes.html'), 'home must link to Docentes');
 assert(html.includes('nuestra-escuela.html'), 'home must link to Nuestra escuela');
 assert(html.includes('propuesta-educativa.html'), 'home must link to Propuesta educativa');
+
+const estudiantes = read('estudiantes-familias.html');
+assert(estudiantes.includes('Estudiantes y familias'), 'student hub must identify its audience');
+assert(estudiantes.includes('tramites.html'), 'student hub must link to procedures');
+assert(estudiantes.includes('consultar-estado.html'), 'student hub must link to DNI status lookup');
+assert(estudiantes.includes('boleto-estudiantil.html'), 'student hub must link to student transport');
+assert(estudiantes.includes('ingreso-2027.html'), 'student hub must link to admission information');
+
+const docentes = read('docentes.html');
+assert(docentes.includes('Docentes'), 'teacher hub must identify its audience');
+assert(docentes.includes('Reserva del Salón de Audiovisuales'), 'teacher hub must expose audiovisual booking');
+assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must use current audiovisual form');
+assert(docentes.includes('Carro Tecnológico'), 'teacher hub must expose technological cart access');
+assert(!docentes.includes('Continuidad pedagógica por curso - ENSPA'), 'teacher hub must not expose internal spreadsheet names');
+
+const tramites = read('tramites.html');
+assert(tramites.includes('estudiantes-familias.html'), 'procedures must be nested under students and families');
+assert(tramites.includes('docentes.html'), 'procedures page must keep the new primary navigation');
 
 const vida = read('vida-escolar.html');
 assert(vida.includes('2.º Encuentro de RE Bonaerense'), 'Vida escolar must contain RE Bonaerense');
