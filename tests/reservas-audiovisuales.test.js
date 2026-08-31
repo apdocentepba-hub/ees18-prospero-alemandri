@@ -57,4 +57,59 @@ assert.throws(
   /INVALID_REPEAT_RANGE/
 );
 
+assert.throws(
+  () => rules.buildWeeklyDates('2026-09-01', '2026-11-15'),
+  /REPEAT_WINDOW_EXCEEDED/
+);
+
+const payload = rules.buildReservationPayload(
+  {
+    teacher: 'Luciano Leal',
+    email: 'facutronge27@gmail.com',
+    course: '5to 2da',
+    subject: 'Geografía',
+    mode: 'weekly',
+    repeatUntil: '2026-09-29',
+    projector: true,
+    speakers: false,
+    schoolNotebook: true,
+    internet: true,
+    observations: 'Clase con mapas.'
+  },
+  {
+    selectedDate: '2026-09-01',
+    selectedSlotIds: ['M2', 'M3']
+  }
+);
+
+assert.deepStrictEqual(payload, {
+  mode: 'weekly',
+  date: '2026-09-01',
+  repeatUntil: '2026-09-29',
+  slotIds: ['M2', 'M3'],
+  start: '08:30',
+  end: '10:50',
+  teacher: 'Luciano Leal',
+  email: 'facutronge27@gmail.com',
+  emailType: 'externo',
+  course: '5to 2da',
+  subject: 'Geografía',
+  shift: 'Mañana',
+  resources: {
+    projector: true,
+    speakers: false,
+    schoolNotebook: true,
+    internet: true
+  },
+  observations: 'Clase con mapas.'
+});
+
+assert.throws(
+  () => rules.buildReservationPayload(
+    { teacher: 'Docente', email: 'correo-invalido', course: '5° 1°', subject: 'Historia', mode: 'single' },
+    { selectedDate: '2026-09-01', selectedSlotIds: ['M1'] }
+  ),
+  /INVALID_EMAIL/
+);
+
 console.log('reservas-audiovisuales.test.js: all assertions passed');
