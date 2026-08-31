@@ -1,5 +1,5 @@
 function getReservationSpreadsheet_() {
-  return SpreadsheetApp.openById(RESERVAS_SETTINGS_.SPREADSHEET_ID);
+  return SpreadsheetApp.openById(reservationSpreadsheetId_());
 }
 
 function getRequiredSheet_(sheetName) {
