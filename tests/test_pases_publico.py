@@ -53,10 +53,12 @@ def test_pases_ofrece_progreso_y_consulta_de_estado():
     assert "Consultar estado" in html
 
 
-def test_consulta_estado_usa_codigo_y_no_dni():
+def test_consulta_estado_usa_dni_y_no_codigo():
     html = read("consultar-estado.html")
-    assert "Código de seguimiento" in html
-    assert 'name="dni"' not in html.lower()
+    assert 'name="dni"' in html.lower()
+    assert 'inputmode="numeric"' in html.lower()
+    assert "Consultar por DNI" in html
+    assert "Código de seguimiento" not in html
     for texto in [
         "Solicitud recibida",
         "Documentación en revisión",
@@ -64,3 +66,13 @@ def test_consulta_estado_usa_codigo_y_no_dni():
         "Trámite finalizado",
     ]:
         assert texto in html
+
+
+def test_consulta_estado_carga_cliente_publico():
+    html = read("consultar-estado.html")
+    assert 'assets/js/estado-publico.js' in html
+    js = read("assets/js/estado-publico.js")
+    assert "normalizarDni" in js
+    assert "callback" in js
+    assert "estado" in js
+    assert "fechaActualizacion" in js
