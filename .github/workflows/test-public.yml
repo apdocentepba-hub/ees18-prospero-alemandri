@@ -24,5 +24,8 @@ jobs:
           node --check assets/js/main.js
           node --check assets/js/estado-publico.js
           node --check assets/js/status-config.js
+          node --check assets/js/reservas-audiovisuales.js
       - name: Run JavaScript structure checks
-        run: node tests/site.test.js
+        run: |
+          node tests/site.test.js
+          node tests/reservas-audiovisuales.test.js
