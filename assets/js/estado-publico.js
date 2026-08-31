@@ -17,6 +17,19 @@
     result.innerHTML = message;
   };
 
+  const setSuccessResult = (estado, fechaActualizacion) => {
+    const strong = document.createElement('strong');
+    const br = document.createElement('br');
+    const span = document.createElement('span');
+
+    strong.textContent = estado;
+    span.textContent = `Última actualización: ${fechaActualizacion}`;
+
+    result.hidden = false;
+    result.dataset.state = 'success';
+    result.replaceChildren(strong, br, span);
+  };
+
   const cleanupJsonp = (script, callbackName, timer) => {
     if (timer) window.clearTimeout(timer);
     if (script && script.parentNode) script.parentNode.removeChild(script);
@@ -88,10 +101,7 @@
       const estado = String(response.estado || 'Estado no informado');
       const fechaActualizacion = String(response.fechaActualizacion || 'Sin fecha informada');
 
-      setResult(
-        `<strong>${estado}</strong><br><span>Última actualización: ${fechaActualizacion}</span>`,
-        'success'
-      );
+      setSuccessResult(estado, fechaActualizacion);
     } catch (error) {
       if (error && error.message === 'SERVICE_NOT_CONFIGURED') {
         setResult('<strong>La consulta por DNI ya está preparada.</strong><br>Falta activar el servicio de consulta de Secretaría. Mientras tanto, podés comunicarte con la escuela.', 'error');
