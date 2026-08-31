@@ -165,6 +165,24 @@ function yesNoReservation_(value) {
   return value === true ? 'Sí' : 'No';
 }
 
+function generateCancellationToken_() {
+  var seed = Utilities.getUuid() + '|' + Utilities.getUuid() + '|' + new Date().getTime() + '|' + Math.random();
+  var digest = Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256, seed, Utilities.Charset.UTF_8);
+  return Utilities.base64EncodeWebSafe(digest).replace(/=+$/g, '');
+}
+
+function hashCancellationToken_(rawToken) {
+  var digest = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    String(rawToken || ''),
+    Utilities.Charset.UTF_8
+  );
+  return digest.map(function (byte) {
+    var value = byte < 0 ? byte + 256 : byte;
+    return ('0' + value.toString(16)).slice(-2);
+  }).join('');
+}
+
 function buildReservationRecordForDate_(payload, date, groupId) {
   return {
     id: Utilities.getUuid(),
@@ -234,11 +252,21 @@ function createReservation(payload) {
     var groupId = normalized.mode === 'weekly' ? Utilities.getUuid() : '';
     for (var i = 0; i < plan.confirmedDates.length; i += 1) {
       var record = buildReservationRecordForDate_(normalized, plan.confirmedDates[i], groupId);
+      var rawToken = generateCancellationToken_();
+      record.cancellationHash = hashCancellationToken_(rawToken);
+      record.rawCancellationToken_ = rawToken;
       appendReservationRecord_(record);
       createdRecords.push(record);
     }
   } finally {
     lock.releaseLock();
+  }
+
+  for (var secondaryIndex = 0; secondaryIndex < createdRecords.length; secondaryIndex += 1) {
+    var created = createdRecords[secondaryIndex];
+    syncReservationToCalendar_(created);
+    sendReservationConfirmation_(created, created.rawCancellationToken_);
+    delete created.rawCancellationToken_;
   }
 
   return {
