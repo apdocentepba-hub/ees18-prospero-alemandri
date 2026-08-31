@@ -50,7 +50,8 @@ for (const file of [
   'AdminSetup.gs',
   'Reservations.gs',
   'CalendarSync.gs',
-  'Mail.gs'
+  'Mail.gs',
+  'Cancellations.gs'
 ]) {
   const source = fs.readFileSync(path.join(backendDir, file), 'utf8');
   vm.runInContext(source, context, { filename: file });
@@ -222,5 +223,14 @@ assert.strictEqual(
   context.reservationResourcesText_({ projector: true, speakers: false, schoolNotebook: true, internet: true }),
   'Cañón/proyector, Notebook de la escuela, Internet'
 );
+
+const cancellationRecords = [
+  { id: 'active', state: 'Confirmada', cancellationHash: context.hashCancellationToken_('token-activo'), date: '2026-09-10', start: '08:30', end: '09:30' },
+  { id: 'cancelled', state: 'Cancelada', cancellationHash: context.hashCancellationToken_('token-usado'), date: '2026-09-11', start: '10:50', end: '11:50' }
+];
+assert.strictEqual(context.lookupCancellationInRecords_('token-inexistente', cancellationRecords).code, 'INVALID_TOKEN');
+assert.strictEqual(context.lookupCancellationInRecords_('token-usado', cancellationRecords).code, 'ALREADY_CANCELLED');
+assert.strictEqual(context.lookupCancellationInRecords_('token-activo', cancellationRecords).ok, true);
+assert.strictEqual(context.lookupCancellationInRecords_('token-activo', cancellationRecords).reservation.id, 'active');
 
 console.log('apps-script-reservas.test.js: all assertions passed');
