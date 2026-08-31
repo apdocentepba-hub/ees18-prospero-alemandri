@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://apdocentepba-hub.github.io/ees18-prospero-alemandri/sitemap.xml
+Sitemap: https://ees18avellaneda.edu.ar/sitemap.xml

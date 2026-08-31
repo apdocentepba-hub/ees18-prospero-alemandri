@@ -2,23 +2,27 @@
 
 Sitio web institucional de la **Escuela de Educación Secundaria Nº 18 “Próspero Alemandri”**, Avellaneda.
 
-## Estado actual
+Sitio público: **https://ees18avellaneda.edu.ar/**
 
-Primera versión visual en desarrollo, con identidad celeste/azul inspirada en la tradición ENSPA y adaptación al nuevo nombre institucional.
+## Contenido
 
-### Incluye
+- Información institucional y autoridades.
+- Propuesta educativa y plan de estudios.
+- Trámites escolares, pases y analíticos.
+- Consulta pública del estado de trámites por DNI mediante Web App independiente.
+- Vida escolar, comunicados e Ingreso 2027.
+- Diseño responsive y accesibilidad básica.
 
-- Portada institucional responsive.
-- Navegación adaptable a dispositivos móviles.
-- Secciones de Institución, Propuesta educativa, Comunidad, Novedades, Calendario, Documentación y Contacto.
-- Orientaciones: Comunicación, Ciencias Sociales, Lenguas Extranjeras y Ciencias Naturales.
-- Accesibilidad básica y soporte para `prefers-reduced-motion`.
-- Verificación estructural en `tests/site.test.js`.
+## Publicación
 
-## Desarrollo
+El sitio se publica mediante GitHub Pages desde la rama `main` y utiliza el dominio institucional `ees18avellaneda.edu.ar`.
 
-La primera versión visual se trabaja en la rama:
+La consulta pública de trámites usa un Web App de Google Apps Script independiente del formulario de solicitudes. La web sólo muestra el estado público y la fecha de actualización; no expone nombre, teléfono, correo ni documentación adjunta.
 
-`feat/primera-version-visual`
+## Verificación
 
-Para verla localmente, abrir `index.html` en un navegador o servir el directorio con un servidor estático.
+La integración continua ejecuta:
+
+- pruebas Python con `pytest`;
+- verificación de sintaxis JavaScript del cliente principal y de la consulta pública;
+- controles estructurales del sitio.
