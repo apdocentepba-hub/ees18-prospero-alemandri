@@ -20,6 +20,9 @@ jobs:
       - name: Run Python tests
         run: pytest -q
       - name: Check JavaScript syntax
-        run: node --check assets/js/main.js
+        run: |
+          node --check assets/js/main.js
+          node --check assets/js/estado-publico.js
+          node --check assets/js/status-config.js
       - name: Run JavaScript structure checks
         run: node tests/site.test.js
