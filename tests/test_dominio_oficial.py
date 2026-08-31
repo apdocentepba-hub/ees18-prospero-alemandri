@@ -36,3 +36,10 @@ def test_sitemap_y_robots_usan_dominio_oficial():
     assert OLD not in sitemap
     assert OFFICIAL in sitemap
     assert f"Sitemap: {OFFICIAL}/sitemap.xml" in robots
+
+
+def test_manifest_usa_raiz_del_dominio_oficial():
+    manifest = read("site.webmanifest")
+    assert '"start_url": "/"' in manifest
+    assert '"scope": "/"' in manifest
+    assert '/ees18-prospero-alemandri/' not in manifest
