@@ -1,5 +1,5 @@
 var RESERVAS_SETTINGS_ = Object.freeze({
-  SPREADSHEET_ID: '1o8G7tD-w1FBA4LB3zC3SEtx4hVXKvALSupGnHEMqHkQ',
+  SPREADSHEET_PROPERTY: 'RESERVAS_SPREADSHEET_ID',
   RESERVAS_SHEET: 'Reservas',
   CONFIG_SHEET: 'Configuración',
   BLOCKED_DAYS_SHEET: 'Días bloqueados',
@@ -24,6 +24,12 @@ var RESERVAS_SLOTS_ = Object.freeze({
     Object.freeze({ id: 'T5', start: '17:20', end: '18:20', shift: 'Tarde' })
   ])
 });
+
+function reservationSpreadsheetId_() {
+  var value = PropertiesService.getScriptProperties().getProperty(RESERVAS_SETTINGS_.SPREADSHEET_PROPERTY);
+  if (!value) throw new Error('MISSING_SPREADSHEET_CONFIGURATION');
+  return String(value).trim();
+}
 
 function allReservationSlots_() {
   return RESERVAS_SLOTS_.MANANA.concat(RESERVAS_SLOTS_.TARDE);
