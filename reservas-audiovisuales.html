@@ -46,65 +46,39 @@
     <div class="container booking-layout">
       <section class="booking-calendar-card" aria-labelledby="calendar-heading">
         <div class="booking-card-heading">
-          <div>
-            <span class="booking-eyebrow">Paso 1</span>
-            <h2 id="calendar-heading">Elegí el día</h2>
-          </div>
+          <div><span class="booking-eyebrow">Paso 1</span><h2 id="calendar-heading">Elegí el día</h2></div>
           <div class="calendar-controls" aria-label="Cambiar mes">
             <button type="button" id="calendar-prev" class="calendar-nav" aria-label="Mes anterior">←</button>
             <strong id="calendar-month-label"></strong>
             <button type="button" id="calendar-next" class="calendar-nav" aria-label="Mes siguiente">→</button>
           </div>
         </div>
-
         <div class="booking-legend" aria-label="Referencias del calendario">
           <span><i class="legend-dot is-available"></i>Disponible</span>
           <span><i class="legend-dot is-partial"></i>Parcial</span>
           <span><i class="legend-dot is-full"></i>Completo</span>
           <span><i class="legend-dot is-blocked"></i>Bloqueado</span>
         </div>
-
         <div class="calendar-weekdays" aria-hidden="true"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
         <div id="booking-calendar" class="booking-calendar" role="grid" aria-label="Calendario de disponibilidad"></div>
       </section>
 
       <section class="booking-day-card" aria-labelledby="selected-date-title">
         <div class="booking-card-heading">
-          <div>
-            <span class="booking-eyebrow">Paso 2</span>
-            <h2 id="selected-date-title">Seleccioná un día</h2>
-          </div>
+          <div><span class="booking-eyebrow">Paso 2</span><h2 id="selected-date-title">Seleccioná un día</h2></div>
           <span id="day-status-badge" class="day-status-badge">Sin fecha</span>
         </div>
-
         <p id="day-help" class="booking-help">Al elegir una fecha hábil aparecerán acá todos los horarios de mañana y tarde.</p>
-
-        <div class="shift-block">
-          <div class="shift-heading"><h3>Turno mañana</h3><span>07:30 a 12:50</span></div>
-          <div id="morning-slots" class="slot-list" aria-label="Horarios del turno mañana"></div>
-        </div>
-
-        <div class="shift-block">
-          <div class="shift-heading"><h3>Turno tarde</h3><span>13:00 a 18:20</span></div>
-          <div id="afternoon-slots" class="slot-list" aria-label="Horarios del turno tarde"></div>
-        </div>
-
-        <div id="selection-summary" class="selection-summary" aria-live="polite">
-          <strong>Todavía no seleccionaste horarios.</strong>
-          <span>Podés marcar uno o varios módulos consecutivos del mismo turno.</span>
-        </div>
+        <div class="shift-block"><div class="shift-heading"><h3>Turno mañana</h3><span>07:30 a 12:50</span></div><div id="morning-slots" class="slot-list" aria-label="Horarios del turno mañana"></div></div>
+        <div class="shift-block"><div class="shift-heading"><h3>Turno tarde</h3><span>13:00 a 18:20</span></div><div id="afternoon-slots" class="slot-list" aria-label="Horarios del turno tarde"></div></div>
+        <div id="selection-summary" class="selection-summary" aria-live="polite"><strong>Todavía no seleccionaste horarios.</strong><span>Podés marcar uno o varios módulos consecutivos del mismo turno.</span></div>
       </section>
     </div>
   </section>
 
   <section class="page-section page-section--soft booking-form-section">
     <div class="container booking-form-shell">
-      <div class="section-heading">
-        <span>Paso 3</span>
-        <h2>Completá los datos de la reserva.</h2>
-        <p>El formulario se habilita cuando seleccionás una fecha y al menos un módulo disponible.</p>
-      </div>
-
+      <div class="section-heading"><span>Paso 3</span><h2>Completá los datos de la reserva.</h2><p>El formulario se habilita cuando seleccionás una fecha y al menos un módulo disponible.</p></div>
       <form id="booking-form" class="booking-form" novalidate>
         <fieldset id="booking-fields" disabled>
           <div class="booking-form-grid">
@@ -113,44 +87,29 @@
             <label><span>Curso</span><input id="course" name="course" type="text" placeholder="Ej. 5° 2°" required></label>
             <label><span>Materia / espacio curricular</span><input id="subject" name="subject" type="text" required></label>
           </div>
-
           <div class="booking-options">
-            <div>
-              <span class="booking-field-title">Recursos</span>
-              <div class="resource-grid">
-                <label><input type="checkbox" name="projector"> <span>Cañón</span></label>
-                <label><input type="checkbox" name="speakers"> <span>Parlantes</span></label>
-                <label><input type="checkbox" name="schoolNotebook"> <span>Notebook de la escuela</span></label>
-                <label><input type="checkbox" name="internet"> <span>Internet</span></label>
-              </div>
-            </div>
-
-            <div>
-              <span class="booking-field-title">Modalidad</span>
-              <div class="mode-options">
-                <label><input type="radio" name="mode" value="single" checked> <span>Solo este día</span></label>
-                <label><input type="radio" name="mode" value="weekly"> <span>Repetir semanalmente</span></label>
-              </div>
-              <label id="repeat-until-wrap" class="repeat-until" hidden><span>Repetir hasta</span><input id="repeat-until" name="repeatUntil" type="date"></label>
-            </div>
+            <div><span class="booking-field-title">Recursos</span><div class="resource-grid">
+              <label><input type="checkbox" name="projector"> <span>Cañón</span></label>
+              <label><input type="checkbox" name="speakers"> <span>Parlantes</span></label>
+              <label><input type="checkbox" name="schoolNotebook"> <span>Notebook de la escuela</span></label>
+              <label><input type="checkbox" name="internet"> <span>Internet</span></label>
+            </div></div>
+            <div><span class="booking-field-title">Modalidad</span><div class="mode-options">
+              <label><input type="radio" name="mode" value="single" checked> <span>Solo este día</span></label>
+              <label><input type="radio" name="mode" value="weekly"> <span>Repetir semanalmente</span></label>
+            </div><label id="repeat-until-wrap" class="repeat-until" hidden><span>Repetir hasta</span><input id="repeat-until" name="repeatUntil" type="date"></label></div>
           </div>
-
           <label class="booking-observations"><span>Observaciones</span><textarea id="observations" name="observations" rows="3" maxlength="500"></textarea></label>
-
-          <div class="booking-confirm-box">
-            <div id="confirmation-summary"><strong>Revisá fecha y horario antes de confirmar.</strong></div>
-            <button id="booking-submit" class="booking-submit" type="submit">Confirmar reserva</button>
-          </div>
+          <div class="booking-confirm-box"><div id="confirmation-summary"><strong>Revisá fecha y horario antes de confirmar.</strong></div><button id="booking-submit" class="booking-submit" type="submit">Confirmar reserva</button></div>
         </fieldset>
       </form>
-
       <div id="booking-result" class="booking-result" hidden aria-live="polite"></div>
     </div>
   </section>
 </main>
-
 <footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Avellaneda · Provincia de Buenos Aires</span></div><nav><a href="index.html">Inicio</a><a href="docentes.html">Docentes</a><a href="contacto.html">Contacto</a></nav><span>© <span id="current-year">2026</span></span></div></footer>
 <script src="assets/js/main.js"></script>
+<script src="assets/js/reservas-config.js"></script>
 <script src="assets/js/reservas-audiovisuales.js"></script>
 </body>
 </html>
