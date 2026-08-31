@@ -124,6 +124,20 @@ assert.deepStrictEqual(
 assert.strictEqual(JSON.stringify(availability).includes('Docente Privado'), false, 'la respuesta pública no debe filtrar nombres');
 assert.strictEqual(JSON.stringify(availability).includes('privado@example.com'), false, 'la respuesta pública no debe filtrar correos');
 
+const sameDayAtTen = context.buildAvailabilityForDate_(
+  '2026-08-31',
+  '2026-08-31',
+  [],
+  [],
+  '10:00'
+);
+assert.deepStrictEqual(
+  Array.from(sameDayAtTen.slots.filter((slot) => !slot.available).map((slot) => slot.id)),
+  ['M1', 'M2', 'M3'],
+  'el mismo día no debe permitir módulos cuya hora de inicio ya llegó'
+);
+assert.strictEqual(sameDayAtTen.free, 7, 'los módulos futuros del mismo día deben seguir disponibles');
+
 const blocked = context.buildAvailabilityForDate_(
   '2026-09-02',
   '2026-08-31',
@@ -194,6 +208,25 @@ assert.deepStrictEqual(
   'la fecha ocupada debe informarse sin rechazar toda la serie'
 );
 assert.strictEqual(JSON.stringify(plan).includes('Luciano Leal'), false, 'el plan de conflictos no debe exponer titulares previos');
+
+const sameDayPastPlan = context.planReservationDates_(
+  context.normalizeReservationPayload_({
+    mode: 'single',
+    date: '2026-08-31',
+    slotIds: ['M3'],
+    teacher: 'Prueba horario',
+    email: 'prueba@abc.gob.ar',
+    course: '4° 1°',
+    subject: 'Historia',
+    resources: {}
+  }, '2026-08-31'),
+  '2026-08-31',
+  [],
+  [],
+  '10:00'
+);
+assert.strictEqual(sameDayPastPlan.confirmedDates.length, 0, 'un módulo ya iniciado no debe poder confirmarse');
+assert.strictEqual(sameDayPastPlan.conflicts.length, 1);
 
 const singleConflict = context.planReservationDates_(
   context.normalizeReservationPayload_({
