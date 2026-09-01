@@ -34,7 +34,7 @@ jobs:
           node tests/apps-script-reservas.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
-      - name: One-shot production reservation control
+      - name: One-shot production cancellation control
         run: |
           python - <<'PY'
           import json, re, urllib.parse, urllib.request
@@ -42,36 +42,25 @@ jobs:
 
           config = Path('assets/js/reservas-config.js').read_text(encoding='utf-8')
           base = re.search(r"EES18_RESERVAS_API_URL\s*=\s*'([^']+)'", config).group(1)
+          token = 'dq9crwwJQJxhH3durP11IWLDBSOSP7ay-pGNzKUaBo4'
 
           def get_json(params):
               url = base + '?' + urllib.parse.urlencode(params)
               req = urllib.request.Request(url, headers={'User-Agent': 'EES18-production-e2e/1.0'})
-              with urllib.request.urlopen(req, timeout=30) as response:
+              with urllib.request.urlopen(req, timeout=45) as response:
                   return json.loads(response.read().decode('utf-8'))
 
-          target_date = '2026-09-02'
-          availability = get_json({'action': 'availability', 'date': target_date})
-          free_slots = [slot for slot in availability.get('slots', []) if slot.get('available')]
-          assert free_slots, availability
-          slot = free_slots[0]
+          lookup = get_json({'action': 'cancelLookup', 'token': token})
+          assert lookup.get('ok') is True, lookup
+          assert lookup['reservation']['id'] == '691fe10f-c25b-48fd-8c4d-ee58f673472b', lookup
+          print('PRODUCTION_E2E_CANCEL_LOOKUP_OK=' + lookup['reservation']['id'])
 
-          payload = {
-              'mode': 'single',
-              'date': target_date,
-              'slotIds': [slot['id']],
-              'teacher': 'PRUEBA SISTEMA PRODUCCIÓN',
-              'email': 'martin.nicolas.podubinio@gmail.com',
-              'course': 'PRUEBA E2E',
-              'subject': 'PRUEBA CONTROL PRODUCCIÓN',
-              'resources': {},
-              'observations': 'PRUEBA E2E PRODUCCIÓN DESCARTABLE. CANCELAR AL FINALIZAR.'
-          }
-          result = get_json({'action': 'create', 'payload': json.dumps(payload, ensure_ascii=False)})
+          result = get_json({'action': 'cancel', 'token': token})
           assert result.get('ok') is True, result
-          assert result.get('confirmed') == 1, result
-          reservation = result['reservations'][0]
-          print('PRODUCTION_E2E_CREATED_ID=' + reservation['id'])
-          print('PRODUCTION_E2E_DATE=' + reservation['date'])
-          print('PRODUCTION_E2E_SLOT=' + slot['id'])
-          print('PRODUCTION_E2E_TIME=' + reservation['start'] + '-' + reservation['end'])
+          print('PRODUCTION_E2E_CANCEL_OK=' + result['reservation']['id'])
+
+          second = get_json({'action': 'cancelLookup', 'token': token})
+          assert second.get('ok') is False, second
+          assert second.get('code') == 'ALREADY_CANCELLED', second
+          print('PRODUCTION_E2E_CANCEL_IDEMPOTENT=' + second['code'])
           PY
