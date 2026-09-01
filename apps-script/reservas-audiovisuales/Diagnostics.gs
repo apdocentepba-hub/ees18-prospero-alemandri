@@ -18,9 +18,34 @@ function diagnoseReservationRuntimeDependencies_() {
   };
 }
 
+function diagnoseReservationTarget_() {
+  var sheet = getRequiredSheet_(RESERVAS_SETTINGS_.RESERVAS_SHEET);
+  var lastColumn = sheet.getLastColumn();
+  var headers = lastColumn > 0
+    ? sheet.getRange(1, 1, 1, lastColumn).getValues()[0]
+    : [];
+  var headerMap = buildHeaderMap_(headers);
+  var requiredColumns = Array.isArray(RESERVAS_EXTRA_COLUMNS_)
+    ? RESERVAS_EXTRA_COLUMNS_
+    : [];
+  var missingColumns = requiredColumns.filter(function (headerName) {
+    return typeof headerMap[normalizeHeader_(headerName)] !== 'number';
+  });
+  var nextRow = sheet.getLastRow() + 1;
+  var targetRange = sheet.getRange(nextRow, 1, 1, Math.max(1, lastColumn));
+
+  return {
+    nextRow: nextRow,
+    lastColumn: lastColumn,
+    missingColumns: missingColumns,
+    canEdit: targetRange.canEdit()
+  };
+}
+
 function diagnoseReservationCreate_(payload) {
   var stage = 'NORMALIZE';
   var lock = null;
+  var target = null;
 
   try {
     requireInstitutionalReservationEmail_(payload && payload.email);
@@ -32,8 +57,9 @@ function diagnoseReservationCreate_(payload) {
     stage = 'LOCK';
     lock = LockService.getScriptLock();
     lock.waitLock(10000);
-    lock.releaseLock();
-    lock = null;
+
+    stage = 'TARGET';
+    target = diagnoseReservationTarget_();
 
     stage = 'READ';
     var reservations = readReservationRecords_();
@@ -57,6 +83,7 @@ function diagnoseReservationCreate_(payload) {
         requested: plan.requested,
         confirmed: 0,
         conflicts: plan.conflicts.length,
+        target: target,
         runtimeDependencies: diagnoseReservationRuntimeDependencies_()
       };
     }
@@ -84,6 +111,7 @@ function diagnoseReservationCreate_(payload) {
         hasCancellationHash: Boolean(record.cancellationHash),
         syncState: record.syncState
       },
+      target: target,
       runtimeDependencies: diagnoseReservationRuntimeDependencies_()
     };
   } catch (error) {
@@ -93,6 +121,7 @@ function diagnoseReservationCreate_(payload) {
       ready: false,
       stage: stage,
       code: diagnosticReservationErrorCode_(error),
+      target: target,
       runtimeDependencies: diagnoseReservationRuntimeDependencies_()
     };
   } finally {
