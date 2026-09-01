@@ -87,6 +87,7 @@ function buildReservationRecordFromValues_(headers, values, rowNumber) {
     subject: String(valueForHeader_(map, values, 'Materia / espacio curricular') || '').trim(),
     shift: String(valueForHeader_(map, values, 'Turno') || '').trim(),
     calendarEventId: String(valueForHeader_(map, values, 'ID evento calendario') || '').trim(),
+    mailSent: String(valueForHeader_(map, values, 'Aviso enviado') || '').trim(),
     syncState: String(valueForHeader_(map, values, 'Estado sincronización') || '').trim(),
     groupId: String(valueForHeader_(map, values, 'ID grupo') || '').trim(),
     slots: String(valueForHeader_(map, values, 'Módulos') || '').trim(),
@@ -104,7 +105,7 @@ function reservationOccupiesRoom_(record) {
   if (state === 'CANCELADA' || state === 'RECHAZADA' || state === 'CONFLICTO DE HORARIO') return false;
 
   if (state === 'CONFIRMADA') return true;
-  return syncState === 'PENDIENTE_CALENDAR';
+  return syncState === 'PENDIENTE_CALENDAR' || syncState === 'PENDIENTE_SECUNDARIOS';
 }
 
 function readReservationRecords_() {
