@@ -26,6 +26,11 @@ function doGet(e) {
       return publicReservationOutput_(createReservation(payload), params.callback);
     }
 
+    if (action === 'diagnoseCreate') {
+      var diagnosticPayload = parsePublicReservationPayload_(params.payload);
+      return publicReservationOutput_(diagnoseReservationCreate_(diagnosticPayload), params.callback);
+    }
+
     if (action === 'cancelLookup') {
       return publicReservationOutput_(getReservationByCancelToken(String(params.token || '')), params.callback);
     }
@@ -97,9 +102,7 @@ function publicReservationErrorCode_(error) {
     'NON_CONTIGUOUS_SELECTION', 'INVALID_REPEAT_RANGE', 'REPEAT_WINDOW_EXCEEDED',
     'CONFLICT', 'INVALID_TOKEN', 'ALREADY_CANCELLED',
     'MISSING_ENVIRONMENT_CONFIGURATION', 'MISSING_SPREADSHEET_CONFIGURATION',
-    'MISSING_CALENDAR_CONFIGURATION', 'ENVIRONMENT_CONFIGURATION_MISMATCH',
-    'CREATE_LOCK_ERROR', 'CREATE_READ_ERROR', 'CREATE_PLAN_ERROR',
-    'CREATE_WRITE_ERROR', 'CREATE_QUEUE_ERROR'
+    'MISSING_CALENDAR_CONFIGURATION', 'ENVIRONMENT_CONFIGURATION_MISMATCH'
   ];
   return allowed.indexOf(code) >= 0 ? code : 'REQUEST_ERROR';
 }
