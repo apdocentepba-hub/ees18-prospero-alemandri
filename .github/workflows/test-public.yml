@@ -32,5 +32,6 @@ jobs:
           node tests/site.test.js
           node tests/reservas-audiovisuales.test.js
           node tests/apps-script-reservas.test.js
+          node tests/abc-email-policy.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
