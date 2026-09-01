@@ -18,7 +18,7 @@ if not BASE_URL.startswith("https://script.google.com/") or not BASE_URL.endswit
 
 def get_json(params):
     url = BASE_URL + "?" + urllib.parse.urlencode(params)
-    request = urllib.request.Request(url, headers={"User-Agent": "EES18-reservas-pilot-probe/1.0"})
+    request = urllib.request.Request(url, headers={"User-Agent": "EES18-reservas-production-probe/1.0"})
     with urllib.request.urlopen(request, timeout=30) as response:
         if response.status != 200:
             raise RuntimeError(f"Unexpected HTTP status: {response.status}")
@@ -28,6 +28,7 @@ def get_json(params):
 health = get_json({"action": "health"})
 assert health.get("ok") is True, health
 assert health.get("service") == "reservas-audiovisuales", health
+assert health.get("environment") == "production", health
 
 availability = get_json({"action": "availability", "date": "2026-09-01"})
 assert availability.get("ok") is True, availability
@@ -41,7 +42,8 @@ for forbidden in ("teacher", "profesor", "correo", "email", "materia", "course",
     assert forbidden not in serialized, f"Public availability leaked forbidden field: {forbidden}"
 
 print(
-    "reservation Web App live probe OK:",
+    "reservation Web App production probe OK:",
+    health.get("environment"),
     availability.get("status"),
     f"{availability.get('free')}/{availability.get('total')} free slots",
 )
