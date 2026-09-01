@@ -112,4 +112,21 @@ assert.throws(
   /INVALID_EMAIL/
 );
 
+assert.deepStrictEqual(
+  rules.occupiedSlotIdsFromMonthDay({ occupiedSlotIds: ['M1', 'T2', 'INVALID'] }),
+  ['M1', 'T2'],
+  'la vista diaria debe poder pintar horarios inmediatamente con el resumen mensual'
+);
+assert.deepStrictEqual(
+  rules.occupiedSlotIdsFromMonthDay(null),
+  [],
+  'si el mes no tiene detalle de módulos, la selección optimista debe ser vacía'
+);
+
+const gate = rules.createLatestRequestGate();
+const firstRequest = gate.next('2026-09-02');
+const secondRequest = gate.next('2026-09-03');
+assert.strictEqual(gate.isCurrent(firstRequest, '2026-09-02'), false, 'una respuesta vieja no debe bloquear ni sobrescribir el día nuevo');
+assert.strictEqual(gate.isCurrent(secondRequest, '2026-09-03'), true, 'la última selección debe seguir vigente');
+
 console.log('reservas-audiovisuales.test.js: all assertions passed');
