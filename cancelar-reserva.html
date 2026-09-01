@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Cancelación segura de reservas del Salón de Audiovisuales de la E.E.S. Nº 18 Próspero Alemandri.">
+  <meta name="theme-color" content="#0f3f62">
+  <title>Cancelar reserva · E.E.S. Nº 18</title>
+  <link rel="canonical" href="https://ees18avellaneda.edu.ar/cancelar-reserva.html">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/multipage.css">
+  <link rel="stylesheet" href="assets/css/reservas-audiovisuales.css">
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<div class="government-bar"><div class="container government-bar__inner"><span>Educación Pública · Provincia de Buenos Aires</span><span>Avellaneda · Nivel Secundario</span></div></div>
+<header class="site-header"><div class="container header-shell"><a class="brand" href="index.html" aria-label="Inicio - E.E.S. Nº 18 Próspero Alemandri"><span class="brand-logo"><img class="enspa-logo" src="https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg" alt="Emblema histórico de la institución"></span><span class="brand-copy"><span class="brand-copy__legacy">Escuela secundaria estatal · Avellaneda</span><strong>ESCUELA DE EDUCACIÓN SECUNDARIA Nº 18</strong><span class="brand-copy__name">“PRÓSPERO ALEMANDRI”</span></span></a><button class="menu-toggle" id="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false" aria-label="Abrir menú de navegación"><span></span><span></span><span></span></button><nav class="primary-nav" id="primary-nav" aria-label="Navegación principal"><a href="index.html">Inicio</a><a href="nuestra-escuela.html">Nuestra escuela</a><a href="propuesta-educativa.html">Propuesta educativa</a><a href="estudiantes-familias.html">Estudiantes y familias</a><a href="docentes.html" aria-current="page">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="ingreso-2027.html">Ingreso 2027</a><a href="contacto.html" class="nav-cta">Contacto</a></nav></div></header>
+<main id="contenido">
+  <section class="page-hero"><div class="container page-hero__grid"><div><span class="page-kicker">Reservas docentes</span><h1>Cancelar una reserva</h1><p>Este enlace valida de forma segura la reserva antes de mostrar sus datos. Una cancelación libera inmediatamente el horario para otros docentes.</p></div><aside class="page-note"><small>Seguridad</small><strong>El enlace es personal</strong><span>No compartas el enlace recibido por correo. No permite ver otras reservas.</span></aside></div></section>
+
+  <section class="page-section">
+    <div class="container booking-cancel-shell">
+      <div id="cancel-loading" class="booking-result" aria-live="polite">
+        <strong>Validando el enlace de cancelación…</strong>
+        <span>Los datos de la reserva se mostrarán únicamente si el enlace es válido.</span>
+      </div>
+
+      <article id="cancel-details" hidden class="booking-panel booking-cancel-card" aria-live="polite">
+        <span class="page-kicker">Reserva encontrada</span>
+        <h2 id="cancel-date">Reserva</h2>
+        <dl class="booking-cancel-details">
+          <div><dt>Horario</dt><dd id="cancel-time">—</dd></div>
+          <div><dt>Curso</dt><dd id="cancel-course">—</dd></div>
+          <div><dt>Materia</dt><dd id="cancel-subject">—</dd></div>
+        </dl>
+        <p>Al cancelar, el horario vuelve a quedar disponible. Para modificar fecha u horario, cancelá esta reserva y luego hacé una nueva.</p>
+        <button id="cancel-confirm" class="button button--primary" type="button" disabled>Cancelar esta reserva</button>
+      </article>
+
+      <div id="cancel-result" class="booking-result" hidden aria-live="polite"></div>
+      <p class="booking-back-link"><a href="reservas-audiovisuales.html">← Volver al sistema de reservas</a></p>
+    </div>
+  </section>
+</main>
+<footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Avellaneda · Provincia de Buenos Aires</span></div><nav><a href="index.html">Inicio</a><a href="docentes.html">Docentes</a><a href="contacto.html">Contacto</a></nav><span>© <span id="current-year">2026</span></span></div></footer>
+<script src="assets/js/main.js"></script>
+<script src="assets/js/reservas-config.js"></script>
+<script src="assets/js/cancelar-reserva.js"></script>
+</body>
+</html>

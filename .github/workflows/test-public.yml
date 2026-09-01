@@ -24,5 +24,13 @@ jobs:
           node --check assets/js/main.js
           node --check assets/js/estado-publico.js
           node --check assets/js/status-config.js
+          node --check assets/js/reservas-config.js
+          node --check assets/js/reservas-audiovisuales.js
+          node --check assets/js/cancelar-reserva.js
       - name: Run JavaScript structure checks
-        run: node tests/site.test.js
+        run: |
+          node tests/site.test.js
+          node tests/reservas-audiovisuales.test.js
+          node tests/apps-script-reservas.test.js
+      - name: Probe deployed reservation Web App
+        run: python tests/probe_reservas_live.py
