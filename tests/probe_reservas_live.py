@@ -17,9 +17,7 @@ if not BASE_URL.startswith("https://script.google.com/") or not BASE_URL.endswit
     raise SystemExit("Reservation Web App URL is not a valid Apps Script /exec URL")
 
 ALLOWED_SLOT_IDS = {"M1", "M2", "M3", "M4", "M5", "T1", "T2", "T3", "T4", "T5"}
-ORDERED_SLOT_IDS = ["M1", "M2", "M3", "M4", "M5", "T1", "T2", "T3", "T4", "T5"]
 FORBIDDEN_PUBLIC_FIELDS = ("teacher", "profesor", "correo", "email", "materia", "course", "curso")
-E2E_MARKER = "PRUEBA ASYNC 20260901-1426"
 
 
 def get_json(params):
@@ -92,6 +90,7 @@ serialized = json.dumps(availability, ensure_ascii=False).lower()
 for forbidden in FORBIDDEN_PUBLIC_FIELDS:
     assert forbidden not in serialized, f"Public availability leaked forbidden field: {forbidden}"
 
+# Safe guard-path probe: INVALID date guarantees no reservation can be created.
 external_email_probe, guard_latency = timed_get_json("external-email-guard", {
     "action": "create",
     "payload": json.dumps({
@@ -108,65 +107,6 @@ external_email_probe, guard_latency = timed_get_json("external-email-guard", {
 assert external_email_probe.get("ok") is False, external_email_probe
 assert external_email_probe.get("code") == "INSTITUTIONAL_EMAIL_REQUIRED", external_email_probe
 
-# One-shot controlled E2E probe for the async confirmation cutover.
-selected_date = None
-selected_slot = None
-for iso_date in sorted(month_warm["days"]):
-    if iso_date < "2026-09-02":
-        continue
-    day_info = month_warm["days"][iso_date]
-    if day_info.get("status") not in {"available", "partial"}:
-        continue
-    occupied = set(day_info.get("occupiedSlotIds") or [])
-    free_slots = [slot_id for slot_id in ORDERED_SLOT_IDS if slot_id not in occupied]
-    if free_slots:
-        selected_date = iso_date
-        selected_slot = free_slots[0]
-        break
-
-assert selected_date and selected_slot, "No future free slot found for controlled async E2E probe"
-
-create_payload = {
-    "mode": "single",
-    "date": selected_date,
-    "slotIds": [selected_slot],
-    "teacher": "PRUEBA TECNICA ASYNC",
-    "email": "secundaria18avellaneda@abc.gob.ar",
-    "course": E2E_MARKER,
-    "subject": E2E_MARKER,
-    "resources": {},
-    "observations": "Prueba técnica controlada de confirmación asíncrona; eliminar/cancelar al finalizar.",
-}
-create_response, create_latency = timed_get_json("create-async-e2e", {
-    "action": "create",
-    "payload": json.dumps(create_payload, ensure_ascii=False),
-})
-assert create_response.get("ok") is True, create_response
-assert create_response.get("confirmed") == 1, create_response
-assert create_response.get("secondaryProcessing") in {"queued", "pending"}, create_response
-created = (create_response.get("reservations") or [None])[0]
-assert created and created.get("id"), create_response
-reservation_id = created["id"]
-print("ASYNC_E2E", json.dumps({
-    "marker": E2E_MARKER,
-    "reservation_id": reservation_id,
-    "date": selected_date,
-    "slot": selected_slot,
-    "secondaryProcessing": create_response.get("secondaryProcessing"),
-    "create_latency": round(create_latency, 3),
-}, ensure_ascii=False, sort_keys=True))
-
-# The room must be occupied immediately, independently of Calendar/Mail completion.
-time.sleep(1)
-after_create, after_create_latency = timed_get_json("availability-after-create", {
-    "action": "availability",
-    "date": selected_date,
-})
-assert after_create.get("ok") is True, after_create
-slot_after_create = next((slot for slot in after_create.get("slots", []) if slot.get("id") == selected_slot), None)
-assert slot_after_create is not None, after_create
-assert slot_after_create.get("available") is False, after_create
-
 print(
     "reservation Web App production probe OK:",
     health.get("environment"),
@@ -174,7 +114,6 @@ print(
     f"{availability.get('free')}/{availability.get('total')} free slots",
     "month slot contract OK",
     "external email blocked",
-    "async create queued",
 )
 print(
     "LATENCY SUMMARY",
@@ -185,7 +124,5 @@ print(
         "availability_cold": round(availability_cold_latency, 3),
         "availability_warm": round(availability_warm_latency, 3),
         "external_email_guard": round(guard_latency, 3),
-        "create_async_e2e": round(create_latency, 3),
-        "availability_after_create": round(after_create_latency, 3),
     }, sort_keys=True),
 )
