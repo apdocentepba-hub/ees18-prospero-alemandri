@@ -221,10 +221,17 @@
 
   const API_URL = String(window.EES18_RESERVAS_API_URL || '').trim();
   const apiReady = Boolean(API_URL);
+  const MONTH_SNAPSHOT_PREFIX = 'EES18_RESERVAS_MONTH_SNAPSHOT_';
+  const REQUEST_TIMEOUT_MS = 45000;
+  const MONTH_RETRY_DELAY_MS = 4000;
+  const MONTH_RETRY_MAX_ATTEMPTS = 3;
+
   let requestCounter = 0;
   const monthAvailabilityCache = new Map();
   const monthRequestGate = rules.createLatestRequestGate();
   const dayRequestGate = rules.createLatestRequestGate();
+  const monthRetryAttempts = new Map();
+  const monthRetryTimers = new Map();
 
   const monthLabel = document.getElementById('calendar-month-label');
   const prevButton = document.getElementById('calendar-prev');
@@ -277,6 +284,73 @@
     return `${state.visibleMonth.getFullYear()}-${String(state.visibleMonth.getMonth() + 1).padStart(2, '0')}`;
   }
 
+  function monthSnapshotStorageKey(key) {
+    return `${MONTH_SNAPSHOT_PREFIX}${key}`;
+  }
+
+  function readStoredMonthSnapshot(key) {
+    try {
+      const raw = window.localStorage.getItem(monthSnapshotStorageKey(key));
+      if (!raw) return null;
+      const parsed = JSON.parse(raw);
+      if (!parsed || parsed.key !== key || !parsed.days || typeof parsed.days !== 'object') return null;
+      return parsed;
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function storeMonthSnapshot(key, days) {
+    const snapshot = { key, savedAt: Date.now(), days };
+    monthAvailabilityCache.set(key, snapshot);
+    try {
+      window.localStorage.setItem(monthSnapshotStorageKey(key), JSON.stringify(snapshot));
+    } catch (error) {
+      // Private browsing or storage quota errors must never block reservations.
+    }
+    return snapshot;
+  }
+
+  function removeMonthSnapshot(key) {
+    monthAvailabilityCache.delete(key);
+    try {
+      window.localStorage.removeItem(monthSnapshotStorageKey(key));
+    } catch (error) {
+      // Storage is only an optimization.
+    }
+  }
+
+  function bestMonthSnapshot(key) {
+    const memory = monthAvailabilityCache.get(key);
+    if (memory && memory.days) return memory;
+    const stored = readStoredMonthSnapshot(key);
+    if (stored && stored.days) {
+      monthAvailabilityCache.set(key, stored);
+      return stored;
+    }
+    return null;
+  }
+
+  function clearMonthRetry(key) {
+    const timer = monthRetryTimers.get(key);
+    if (timer) window.clearTimeout(timer);
+    monthRetryTimers.delete(key);
+    monthRetryAttempts.delete(key);
+  }
+
+  function scheduleMonthRetry(key) {
+    if (!apiReady || key !== visibleMonthKey() || monthRetryTimers.has(key)) return;
+    const attempts = Number(monthRetryAttempts.get(key) || 0);
+    if (attempts >= MONTH_RETRY_MAX_ATTEMPTS) return;
+
+    monthRetryAttempts.set(key, attempts + 1);
+    const timer = window.setTimeout(() => {
+      monthRetryTimers.delete(key);
+      if (visibleMonthKey() === key) loadMonthAvailability();
+    }, MONTH_RETRY_DELAY_MS);
+    monthRetryTimers.set(key, timer);
+  }
+
   function formatLongDate(isoDate) {
     const [year, month, day] = isoDate.split('-').map(Number);
     return new Intl.DateTimeFormat('es-AR', {
@@ -325,7 +399,7 @@
       timer = window.setTimeout(() => {
         cleanupJsonp(script, callbackName, timer);
         reject(new Error('TIMEOUT'));
-      }, 15000);
+      }, REQUEST_TIMEOUT_MS);
       document.head.appendChild(script);
     });
   }
@@ -342,7 +416,7 @@
     const dayInfo = state.monthDays[toIsoLocal(date)];
     return dayInfo && ['available', 'partial', 'full', 'blocked'].includes(dayInfo.status)
       ? dayInfo.status
-      : 'blocked';
+      : 'updating';
   }
 
   function dateCaption(status) {
@@ -350,6 +424,7 @@
     if (status === 'available') return 'Disponible';
     if (status === 'partial') return 'Parcial';
     if (status === 'full') return 'Completo';
+    if (status === 'updating') return 'Actualizando…';
     return 'Bloqueado';
   }
 
@@ -387,7 +462,7 @@
       caption.textContent = captionText;
       button.append(number, caption);
 
-      if (status === 'blocked' || status === 'full') button.disabled = true;
+      if (status === 'blocked' || status === 'full' || status === 'updating') button.disabled = true;
       if (state.selectedDate === isoDate) button.classList.add('is-selected');
       button.addEventListener('click', () => selectDate(isoDate));
       calendar.appendChild(button);
@@ -442,7 +517,7 @@
     const month = state.visibleMonth.getMonth() + 1;
     const key = visibleMonthKey();
     const requestVersion = monthRequestGate.next(key);
-    const cached = monthAvailabilityCache.get(key);
+    const cached = bestMonthSnapshot(key);
 
     if (cached && cached.days) {
       state.monthDays = cached.days;
@@ -458,13 +533,14 @@
       if (!monthRequestGate.isCurrent(requestVersion, key)) return;
       if (!response.ok || !response.days) throw new Error(response.code || 'INVALID_RESPONSE');
       state.monthDays = response.days;
-      monthAvailabilityCache.set(key, { days: response.days, savedAt: Date.now() });
+      storeMonthSnapshot(key, response.days);
+      clearMonthRetry(key);
     } catch (error) {
       if (!monthRequestGate.isCurrent(requestVersion, key)) return;
       if (!cached) {
-        state.monthDays = {};
-        setResult('<strong>No pudimos cargar la disponibilidad.</strong><span>Intentá nuevamente en unos minutos. El sistema actual sigue disponible desde Docentes.</span>', 'error');
+        setResult('<strong>La disponibilidad se está actualizando.</strong><span>Apps Script está tardando más de lo normal. El calendario reintentará automáticamente.</span>', 'info');
       }
+      scheduleMonthRetry(key);
     } finally {
       if (!monthRequestGate.isCurrent(requestVersion, key)) return;
       state.monthLoading = false;
@@ -472,53 +548,29 @@
     }
   }
 
-  async function selectDate(isoDate) {
+  function selectDate(isoDate) {
     if (!apiReady) return;
 
     const requestVersion = dayRequestGate.next(isoDate);
-    const monthDay = state.monthDays[isoDate] || {};
+    if (!dayRequestGate.isCurrent(requestVersion, isoDate)) return;
+
+    const monthDay = state.monthDays[isoDate];
+    if (!monthDay || monthDay.status === 'blocked' || monthDay.status === 'full') return;
+
     state.selectedDate = isoDate;
     state.selectedSlotIds = [];
     state.occupiedSlotIds = rules.occupiedSlotIdsFromMonthDay(state.monthDays[isoDate]);
     selectedDateTitle.textContent = formatLongDate(isoDate);
-    dayStatusBadge.textContent = dateCaption(monthDay.status || 'available');
-    dayStatusBadge.dataset.state = monthDay.status || 'available';
-    dayHelp.textContent = 'Horarios cargados. Verificando cambios recientes…';
+    dayStatusBadge.textContent = dateCaption(monthDay.status);
+    dayStatusBadge.dataset.state = monthDay.status;
+    dayHelp.textContent = 'Marcá uno o varios módulos consecutivos del mismo turno.';
     bookingResult.hidden = true;
     repeatUntilInput.min = isoDate;
     repeatUntilInput.max = toIsoLocal(maxDate);
     renderCalendar();
     renderSlots();
     renderSelectionSummary();
-
-    try {
-      const response = await requestJsonp('availability', { date: isoDate });
-      if (!dayRequestGate.isCurrent(requestVersion, isoDate) || state.selectedDate !== isoDate) return;
-      if (!response.ok || !Array.isArray(response.slots)) throw new Error(response.code || 'INVALID_RESPONSE');
-
-      state.occupiedSlotIds = response.slots.filter((slot) => slot.available !== true).map((slot) => slot.id);
-      state.selectedSlotIds = state.selectedSlotIds.filter((slotId) => !state.occupiedSlotIds.includes(slotId));
-      dayStatusBadge.textContent = dateCaption(response.status);
-      dayStatusBadge.dataset.state = response.status;
-      dayHelp.textContent = response.status === 'blocked'
-        ? (response.reason || 'Este día no admite reservas.')
-        : 'Marcá uno o varios módulos consecutivos del mismo turno.';
-      if (response.status === 'blocked' || response.status === 'full') {
-        state.selectedDate = '';
-        state.selectedSlotIds = [];
-      }
-    } catch (error) {
-      if (!dayRequestGate.isCurrent(requestVersion, isoDate) || state.selectedDate !== isoDate) return;
-      dayStatusBadge.textContent = 'Sin actualizar';
-      dayStatusBadge.dataset.state = 'partial';
-      dayHelp.textContent = 'Mostramos la última disponibilidad cargada. Antes de guardar, el sistema vuelve a comprobar el horario.';
-    } finally {
-      if (!dayRequestGate.isCurrent(requestVersion, isoDate)) return;
-      renderCalendar();
-      renderSlots();
-      renderSelectionSummary();
-      updateConfirmationSummary();
-    }
+    updateConfirmationSummary();
   }
 
   function toggleSlot(slotId, checked) {
@@ -585,11 +637,12 @@
       emailKind.textContent = 'Revisá el formato del correo';
       return;
     }
-    emailKind.textContent = rules.isInstitutionalEmail(email) ? 'Correo institucional' : 'Correo externo válido';
+    emailKind.textContent = rules.isInstitutionalEmail(email) ? 'Correo institucional' : 'Usá tu correo @abc.gob.ar';
   }
 
   function updateModeUi() {
-    const mode = bookingForm.querySelector('input[name="mode"]:checked')?.value || 'single';
+    const modeInput = bookingForm.querySelector('input[name="mode"]:checked');
+    const mode = modeInput ? modeInput.value : 'single';
     repeatUntilWrap.hidden = mode !== 'weekly';
     repeatUntilInput.required = mode === 'weekly';
     if (mode !== 'weekly') repeatUntilInput.value = '';
@@ -631,11 +684,15 @@
     return messages[code] || 'Revisá los datos e intentá nuevamente.';
   }
 
-  async function refreshSelectedDateAfterWrite() {
-    const selected = state.selectedDate;
-    monthAvailabilityCache.delete(visibleMonthKey());
-    await loadMonthAvailability();
-    if (selected) await selectDate(selected);
+  function refreshSelectedDateAfterWrite() {
+    const key = visibleMonthKey();
+    removeMonthSnapshot(key);
+    clearMonthRetry(key);
+    state.selectedDate = '';
+    state.selectedSlotIds = [];
+    state.occupiedSlotIds = [];
+    dayRequestGate.next('');
+    loadMonthAvailability();
   }
 
   bookingForm.addEventListener('submit', async (event) => {
@@ -664,7 +721,7 @@
       if (!response.ok) {
         if (response.code === 'CONFLICT') {
           setResult('<strong>Ese horario acaba de ocuparse.</strong><span>Actualizamos el calendario para que elijas otra franja.</span>', 'error');
-          await refreshSelectedDateAfterWrite();
+          refreshSelectedDateAfterWrite();
           return;
         }
         throw new Error(response.code || 'REQUEST_ERROR');
@@ -675,7 +732,7 @@
         ? `<span>No se pudieron reservar: ${conflicts.map((item) => item.date).join(', ')}.</span>`
         : '<span>Todas las fechas solicitadas quedaron confirmadas.</span>';
       setResult(`<strong>${response.confirmed} de ${response.requested} ${response.requested === 1 ? 'reserva confirmada' : 'reservas confirmadas'}.</strong>${conflictText}<span>La confirmación y el enlace de cancelación se envían al correo indicado.</span>`, 'success');
-      await refreshSelectedDateAfterWrite();
+      refreshSelectedDateAfterWrite();
     } catch (error) {
       setResult('<strong>No pudimos confirmar la reserva.</strong><span>No se muestra ninguna reserva como confirmada sin respuesta válida del servidor. Intentá nuevamente.</span>', 'error');
     } finally {
