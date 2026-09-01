@@ -1,3 +1,6 @@
+var RESERVAS_PUBLIC_AVAILABILITY_CACHE_KEY_ = 'reservas-public-availability-v1';
+var RESERVAS_PUBLIC_AVAILABILITY_CACHE_SECONDS_ = 20;
+
 function parseIsoDateParts_(isoDate) {
   var text = String(isoDate == null ? '' : isoDate).trim();
   var match = text.match(/^(\d{4})-(\d{2})-(\d{2})$/);
@@ -98,6 +101,78 @@ function occupiedSlotIdsForDate_(isoDate, reservationRecords) {
     .filter(function (slotId) { return occupiedMap[slotId] === true; });
 }
 
+function buildPublicAvailabilitySnapshot_(reservationRecords, blockedDays) {
+  var occupiedByDate = {};
+  var records = Array.isArray(reservationRecords) ? reservationRecords : [];
+
+  for (var i = 0; i < records.length; i += 1) {
+    var record = records[i];
+    if (!record || !record.date || !reservationOccupiesRoom_(record)) continue;
+
+    if (!occupiedByDate[record.date]) occupiedByDate[record.date] = {};
+    var touched = slotIdsTouchedByRange_(record.start, record.end);
+    for (var slotIndex = 0; slotIndex < touched.length; slotIndex += 1) {
+      occupiedByDate[record.date][touched[slotIndex]] = true;
+    }
+  }
+
+  Object.keys(occupiedByDate).forEach(function (date) {
+    var map = occupiedByDate[date];
+    occupiedByDate[date] = allReservationSlots_()
+      .map(function (slot) { return slot.id; })
+      .filter(function (slotId) { return map[slotId] === true; });
+  });
+
+  var blockedByDate = {};
+  var blocked = Array.isArray(blockedDays) ? blockedDays : [];
+  for (var blockedIndex = 0; blockedIndex < blocked.length; blockedIndex += 1) {
+    var item = blocked[blockedIndex];
+    if (!item || item.active !== true || !item.date) continue;
+    blockedByDate[item.date] = {
+      type: String(item.type || '').trim(),
+      description: String(item.description || '').trim()
+    };
+  }
+
+  return {
+    occupiedByDate: occupiedByDate,
+    blockedByDate: blockedByDate
+  };
+}
+
+function readPublicAvailabilitySnapshot_() {
+  var cache = CacheService.getScriptCache();
+  try {
+    var cached = cache.get(RESERVAS_PUBLIC_AVAILABILITY_CACHE_KEY_);
+    if (cached) {
+      var parsed = JSON.parse(cached);
+      if (parsed && parsed.occupiedByDate && parsed.blockedByDate) return parsed;
+    }
+  } catch (error) {
+    console.warn('No se pudo leer el cache de disponibilidad', error);
+  }
+
+  var snapshot = buildPublicAvailabilitySnapshot_(readReservationRecords_(), readBlockedDays_());
+  try {
+    cache.put(
+      RESERVAS_PUBLIC_AVAILABILITY_CACHE_KEY_,
+      JSON.stringify(snapshot),
+      RESERVAS_PUBLIC_AVAILABILITY_CACHE_SECONDS_
+    );
+  } catch (error) {
+    console.warn('No se pudo guardar el cache de disponibilidad', error);
+  }
+  return snapshot;
+}
+
+function invalidatePublicAvailabilityCache_() {
+  try {
+    CacheService.getScriptCache().remove(RESERVAS_PUBLIC_AVAILABILITY_CACHE_KEY_);
+  } catch (error) {
+    console.warn('No se pudo invalidar el cache de disponibilidad', error);
+  }
+}
+
 function startedSlotIdsForSameDay_(isoDate, todayIso, currentTimeText) {
   if (isoDate !== todayIso || !String(currentTimeText || '').trim()) return [];
 
@@ -134,6 +209,24 @@ function blockedAvailability_(isoDate, reason) {
   };
 }
 
+function availableResultForOccupiedIds_(isoDate, occupiedSlotIds, todayIso, currentTimeText) {
+  var started = startedSlotIdsForSameDay_(isoDate, todayIso, currentTimeText);
+  var slots = publicSlotsForOccupiedIds_((occupiedSlotIds || []).concat(started));
+  var free = slots.filter(function (slot) { return slot.available; }).length;
+  var total = slots.length;
+  var status = free === 0 ? 'full' : (free === total ? 'available' : 'partial');
+
+  return {
+    ok: true,
+    date: isoDate,
+    status: status,
+    free: free,
+    total: total,
+    reason: '',
+    slots: slots
+  };
+}
+
 function buildAvailabilityForDate_(isoDate, todayIso, reservationRecords, blockedDays, currentTimeText) {
   parseIsoDateParts_(isoDate);
   parseIsoDateParts_(todayIso);
@@ -151,22 +244,34 @@ function buildAvailabilityForDate_(isoDate, todayIso, reservationRecords, blocke
     return blockedAvailability_(isoDate, blockedDay.description || blockedDay.type || 'Día bloqueado');
   }
 
-  var occupied = occupiedSlotIdsForDate_(isoDate, reservationRecords);
-  var started = startedSlotIdsForSameDay_(isoDate, todayIso, currentTimeText);
-  var slots = publicSlotsForOccupiedIds_(occupied.concat(started));
-  var free = slots.filter(function (slot) { return slot.available; }).length;
-  var total = slots.length;
-  var status = free === 0 ? 'full' : (free === total ? 'available' : 'partial');
+  return availableResultForOccupiedIds_(
+    isoDate,
+    occupiedSlotIdsForDate_(isoDate, reservationRecords),
+    todayIso,
+    currentTimeText
+  );
+}
 
-  return {
-    ok: true,
-    date: isoDate,
-    status: status,
-    free: free,
-    total: total,
-    reason: '',
-    slots: slots
-  };
+function buildAvailabilityForDateFromSnapshot_(isoDate, todayIso, snapshot, currentTimeText) {
+  parseIsoDateParts_(isoDate);
+  parseIsoDateParts_(todayIso);
+
+  if (!isWithinBookingWindow_(isoDate, todayIso)) {
+    return blockedAvailability_(isoDate, 'Fuera de la ventana de reserva');
+  }
+
+  if (isWeekend_(isoDate)) {
+    return blockedAvailability_(isoDate, 'Fin de semana');
+  }
+
+  var safeSnapshot = snapshot || { occupiedByDate: {}, blockedByDate: {} };
+  var blockedDay = safeSnapshot.blockedByDate && safeSnapshot.blockedByDate[isoDate];
+  if (blockedDay) {
+    return blockedAvailability_(isoDate, blockedDay.description || blockedDay.type || 'Día bloqueado');
+  }
+
+  var occupied = safeSnapshot.occupiedByDate && safeSnapshot.occupiedByDate[isoDate];
+  return availableResultForOccupiedIds_(isoDate, occupied || [], todayIso, currentTimeText);
 }
 
 function reservationClock_(nowValue) {
@@ -187,11 +292,10 @@ function currentReservationTime_() {
 
 function getAvailability(dateIso) {
   var clock = reservationClock_();
-  return buildAvailabilityForDate_(
+  return buildAvailabilityForDateFromSnapshot_(
     dateIso,
     clock.date,
-    readReservationRecords_(),
-    readBlockedDays_(),
+    readPublicAvailabilitySnapshot_(),
     clock.time
   );
 }
@@ -209,14 +313,13 @@ function getMonthAvailability(year, month) {
 
   var clock = reservationClock_();
   var todayIso = clock.date;
-  var reservations = readReservationRecords_();
-  var blockedDays = readBlockedDays_();
+  var snapshot = readPublicAvailabilitySnapshot_();
   var daysInMonth = new Date(Date.UTC(numericYear, numericMonth, 0)).getUTCDate();
   var days = {};
 
   for (var day = 1; day <= daysInMonth; day += 1) {
     var isoDate = formatIsoParts_(numericYear, numericMonth, day);
-    var availability = buildAvailabilityForDate_(isoDate, todayIso, reservations, blockedDays, clock.time);
+    var availability = buildAvailabilityForDateFromSnapshot_(isoDate, todayIso, snapshot, clock.time);
     days[isoDate] = {
       status: availability.status,
       free: availability.free,
