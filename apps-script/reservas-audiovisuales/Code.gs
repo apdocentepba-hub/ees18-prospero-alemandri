@@ -27,8 +27,8 @@ function doGet(e) {
     }
 
     if (action === 'diagnoseCreate') {
-      var diagnosticPayload = parsePublicReservationPayload_(params.payload);
-      return publicReservationOutput_(diagnoseReservationCreate_(diagnosticPayload), params.callback);
+      payload = parsePublicReservationPayload_(params.payload);
+      return publicReservationOutput_(diagnoseReservationCreate_(payload), params.callback);
     }
 
     if (action === 'cancelLookup') {
