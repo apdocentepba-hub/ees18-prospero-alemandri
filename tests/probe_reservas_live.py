@@ -17,6 +17,7 @@ if not BASE_URL.startswith("https://script.google.com/") or not BASE_URL.endswit
     raise SystemExit("Reservation Web App URL is not a valid Apps Script /exec URL")
 
 ALLOWED_SLOT_IDS = {"M1", "M2", "M3", "M4", "M5", "T1", "T2", "T3", "T4", "T5"}
+ORDERED_SLOT_IDS = ["M1", "M2", "M3", "M4", "M5", "T1", "T2", "T3", "T4", "T5"]
 FORBIDDEN_PUBLIC_FIELDS = ("teacher", "profesor", "correo", "email", "materia", "course", "curso")
 
 
@@ -107,6 +108,48 @@ external_email_probe, guard_latency = timed_get_json("external-email-guard", {
 assert external_email_probe.get("ok") is False, external_email_probe
 assert external_email_probe.get("code") == "INSTITUTIONAL_EMAIL_REQUIRED", external_email_probe
 
+# Safe no-write preflight diagnostic: reproduces validation/read/plan/build only.
+selected_date = None
+selected_slot = None
+for iso_date in sorted(month_warm["days"]):
+    if iso_date < "2026-09-02":
+        continue
+    day_info = month_warm["days"][iso_date]
+    if day_info.get("status") not in {"available", "partial"}:
+        continue
+    occupied = set(day_info.get("occupiedSlotIds") or [])
+    free_slots = [slot_id for slot_id in ORDERED_SLOT_IDS if slot_id not in occupied]
+    if free_slots:
+        selected_date = iso_date
+        selected_slot = free_slots[0]
+        break
+
+assert selected_date and selected_slot, "No future free slot found for safe create diagnostic"
+
+diagnostic_payload = {
+    "mode": "single",
+    "date": selected_date,
+    "slotIds": [selected_slot],
+    "teacher": "PRUEBA TECNICA DIAGNOSTICO",
+    "email": "secundaria18avellaneda@abc.gob.ar",
+    "course": "PRUEBA DIAGNOSTICO",
+    "subject": "PRUEBA DIAGNOSTICO",
+    "resources": {},
+    "observations": "Diagnóstico sin escritura.",
+}
+diagnostic, diagnostic_latency = timed_get_json("diagnose-create-no-write", {
+    "action": "diagnoseCreate",
+    "payload": json.dumps(diagnostic_payload, ensure_ascii=False),
+})
+print("CREATE_DIAGNOSTIC", json.dumps({
+    "date": selected_date,
+    "slot": selected_slot,
+    "response": diagnostic,
+}, ensure_ascii=False, sort_keys=True))
+assert diagnostic.get("ok") is True, diagnostic
+assert diagnostic.get("ready") is True, diagnostic
+assert diagnostic.get("stage") == "READY", diagnostic
+
 print(
     "reservation Web App production probe OK:",
     health.get("environment"),
@@ -114,6 +157,7 @@ print(
     f"{availability.get('free')}/{availability.get('total')} free slots",
     "month slot contract OK",
     "external email blocked",
+    "create diagnostic ready",
 )
 print(
     "LATENCY SUMMARY",
@@ -124,5 +168,6 @@ print(
         "availability_cold": round(availability_cold_latency, 3),
         "availability_warm": round(availability_warm_latency, 3),
         "external_email_guard": round(guard_latency, 3),
+        "diagnose_create_no_write": round(diagnostic_latency, 3),
     }, sort_keys=True),
 )
