@@ -34,3 +34,53 @@ jobs:
           node tests/apps-script-reservas.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
+      - name: One-shot create pilot reservation
+        run: |
+          python - <<'PY'
+          import json, re, urllib.parse, urllib.request
+          from pathlib import Path
+
+          config = Path('assets/js/reservas-config.js').read_text(encoding='utf-8')
+          base = re.search(r"EES18_RESERVAS_API_URL\s*=\s*'([^']+)'", config).group(1)
+
+          def get(params):
+              url = base + '?' + urllib.parse.urlencode(params)
+              req = urllib.request.Request(url, headers={'User-Agent': 'EES18-e2e-create/1.0'})
+              with urllib.request.urlopen(req, timeout=30) as r:
+                  return json.loads(r.read().decode('utf-8'))
+
+          chosen_date = None
+          chosen_slot = None
+          for date in ('2026-09-04', '2026-09-07', '2026-09-08'):
+              availability = get({'action': 'availability', 'date': date})
+              for slot in availability.get('slots', []):
+                  if slot.get('available') is True:
+                      chosen_date = date
+                      chosen_slot = slot.get('id')
+                      break
+              if chosen_slot:
+                  break
+
+          if not chosen_slot:
+              raise SystemExit('No free pilot slot found')
+
+          payload = {
+              'mode': 'single',
+              'date': chosen_date,
+              'slotIds': [chosen_slot],
+              'teacher': 'PRUEBA SISTEMA E2E',
+              'email': 'martin.nicolas.podubinio@gmail.com',
+              'course': 'PRUEBA E2E',
+              'subject': 'PRUEBA CANCELACION E2E',
+              'resources': {'projector': False, 'speakers': False, 'schoolNotebook': False, 'internet': False},
+              'observations': 'PRUEBA E2E DESCARTABLE. CANCELAR AL FINALIZAR.'
+          }
+          result = get({'action': 'create', 'payload': json.dumps(payload, ensure_ascii=False)})
+          assert result.get('ok') is True, result
+          assert result.get('confirmed') == 1, result
+          reservation = result['reservations'][0]
+          print('E2E_CREATED_ID=' + reservation['id'])
+          print('E2E_CREATED_DATE=' + reservation['date'])
+          print('E2E_CREATED_START=' + reservation['start'])
+          print('E2E_CREATED_END=' + reservation['end'])
+          PY
