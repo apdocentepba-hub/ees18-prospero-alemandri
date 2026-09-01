@@ -56,7 +56,7 @@ function deleteReservationCalendarEvent_(record) {
     var message = String(error && error.message ? error.message : error).slice(0, 220);
     updateReservationFieldsById_(record.id, {
       syncError: 'CANCEL_CALENDAR_PENDING: ' + message
-    });
+    }, record.rowNumber);
     return { ok: false, error: message };
   }
 }
@@ -74,9 +74,10 @@ function cancelReservation(rawToken) {
     updateReservationFieldsById_(reservation.id, {
       state: 'Cancelada',
       cancellationDate: new Date()
-    });
+    }, reservation.rowNumber);
     reservation.state = 'Cancelada';
     reservation.cancellationDate = new Date();
+    invalidatePublicAvailabilityCache_();
   } finally {
     lock.releaseLock();
   }

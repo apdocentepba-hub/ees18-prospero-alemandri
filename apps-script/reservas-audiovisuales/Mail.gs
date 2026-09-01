@@ -34,7 +34,7 @@ function sendReservationConfirmation_(reservation, rawToken) {
       mailSent: 'Sí',
       syncState: reservation.syncState === 'PENDIENTE_CALENDAR' ? 'PENDIENTE_CALENDAR' : 'OK',
       syncError: reservation.syncError || ''
-    });
+    }, reservation.rowNumber);
     return { ok: true };
   } catch (error) {
     var message = String(error && error.message ? error.message : error).slice(0, 220);
@@ -42,7 +42,7 @@ function sendReservationConfirmation_(reservation, rawToken) {
       mailSent: 'No',
       syncState: reservation.syncState === 'PENDIENTE_CALENDAR' ? 'PENDIENTE_CALENDAR' : 'MAIL_PENDING',
       syncError: 'MAIL_PENDING: ' + message
-    });
+    }, reservation.rowNumber);
     return { ok: false, error: message };
   }
 }

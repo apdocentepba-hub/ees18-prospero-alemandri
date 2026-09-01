@@ -1,5 +1,10 @@
+var reservationSpreadsheetCache_ = null;
+
 function getReservationSpreadsheet_() {
-  return SpreadsheetApp.openById(reservationSpreadsheetId_());
+  if (!reservationSpreadsheetCache_) {
+    reservationSpreadsheetCache_ = SpreadsheetApp.openById(reservationSpreadsheetId_());
+  }
+  return reservationSpreadsheetCache_;
 }
 
 function getRequiredSheet_(sheetName) {
@@ -120,6 +125,20 @@ function readReservationRecords_() {
   return records;
 }
 
+function readReservationRecordAtRow_(rowNumber) {
+  var numericRow = Number(rowNumber);
+  if (!Number.isInteger(numericRow) || numericRow < 2) return null;
+
+  var sheet = getRequiredSheet_(RESERVAS_SETTINGS_.RESERVAS_SHEET);
+  var lastColumn = sheet.getLastColumn();
+  if (lastColumn < 1 || numericRow > sheet.getLastRow()) return null;
+
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
+  var values = sheet.getRange(numericRow, 1, 1, lastColumn).getValues()[0];
+  var record = buildReservationRecordFromValues_(headers, values, numericRow);
+  return record.id || record.date || record.state ? record : null;
+}
+
 function normalizeActive_(value) {
   if (value === true || value === 1) return true;
   var normalized = String(value == null ? '' : value).trim().toUpperCase();
@@ -213,8 +232,9 @@ function appendReservationRecord_(record) {
   assignRowValueByHeader_(row, map, 'Estado sincronización', record.syncState || 'PENDIENTE_CALENDAR');
   assignRowValueByHeader_(row, map, 'Último error sincronización', record.syncError || '');
 
-  sheet.appendRow(row);
-  record.rowNumber = sheet.getLastRow();
+  var rowNumber = sheet.getLastRow() + 1;
+  sheet.getRange(rowNumber, 1, 1, row.length).setValues([row]);
+  record.rowNumber = rowNumber;
   return record;
 }
 
@@ -226,13 +246,29 @@ function findReservationRecordById_(reservationId) {
   return null;
 }
 
-function updateReservationFieldsById_(reservationId, fields) {
-  var record = findReservationRecordById_(reservationId);
-  if (!record || !record.rowNumber) throw new Error('RESERVATION_NOT_FOUND');
-
+function updateReservationFieldsById_(reservationId, fields, knownRowNumber) {
   var sheet = getRequiredSheet_(RESERVAS_SETTINGS_.RESERVAS_SHEET);
-  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var lastColumn = sheet.getLastColumn();
+  if (lastColumn < 1) throw new Error('RESERVATION_NOT_FOUND');
+
+  var headers = sheet.getRange(1, 1, 1, lastColumn).getValues()[0];
   var map = buildHeaderMap_(headers);
+  var rowNumber = Number(knownRowNumber);
+  var rowValues = null;
+
+  if (Number.isInteger(rowNumber) && rowNumber >= 2 && rowNumber <= sheet.getLastRow()) {
+    rowValues = sheet.getRange(rowNumber, 1, 1, lastColumn).getValues()[0];
+    var knownId = String(valueForHeader_(map, rowValues, 'ID') || '').trim();
+    if (knownId !== String(reservationId || '').trim()) rowValues = null;
+  }
+
+  if (!rowValues) {
+    var record = findReservationRecordById_(reservationId);
+    if (!record || !record.rowNumber) throw new Error('RESERVATION_NOT_FOUND');
+    rowNumber = record.rowNumber;
+    rowValues = sheet.getRange(rowNumber, 1, 1, lastColumn).getValues()[0];
+  }
+
   var aliases = {
     state: 'Estado',
     calendarEventId: 'ID evento calendario',
@@ -245,16 +281,10 @@ function updateReservationFieldsById_(reservationId, fields) {
 
   Object.keys(fields || {}).forEach(function (key) {
     var headerName = aliases[key] || key;
-    var columnIndex = map[normalizeHeader_(headerName)];
-    if (typeof columnIndex === 'number') {
-      sheet.getRange(record.rowNumber, columnIndex + 1).setValue(fields[key]);
-    }
+    assignRowValueByHeader_(rowValues, map, headerName, fields[key]);
   });
+  assignRowValueByHeader_(rowValues, map, 'Última actualización', new Date());
 
-  var updatedIndex = map[normalizeHeader_('Última actualización')];
-  if (typeof updatedIndex === 'number') {
-    sheet.getRange(record.rowNumber, updatedIndex + 1).setValue(new Date());
-  }
-
-  return findReservationRecordById_(reservationId);
+  sheet.getRange(rowNumber, 1, 1, lastColumn).setValues([rowValues]);
+  return buildReservationRecordFromValues_(headers, rowValues, rowNumber);
 }
