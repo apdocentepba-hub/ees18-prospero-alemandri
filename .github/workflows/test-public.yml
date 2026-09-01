@@ -37,3 +37,5 @@ jobs:
           node tests/apps-script-performance.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
+      - name: Diagnose create without writes
+        run: python tests/probe_reservas_diagnose_once.py
