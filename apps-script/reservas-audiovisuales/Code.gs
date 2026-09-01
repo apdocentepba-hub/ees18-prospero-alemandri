@@ -3,8 +3,14 @@ function doGet(e) {
   var action = String(params.action || 'health').trim();
 
   try {
+    var environmentCheck = validateReservationEnvironmentConfiguration_();
+
     if (action === 'health') {
-      return publicReservationOutput_({ ok: true, service: 'reservas-audiovisuales' }, params.callback);
+      return publicReservationOutput_({
+        ok: true,
+        service: 'reservas-audiovisuales',
+        environment: environmentCheck.environment
+      }, params.callback);
     }
 
     if (action === 'availability') {
@@ -44,6 +50,8 @@ function doPost(e) {
   var callback = params.callback;
 
   try {
+    validateReservationEnvironmentConfiguration_();
+
     var body = {};
     if (e && e.postData && e.postData.contents) {
       body = JSON.parse(e.postData.contents);
@@ -87,7 +95,9 @@ function publicReservationErrorCode_(error) {
     'INVALID_TEACHER', 'INVALID_EMAIL', 'INVALID_COURSE', 'INVALID_SUBJECT',
     'EMPTY_SELECTION', 'INVALID_SLOT_SELECTION', 'MIXED_SHIFT_SELECTION',
     'NON_CONTIGUOUS_SELECTION', 'INVALID_REPEAT_RANGE', 'REPEAT_WINDOW_EXCEEDED',
-    'CONFLICT', 'INVALID_TOKEN', 'ALREADY_CANCELLED'
+    'CONFLICT', 'INVALID_TOKEN', 'ALREADY_CANCELLED',
+    'MISSING_ENVIRONMENT_CONFIGURATION', 'MISSING_SPREADSHEET_CONFIGURATION',
+    'MISSING_CALENDAR_CONFIGURATION', 'ENVIRONMENT_CONFIGURATION_MISMATCH'
   ];
   return allowed.indexOf(code) >= 0 ? code : 'REQUEST_ERROR';
 }
