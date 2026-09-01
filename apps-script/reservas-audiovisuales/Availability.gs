@@ -1,5 +1,5 @@
 var RESERVAS_PUBLIC_AVAILABILITY_CACHE_KEY_ = 'reservas-public-availability-v1';
-var RESERVAS_PUBLIC_AVAILABILITY_CACHE_SECONDS_ = 20;
+var RESERVAS_PUBLIC_AVAILABILITY_CACHE_SECONDS_ = 120;
 
 function parseIsoDateParts_(isoDate) {
   var text = String(isoDate == null ? '' : isoDate).trim();
@@ -23,7 +23,9 @@ function parseIsoDateParts_(isoDate) {
 }
 
 function formatIsoParts_(year, month, day) {
-  return String(year).padStart(4, '0') + '-' + String(month).padStart(2, '0') + '-' + String(day).padStart(2, '0');
+  return String(year).padStart(4, '0') + '-' +
+    String(month).padStart(2, '0') + '-' +
+    String(day).padStart(2, '0');
 }
 
 function isWeekend_(isoDate) {
@@ -142,6 +144,7 @@ function buildPublicAvailabilitySnapshot_(reservationRecords, blockedDays) {
 
 function readPublicAvailabilitySnapshot_() {
   var cache = CacheService.getScriptCache();
+
   try {
     var cached = cache.get(RESERVAS_PUBLIC_AVAILABILITY_CACHE_KEY_);
     if (cached) {
@@ -152,7 +155,11 @@ function readPublicAvailabilitySnapshot_() {
     console.warn('No se pudo leer el cache de disponibilidad', error);
   }
 
-  var snapshot = buildPublicAvailabilitySnapshot_(readReservationRecords_(), readBlockedDays_());
+  var snapshot = buildPublicAvailabilitySnapshot_(
+    readReservationRecords_(),
+    readBlockedDays_()
+  );
+
   try {
     cache.put(
       RESERVAS_PUBLIC_AVAILABILITY_CACHE_KEY_,
@@ -162,6 +169,7 @@ function readPublicAvailabilitySnapshot_() {
   } catch (error) {
     console.warn('No se pudo guardar el cache de disponibilidad', error);
   }
+
   return snapshot;
 }
 
@@ -184,7 +192,9 @@ function startedSlotIdsForSameDay_(isoDate, todayIso, currentTimeText) {
 
 function publicSlotsForOccupiedIds_(occupiedSlotIds) {
   var occupiedMap = {};
-  (occupiedSlotIds || []).forEach(function (slotId) { occupiedMap[slotId] = true; });
+  (occupiedSlotIds || []).forEach(function (slotId) {
+    occupiedMap[slotId] = true;
+  });
 
   return allReservationSlots_().map(function (slot) {
     return {
@@ -205,7 +215,9 @@ function blockedAvailability_(isoDate, reason) {
     free: 0,
     total: allReservationSlots_().length,
     reason: reason || 'Fecha no disponible',
-    slots: publicSlotsForOccupiedIds_(allReservationSlots_().map(function (slot) { return slot.id; }))
+    slots: publicSlotsForOccupiedIds_(
+      allReservationSlots_().map(function (slot) { return slot.id; })
+    )
   };
 }
 
@@ -241,7 +253,10 @@ function buildAvailabilityForDate_(isoDate, todayIso, reservationRecords, blocke
 
   var blockedDay = activeBlockedDay_(isoDate, blockedDays);
   if (blockedDay) {
-    return blockedAvailability_(isoDate, blockedDay.description || blockedDay.type || 'Día bloqueado');
+    return blockedAvailability_(
+      isoDate,
+      blockedDay.description || blockedDay.type || 'Día bloqueado'
+    );
   }
 
   return availableResultForOccupiedIds_(
@@ -267,11 +282,19 @@ function buildAvailabilityForDateFromSnapshot_(isoDate, todayIso, snapshot, curr
   var safeSnapshot = snapshot || { occupiedByDate: {}, blockedByDate: {} };
   var blockedDay = safeSnapshot.blockedByDate && safeSnapshot.blockedByDate[isoDate];
   if (blockedDay) {
-    return blockedAvailability_(isoDate, blockedDay.description || blockedDay.type || 'Día bloqueado');
+    return blockedAvailability_(
+      isoDate,
+      blockedDay.description || blockedDay.type || 'Día bloqueado'
+    );
   }
 
   var occupied = safeSnapshot.occupiedByDate && safeSnapshot.occupiedByDate[isoDate];
-  return availableResultForOccupiedIds_(isoDate, occupied || [], todayIso, currentTimeText);
+  return availableResultForOccupiedIds_(
+    isoDate,
+    occupied || [],
+    todayIso,
+    currentTimeText
+  );
 }
 
 function reservationClock_(nowValue) {
@@ -307,7 +330,13 @@ function getOccupiedSlots(dateIso) {
 function getMonthAvailability(year, month) {
   var numericYear = Number(year);
   var numericMonth = Number(month);
-  if (!Number.isInteger(numericYear) || !Number.isInteger(numericMonth) || numericMonth < 1 || numericMonth > 12) {
+
+  if (
+    !Number.isInteger(numericYear) ||
+    !Number.isInteger(numericMonth) ||
+    numericMonth < 1 ||
+    numericMonth > 12
+  ) {
     throw new Error('INVALID_MONTH');
   }
 
@@ -319,7 +348,13 @@ function getMonthAvailability(year, month) {
 
   for (var day = 1; day <= daysInMonth; day += 1) {
     var isoDate = formatIsoParts_(numericYear, numericMonth, day);
-    var availability = buildAvailabilityForDateFromSnapshot_(isoDate, todayIso, snapshot, clock.time);
+    var availability = buildAvailabilityForDateFromSnapshot_(
+      isoDate,
+      todayIso,
+      snapshot,
+      clock.time
+    );
+
     days[isoDate] = {
       status: availability.status,
       free: availability.free,
@@ -331,5 +366,10 @@ function getMonthAvailability(year, month) {
     };
   }
 
-  return { ok: true, year: numericYear, month: numericMonth, days: days };
+  return {
+    ok: true,
+    year: numericYear,
+    month: numericMonth,
+    days: days
+  };
 }

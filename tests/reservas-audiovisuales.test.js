@@ -142,4 +142,29 @@ assert(frontendSource.includes('const dayRequestGate = rules.createLatestRequest
 assert(frontendSource.includes('rules.occupiedSlotIdsFromMonthDay(state.monthDays[isoDate])'), 'los horarios deben pintarse con el resumen mensual antes de la verificación fresca');
 assert(frontendSource.includes('dayRequestGate.isCurrent'), 'una respuesta diaria vieja no debe sobrescribir la selección actual');
 
+// Regression 4: clicking a day must be fully local once the month snapshot is loaded.
+assert.strictEqual(
+  frontendSource.includes("requestJsonp('availability'"),
+  false,
+  'tocar un día no debe iniciar otra ejecución de Apps Script; el mes ya contiene occupiedSlotIds'
+);
+
+// Regression 5: a successful month snapshot must survive reloads so a cold Apps Script start cannot freeze the calendar.
+assert(
+  frontendSource.includes('window.localStorage'),
+  'el calendario debe persistir snapshots públicos en localStorage'
+);
+assert(
+  frontendSource.includes('EES18_RESERVAS_MONTH_SNAPSHOT_'),
+  'el snapshot persistente debe usar una clave institucional propia'
+);
+assert(
+  frontendSource.includes('Actualizando…'),
+  'sin snapshot todavía, los días deben indicar Actualizando en vez de fingir que están bloqueados'
+);
+assert(
+  frontendSource.includes('scheduleMonthRetry'),
+  'si la actualización mensual falla o vence, la UI debe reintentar en segundo plano'
+);
+
 console.log('reservas-audiovisuales.test.js: all assertions passed');
