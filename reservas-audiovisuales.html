@@ -83,7 +83,7 @@
         <fieldset id="booking-fields" disabled>
           <div class="booking-form-grid">
             <label><span>Apellido y nombre</span><input id="teacher-name" name="teacher" type="text" autocomplete="name" required></label>
-            <label><span>Correo</span><input id="teacher-email" name="email" type="email" autocomplete="email" required><small id="email-kind"></small></label>
+            <label><span>Correo institucional</span><input id="teacher-email" name="email" type="email" autocomplete="email" placeholder="usuario@abc.gob.ar" pattern="[^@\s]+@abc\.gob\.ar" required><small id="email-kind">Solo se admiten correos institucionales @abc.gob.ar.</small></label>
             <label><span>Curso</span><input id="course" name="course" type="text" placeholder="Ej. 5° 2°" required></label>
             <label><span>Materia / espacio curricular</span><input id="subject" name="subject" type="text" required></label>
           </div>
@@ -111,5 +111,6 @@
 <script src="assets/js/main.js"></script>
 <script src="assets/js/reservas-config.js"></script>
 <script src="assets/js/reservas-audiovisuales.js"></script>
+<script src="assets/js/reservas-email-policy.js"></script>
 </body>
 </html>

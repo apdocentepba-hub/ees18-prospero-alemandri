@@ -41,9 +41,29 @@ serialized = json.dumps(availability, ensure_ascii=False).lower()
 for forbidden in ("teacher", "profesor", "correo", "email", "materia", "course", "curso"):
     assert forbidden not in serialized, f"Public availability leaked forbidden field: {forbidden}"
 
+# Safe write-path guard probe: the invalid date guarantees the legacy backend
+# cannot create a reservation. The new backend must reject the Gmail address
+# before evaluating the rest of the payload.
+external_email_probe = get_json({
+    "action": "create",
+    "payload": json.dumps({
+        "mode": "single",
+        "date": "INVALID",
+        "slotIds": ["M1"],
+        "teacher": "Prueba CI",
+        "email": "prueba@gmail.com",
+        "course": "PRUEBA",
+        "subject": "PRUEBA",
+        "resources": {},
+    }, ensure_ascii=False),
+})
+assert external_email_probe.get("ok") is False, external_email_probe
+assert external_email_probe.get("code") == "INSTITUTIONAL_EMAIL_REQUIRED", external_email_probe
+
 print(
     "reservation Web App production probe OK:",
     health.get("environment"),
     availability.get("status"),
     f"{availability.get('free')}/{availability.get('total')} free slots",
+    "external email blocked",
 )

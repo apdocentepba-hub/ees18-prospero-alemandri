@@ -13,6 +13,13 @@ function isInstitutionalReservationEmail_(email) {
   return /^[^\s@]+@abc\.gob\.ar$/.test(String(email || '').trim().toLowerCase());
 }
 
+function requireInstitutionalReservationEmail_(email) {
+  var normalized = reservationRequiredText_(email, 180, 'INVALID_EMAIL');
+  if (!isValidReservationEmail_(normalized)) throw new Error('INVALID_EMAIL');
+  if (!isInstitutionalReservationEmail_(normalized)) throw new Error('INSTITUTIONAL_EMAIL_REQUIRED');
+  return normalized;
+}
+
 function continuousRangeForSlotIds_(slotIds) {
   if (!Array.isArray(slotIds) || slotIds.length === 0) throw new Error('EMPTY_SELECTION');
 
@@ -224,6 +231,8 @@ function publicCreatedReservation_(record) {
 }
 
 function createReservation(payload) {
+  requireInstitutionalReservationEmail_(payload && payload.email);
+
   var clock = reservationClock_();
   var todayIso = clock.date;
   var normalized = normalizeReservationPayload_(payload, todayIso);
