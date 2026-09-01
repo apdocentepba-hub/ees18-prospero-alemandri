@@ -26,6 +26,7 @@ jobs:
           node --check assets/js/status-config.js
           node --check assets/js/reservas-config.js
           node --check assets/js/reservas-audiovisuales.js
+          node --check assets/js/reservas-email-policy.js
           node --check assets/js/cancelar-reserva.js
       - name: Run JavaScript structure checks
         run: |
