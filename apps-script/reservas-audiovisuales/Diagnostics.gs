@@ -10,6 +10,14 @@ function diagnosticReservationErrorCode_(error) {
   return safeCodes.indexOf(code) >= 0 ? code : 'INTERNAL_ERROR';
 }
 
+function diagnoseReservationRuntimeDependencies_() {
+  return {
+    queueFunction: typeof queueReservationSecondaryProcessing_ === 'function',
+    processorFunction: typeof processPendingReservationSecondaries === 'function',
+    scheduleFunction: typeof scheduleReservationSecondaryProcessing_ === 'function'
+  };
+}
+
 function diagnoseReservationCreate_(payload) {
   var stage = 'NORMALIZE';
   var lock = null;
@@ -48,7 +56,8 @@ function diagnoseReservationCreate_(payload) {
         code: 'CONFLICT',
         requested: plan.requested,
         confirmed: 0,
-        conflicts: plan.conflicts.length
+        conflicts: plan.conflicts.length,
+        runtimeDependencies: diagnoseReservationRuntimeDependencies_()
       };
     }
 
@@ -74,7 +83,8 @@ function diagnoseReservationCreate_(payload) {
         hasDate: Boolean(record.date),
         hasCancellationHash: Boolean(record.cancellationHash),
         syncState: record.syncState
-      }
+      },
+      runtimeDependencies: diagnoseReservationRuntimeDependencies_()
     };
   } catch (error) {
     console.error('diagnoseReservationCreate stage', stage, error);
@@ -82,7 +92,8 @@ function diagnoseReservationCreate_(payload) {
       ok: false,
       ready: false,
       stage: stage,
-      code: diagnosticReservationErrorCode_(error)
+      code: diagnosticReservationErrorCode_(error),
+      runtimeDependencies: diagnoseReservationRuntimeDependencies_()
     };
   } finally {
     if (lock) {
