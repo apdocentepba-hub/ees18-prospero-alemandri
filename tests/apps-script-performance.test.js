@@ -179,4 +179,23 @@ availabilityContext.readPublicAvailabilitySnapshot_();
 assert.strictEqual(reservationReads, 2, 'invalidar el cache debe forzar una lectura nueva');
 assert.strictEqual(blockedReads, 2, 'invalidar el cache debe forzar una lectura nueva de bloqueos');
 
+// Regression 3: the month endpoint must carry slot occupancy so clicking a date can paint schedules immediately.
+availabilityContext.reservationClock_ = function () {
+  return { date: '2026-09-01', time: '06:00' };
+};
+availabilityContext.readPublicAvailabilitySnapshot_ = function () {
+  return {
+    occupiedByDate: { '2026-09-03': ['M1'] },
+    blockedByDate: {}
+  };
+};
+const monthAvailability = availabilityContext.getMonthAvailability(2026, 9);
+assert.deepStrictEqual(
+  JSON.parse(JSON.stringify(monthAvailability.days['2026-09-03'].occupiedSlotIds)),
+  ['M1'],
+  'el resumen mensual debe incluir sólo los IDs públicos de módulos ocupados'
+);
+assert.strictEqual(JSON.stringify(monthAvailability).includes('Docente Privado'), false);
+assert.strictEqual(JSON.stringify(monthAvailability).includes('privado@abc.gob.ar'), false);
+
 console.log('apps-script-performance.test.js: all assertions passed');
