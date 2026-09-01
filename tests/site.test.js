@@ -51,6 +51,14 @@ assert(css.includes('@media'), 'responsive rules must exist');
 assert(js.includes('aria-expanded'), 'menu behavior must update aria-expanded');
 assert(js.includes('prefers-reduced-motion'), 'motion preferences must be respected');
 
+// Navegación institucional moderna: superficie suave, pestaña activa clara y CTA separado.
+assert(css.includes('--nav-surface:'), 'navigation must define a soft institutional surface token');
+assert(css.includes('.primary-nav a[aria-current="page"]'), 'navigation must style the current page');
+assert(css.includes('background: var(--nav-active);'), 'current navigation tab must use a soft active background');
+assert(css.includes('box-shadow: inset 0 0 0 1px'), 'navigation shell must have a subtle inset border');
+assert(css.includes('.primary-nav a:not(.nav-cta):hover'), 'navigation tabs must have a dedicated hover treatment');
+assert(css.includes('.nav-cta:hover'), 'contact CTA must have a dedicated hover treatment');
+
 const expectedNavLinks = [
   'index.html',
   'nuestra-escuela.html',
