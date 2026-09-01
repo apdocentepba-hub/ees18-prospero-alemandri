@@ -176,13 +176,37 @@
     };
   }
 
+  function occupiedSlotIdsFromMonthDay(dayInfo) {
+    const allowed = new Set(ALL_SLOTS.map((slot) => slot.id));
+    const source = dayInfo && Array.isArray(dayInfo.occupiedSlotIds) ? dayInfo.occupiedSlotIds : [];
+    return [...new Set(source.map((slotId) => String(slotId || '').trim()))]
+      .filter((slotId) => allowed.has(slotId));
+  }
+
+  function createLatestRequestGate() {
+    let version = 0;
+    let key = '';
+    return {
+      next(nextKey) {
+        version += 1;
+        key = String(nextKey || '');
+        return version;
+      },
+      isCurrent(requestVersion, requestKey) {
+        return requestVersion === version && String(requestKey || '') === key;
+      }
+    };
+  }
+
   return Object.freeze({
     SLOTS,
     buildContinuousRange,
     isInstitutionalEmail,
     isValidEmail,
     buildWeeklyDates,
-    buildReservationPayload
+    buildReservationPayload,
+    occupiedSlotIdsFromMonthDay,
+    createLatestRequestGate
   });
 });
 
