@@ -38,6 +38,28 @@ def timed_get_json(label, params):
     return payload, elapsed
 
 
+# First call: safe no-write runtime diagnostic, intentionally before month reads.
+runtime_payload = {
+    "mode": "single",
+    "date": "2026-09-02",
+    "slotIds": ["M1"],
+    "teacher": "PRUEBA TECNICA DIAGNOSTICO",
+    "email": "secundaria18avellaneda@abc.gob.ar",
+    "course": "PRUEBA DIAGNOSTICO",
+    "subject": "PRUEBA DIAGNOSTICO",
+    "resources": {},
+    "observations": "Diagnóstico sin escritura.",
+}
+runtime_diagnostic, runtime_diagnostic_latency = timed_get_json("diagnose-runtime-no-write", {
+    "action": "diagnoseCreate",
+    "payload": json.dumps(runtime_payload, ensure_ascii=False),
+})
+print("RUNTIME_DIAGNOSTIC", json.dumps(runtime_diagnostic, ensure_ascii=False, sort_keys=True))
+runtime_dependencies = runtime_diagnostic.get("runtimeDependencies") or {}
+assert runtime_dependencies.get("queueFunction") is True, runtime_diagnostic
+assert runtime_dependencies.get("processorFunction") is True, runtime_diagnostic
+assert runtime_dependencies.get("scheduleFunction") is True, runtime_diagnostic
+
 health, health_latency = timed_get_json("health", {"action": "health"})
 assert health.get("ok") is True, health
 assert health.get("service") == "reservas-audiovisuales", health
@@ -158,10 +180,12 @@ print(
     "month slot contract OK",
     "external email blocked",
     "create diagnostic ready",
+    "runtime dependencies loaded",
 )
 print(
     "LATENCY SUMMARY",
     json.dumps({
+        "runtime_diagnostic": round(runtime_diagnostic_latency, 3),
         "health": round(health_latency, 3),
         "month_cold": round(month_cold_latency, 3),
         "month_warm": round(month_warm_latency, 3),
@@ -171,5 +195,3 @@ print(
         "diagnose_create_no_write": round(diagnostic_latency, 3),
     }, sort_keys=True),
 )
-
-# Rerun marker: runtime dependency diagnostic after production deployment.
