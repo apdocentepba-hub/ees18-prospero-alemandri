@@ -8,6 +8,7 @@ const backendDir = path.join(root, 'apps-script', 'reservas-audiovisuales');
 const reservationsSource = fs.readFileSync(path.join(backendDir, 'Reservations.gs'), 'utf8');
 const dataSource = fs.readFileSync(path.join(backendDir, 'Data.gs'), 'utf8');
 const adminSource = fs.readFileSync(path.join(backendDir, 'AdminSetup.gs'), 'utf8');
+const codeSource = fs.readFileSync(path.join(backendDir, 'Code.gs'), 'utf8');
 const queuePath = path.join(backendDir, 'SecondaryQueue.gs');
 const frontendSource = fs.readFileSync(path.join(root, 'assets', 'js', 'reservas-audiovisuales.js'), 'utf8');
 
@@ -47,6 +48,21 @@ assert(
 assert(
   frontendSource.includes('La confirmación y el enlace de cancelación se envían al correo indicado.'),
   'la UI debe dejar claro que el correo se envía después de confirmar la reserva'
+);
+
+for (const code of ['CREATE_READ_ERROR', 'CREATE_PLAN_ERROR', 'CREATE_WRITE_ERROR', 'CREATE_QUEUE_ERROR']) {
+  assert(
+    reservationsSource.includes(code),
+    `createReservation debe distinguir fallos internos con ${code}`
+  );
+  assert(
+    codeSource.includes(`'${code}'`),
+    `Code.gs debe exponer ${code} como código público seguro`
+  );
+}
+assert(
+  reservationsSource.includes("console.error('createReservation stage'"),
+  'el backend debe registrar internamente la causa original y la etapa de creación'
 );
 
 console.log('apps-script-async-secondaries.test.js: all assertions passed');
