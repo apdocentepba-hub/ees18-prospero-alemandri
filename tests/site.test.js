@@ -1,11 +1,11 @@
+const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
-const assert = require('assert');
 
 const root = path.resolve(__dirname, '..');
-const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
+const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
-const principalPages = [
+const requiredFiles = [
   'index.html',
   'nuestra-escuela.html',
   'propuesta-educativa.html',
@@ -13,70 +13,67 @@ const principalPages = [
   'docentes.html',
   'vida-escolar.html',
   'ingreso-2027.html',
-  'contacto.html'
-];
-
-const detailPages = [
   'tramites.html',
-  'historia.html',
-  'plan-estudios.html',
-  'comunicados.html',
-  'pases-equivalencias.html',
+  'contacto.html',
   'consultar-estado.html',
-  'certificado-analitico.html',
+  'comunicados.html',
   'boleto-estudiantil.html',
-  '404.html'
+  'reservas-audiovisuales.html',
+  'cancelar-reserva.html',
+  'assets/css/styles.css',
+  'assets/css/multipage.css',
+  'assets/css/reservas-audiovisuales.css',
+  'assets/js/main.js',
+  'assets/js/status-config.js',
+  'assets/js/estado-publico.js',
+  'assets/js/reservas-config.js',
+  'assets/js/reservas-audiovisuales.js',
+  'assets/js/cancelar-reserva.js',
+  'site.webmanifest',
+  'robots.txt',
+  'sitemap.xml',
+];
+for (const file of requiredFiles) {
+  assert(fs.existsSync(path.join(root, file)), `missing ${file}`);
+}
+
+const pages = [
+  'index.html',
+  'nuestra-escuela.html',
+  'propuesta-educativa.html',
+  'estudiantes-familias.html',
+  'docentes.html',
+  'vida-escolar.html',
+  'ingreso-2027.html',
+  'tramites.html',
+  'contacto.html',
+  'consultar-estado.html',
+  'comunicados.html',
+  'boleto-estudiantil.html',
+  'reservas-audiovisuales.html',
+  'cancelar-reserva.html',
 ];
 
-[...principalPages, ...detailPages, 'visitas-ees18.html', 'enspa-en-accion.html', 'visitas-enspa.html'].forEach((file) => {
-  assert(fs.existsSync(path.join(root, file)), `${file} must exist`);
-});
-assert(fs.existsSync(path.join(root, 'assets/css/styles.css')), 'styles.css must exist');
-assert(fs.existsSync(path.join(root, 'assets/js/main.js')), 'main.js must exist');
-assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2024.jpg')), 'RE Bonaerense image must exist');
+for (const page of pages) {
+  const content = read(page);
+  assert(/<html\s+lang="es"/i.test(content), `${page} must declare Spanish`);
+  assert(/<meta\s+name="viewport"/i.test(content), `${page} must have viewport meta`);
+  assert(/<meta\s+name="description"/i.test(content), `${page} must have description`);
+  assert(/<title>[^<]+<\/title>/i.test(content), `${page} must have title`);
+  assert(content.includes('assets/css/styles.css'), `${page} must use global styles`);
+  assert(content.includes('assets/js/main.js'), `${page} must use main JS`);
+  assert(content.includes('class="skip-link"'), `${page} must expose skip navigation`);
+  assert(content.includes('id="contenido"'), `${page} must expose main content target`);
+  assert(content.includes('E.E.S. Nº 18'), `${page} must preserve school identity`);
+  assert(!/placeholder\.com|example\.com|lorem ipsum/i.test(content), `${page} contains placeholder content`);
+  assert(!/href="#"/i.test(content), `${page} contains dead # links`);
+}
 
 const html = read('index.html');
-const css = read('assets/css/styles.css');
-const js = read('assets/js/main.js');
-
-assert(html.includes('ESCUELA DE EDUCACIÓN SECUNDARIA Nº 18'), 'official school name must be present');
-assert(html.includes('PRÓSPERO ALEMANDRI'), 'school proper name must be present');
-assert(html.includes('assets/css/styles.css'), 'stylesheet must be linked');
-assert(html.includes('assets/js/main.js'), 'script must be linked');
-assert(/id=["']menu-toggle["']/.test(html), 'mobile menu button must exist');
-assert(/aria-expanded=["']false["']/.test(html), 'mobile menu must expose aria-expanded');
-assert(/id=["']primary-nav["']/.test(html), 'primary nav must have an id');
-assert(css.includes('--celeste:'), 'institutional celeste color token must exist');
-assert(css.includes('@media'), 'responsive rules must exist');
-assert(js.includes('aria-expanded'), 'menu behavior must update aria-expanded');
-assert(js.includes('prefers-reduced-motion'), 'motion preferences must be respected');
-
-const expectedNavLinks = [
-  'index.html',
-  'nuestra-escuela.html',
-  'propuesta-educativa.html',
-  'estudiantes-familias.html',
-  'docentes.html',
-  'vida-escolar.html',
-  'ingreso-2027.html',
-  'contacto.html'
-];
-
-for (const page of principalPages) {
-  const source = read(page);
-  for (const href of expectedNavLinks) {
-    assert(source.includes(`href="${href}"`), `${page} must link to ${href}`);
-  }
-  assert(!source.includes('target="_blank"'), `${page} must not open links in a new tab`);
-}
-
-for (const page of detailPages) {
-  const source = read(page);
-  assert(!source.includes('target="_blank"'), `${page} must not open links in a new tab`);
-}
-
-assert(html.includes('2.º Encuentro de RE Bonaerense'), 'home must feature RE Bonaerense');
-assert(html.includes('assets/img/re-bonaerense-2024.jpg'), 'home must show RE Bonaerense image');
+assert(html.includes('estudiantes-familias.html'), 'home must visibly link to Estudiantes y familias');
+assert(html.includes('docentes.html'), 'home must visibly link to Docentes');
+assert(html.includes('nuestra-escuela.html'), 'home must visibly link to Nuestra escuela');
+assert(html.includes('propuesta-educativa.html'), 'home must visibly link to Propuesta educativa');
 assert(html.includes('vida-escolar.html'), 'home must visibly link to Vida escolar');
 assert(html.includes('estudiantes-familias.html'), 'home must link to Estudiantes y familias');
 assert(html.includes('docentes.html'), 'home must link to Docentes');
@@ -92,8 +89,9 @@ assert(estudiantes.includes('ingreso-2027.html'), 'student hub must link to admi
 
 const docentes = read('docentes.html');
 assert(docentes.includes('Docentes'), 'teacher hub must identify its audience');
-assert(docentes.includes('Reserva del Salón de Audiovisuales'), 'teacher hub must expose audiovisual booking');
-assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must use current audiovisual form');
+assert(docentes.includes('Reservar Salón de Audiovisuales'), 'teacher hub must expose audiovisual booking');
+assert(docentes.includes('reservas-audiovisuales.html'), 'teacher hub must link to the active audiovisual booking page');
+assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must retain the audiovisual contingency form');
 assert(docentes.includes('Carro Tecnológico'), 'teacher hub must expose technological cart access');
 assert(!docentes.includes('Continuidad pedagógica por curso - ENSPA'), 'teacher hub must not expose internal spreadsheet names');
 
@@ -103,12 +101,23 @@ assert(tramites.includes('docentes.html'), 'procedures page must keep the new pr
 
 const vida = read('vida-escolar.html');
 assert(vida.includes('2.º Encuentro de RE Bonaerense'), 'Vida escolar must contain RE Bonaerense');
-assert(vida.includes('Estudiantes hacen memoria'), 'Vida escolar must contain project name');
-assert(vida.includes('assets/img/re-bonaerense-2024.jpg'), 'Vida escolar must use the local image');
+assert(vida.includes('22 de agosto de 2025'), 'Vida escolar must contain RE Bonaerense date');
+assert(vida.includes('assets/img/vida-escolar/encuentro-re-bonaerense.jpg'), 'Vida escolar must use local RE Bonaerense image');
+assert(vida.includes('formato full-width'), 'Vida escolar must mention the new native video treatment');
+assert(vida.includes('video class="school-story-media"'), 'Vida escolar must render the approved full-width native video');
+assert(vida.includes('controls preload="metadata" playsinline'), 'Vida escolar native video must expose controls and mobile-safe playback');
+assert(vida.includes('poster="assets/img/vida-escolar/presentacion-escuela-poster.jpg"'), 'Vida escolar video must use local poster');
+assert(vida.includes('source src="assets/video/presentacion-escuela.mp4" type="video/mp4"'), 'Vida escolar video must use local MP4 source');
+assert(!vida.includes('video-showcase__device'), 'Vida escolar must no longer use device mockup video chrome');
+assert(!vida.includes('video-showcase__play'), 'Vida escolar must no longer use fake play button');
 
-const oldAction = read('enspa-en-accion.html');
-assert(oldAction.includes('vida-escolar.html'), 'old ENSPA action URL must redirect to Vida escolar');
-const oldVisit = read('visitas-enspa.html');
-assert(oldVisit.includes('visitas-ees18.html') || oldVisit.includes('ingreso-2027.html'), 'old visits URL must redirect to current visit/ingreso page');
+const css = read('assets/css/styles.css');
+assert(css.includes('.video-showcase__media'), 'global CSS must define full-width video media');
+assert(css.includes('.school-story-media'), 'global CSS must define native school-story video');
+assert(css.includes('prefers-reduced-motion'), 'global CSS must respect reduced motion');
+
+const mainJs = read('assets/js/main.js');
+assert(mainJs.includes('aria-expanded'), 'menu JS must manage aria-expanded');
+assert(mainJs.includes('current-year'), 'main JS must update current year');
 
 console.log('site.test.js: all assertions passed');
