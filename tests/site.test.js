@@ -37,6 +37,8 @@ assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2024.jpg')), 'RE 
 
 const html = read('index.html');
 const css = read('assets/css/styles.css');
+const multipageCss = read('assets/css/multipage.css');
+const navCss = `${css}\n${multipageCss}`;
 const js = read('assets/js/main.js');
 
 assert(html.includes('ESCUELA DE EDUCACIÓN SECUNDARIA Nº 18'), 'official school name must be present');
@@ -52,12 +54,12 @@ assert(js.includes('aria-expanded'), 'menu behavior must update aria-expanded');
 assert(js.includes('prefers-reduced-motion'), 'motion preferences must be respected');
 
 // Navegación institucional moderna: superficie suave, pestaña activa clara y CTA separado.
-assert(css.includes('--nav-surface:'), 'navigation must define a soft institutional surface token');
-assert(css.includes('.primary-nav a[aria-current="page"]'), 'navigation must style the current page');
-assert(css.includes('background: var(--nav-active);'), 'current navigation tab must use a soft active background');
-assert(css.includes('box-shadow: inset 0 0 0 1px'), 'navigation shell must have a subtle inset border');
-assert(css.includes('.primary-nav a:not(.nav-cta):hover'), 'navigation tabs must have a dedicated hover treatment');
-assert(css.includes('.nav-cta:hover'), 'contact CTA must have a dedicated hover treatment');
+assert(navCss.includes('--nav-surface:'), 'navigation must define a soft institutional surface token');
+assert(navCss.includes('.primary-nav a[aria-current="page"]'), 'navigation must style the current page');
+assert(navCss.includes('background: var(--nav-active);'), 'current navigation tab must use a soft active background');
+assert(navCss.includes('box-shadow: inset 0 0 0 1px'), 'navigation shell must have a subtle inset border');
+assert(navCss.includes('.primary-nav a:not(.nav-cta):hover'), 'navigation tabs must have a dedicated hover treatment');
+assert(navCss.includes('.nav-cta:hover'), 'contact CTA must have a dedicated hover treatment');
 
 const expectedNavLinks = [
   'index.html',
