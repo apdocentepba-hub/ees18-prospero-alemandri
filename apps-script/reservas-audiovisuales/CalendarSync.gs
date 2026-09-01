@@ -38,7 +38,10 @@ function reservationEventDescription_(reservation) {
 }
 
 function syncReservationToCalendar_(reservation) {
-  var current = findReservationRecordById_(reservation.id);
+  var current = reservation && reservation.rowNumber
+    ? readReservationRecordAtRow_(reservation.rowNumber)
+    : findReservationRecordById_(reservation.id);
+
   if (current && current.calendarEventId) {
     reservation.calendarEventId = current.calendarEventId;
     reservation.syncState = 'OK';
@@ -64,14 +67,14 @@ function syncReservationToCalendar_(reservation) {
       calendarEventId: reservation.calendarEventId,
       syncState: 'OK',
       syncError: ''
-    });
+    }, reservation.rowNumber);
   } catch (error) {
     reservation.syncState = 'PENDIENTE_CALENDAR';
     reservation.syncError = String(error && error.message ? error.message : error).slice(0, 250);
     updateReservationFieldsById_(reservation.id, {
       syncState: 'PENDIENTE_CALENDAR',
       syncError: reservation.syncError
-    });
+    }, reservation.rowNumber);
   }
 
   return reservation;
