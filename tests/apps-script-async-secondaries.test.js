@@ -74,6 +74,22 @@ assert(
   'el diagnóstico debe devolver el estado de las dependencias de runtime'
 );
 assert(
+  diagnosticsSource.includes("stage = 'TARGET'"),
+  'el diagnóstico debe inspeccionar la fila objetivo antes de cualquier escritura'
+);
+assert(
+  diagnosticsSource.includes('canEdit'),
+  'el diagnóstico debe informar si la fila objetivo es editable'
+);
+assert(
+  diagnosticsSource.includes('nextRow'),
+  'el diagnóstico debe informar qué fila usaría appendReservationRecord_'
+);
+assert(
+  diagnosticsSource.includes('missingColumns'),
+  'el diagnóstico debe informar si faltan columnas requeridas sin agregarlas'
+);
+assert(
   codeSource.includes("action === 'diagnoseCreate'"),
   'Code.gs debe exponer el preflight seguro como diagnoseCreate'
 );
