@@ -7,6 +7,7 @@ const crypto = require('crypto');
 const root = path.resolve(__dirname, '..');
 const backendDir = path.join(root, 'apps-script', 'reservas-audiovisuales');
 let uuidCounter = 0;
+const scriptProperties = {};
 
 const context = vm.createContext({
   console,
@@ -21,6 +22,15 @@ const context = vm.createContext({
   RegExp,
   Error,
   encodeURIComponent,
+  PropertiesService: {
+    getScriptProperties() {
+      return {
+        getProperty(key) {
+          return Object.prototype.hasOwnProperty.call(scriptProperties, key) ? scriptProperties[key] : '';
+        }
+      };
+    }
+  },
   Utilities: {
     DigestAlgorithm: { SHA_256: 'SHA_256' },
     Charset: { UTF_8: 'UTF_8' },
@@ -56,6 +66,25 @@ for (const file of [
   const source = fs.readFileSync(path.join(backendDir, file), 'utf8');
   vm.runInContext(source, context, { filename: file });
 }
+
+scriptProperties.RESERVAS_ENVIRONMENT = 'PILOT';
+scriptProperties.RESERVAS_SPREADSHEET_ID = '1mvbJGjwWWFi7RI1cWCtqppALxGre7WUKg9u0_YeR2Hk';
+scriptProperties.RESERVAS_CALENDAR_ID = 'classroom108484736585769598885@group.calendar.google.com';
+assert.strictEqual(context.reservationEnvironment_(), 'pilot', 'el entorno PILOT debe identificarse explícitamente');
+assert.doesNotThrow(() => context.validateReservationEnvironmentConfiguration_(), 'PILOT debe aceptar únicamente recursos piloto');
+
+scriptProperties.RESERVAS_CALENDAR_ID = '5780a0363aca1620734b2f154ddab8409488e28886e3232631f6d6b6ab4c5ebf@group.calendar.google.com';
+assert.throws(
+  () => context.validateReservationEnvironmentConfiguration_(),
+  /ENVIRONMENT_CONFIGURATION_MISMATCH/,
+  'PILOT no debe poder escribir en el calendario real'
+);
+
+scriptProperties.RESERVAS_ENVIRONMENT = 'PRODUCTION';
+scriptProperties.RESERVAS_SPREADSHEET_ID = '1o8G7tD-w1FBA4LB3zC3SEtx4hVXKvALSupGnHEMqHkQ';
+scriptProperties.RESERVAS_CALENDAR_ID = '5780a0363aca1620734b2f154ddab8409488e28886e3232631f6d6b6ab4c5ebf@group.calendar.google.com';
+assert.strictEqual(context.reservationEnvironment_(), 'production');
+assert.doesNotThrow(() => context.validateReservationEnvironmentConfiguration_(), 'PRODUCTION debe aceptar BASE + calendario real');
 
 assert.strictEqual(context.isWeekend_('2026-09-05'), true, 'sábado debe quedar bloqueado');
 assert.strictEqual(context.isWeekend_('2026-09-06'), true, 'domingo debe quedar bloqueado');
