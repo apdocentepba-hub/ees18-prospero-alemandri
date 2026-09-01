@@ -50,7 +50,7 @@ assert(
   'la UI debe dejar claro que el correo se envía después de confirmar la reserva'
 );
 
-for (const code of ['CREATE_READ_ERROR', 'CREATE_PLAN_ERROR', 'CREATE_WRITE_ERROR', 'CREATE_QUEUE_ERROR']) {
+for (const code of ['CREATE_LOCK_ERROR', 'CREATE_READ_ERROR', 'CREATE_PLAN_ERROR', 'CREATE_WRITE_ERROR', 'CREATE_QUEUE_ERROR']) {
   assert(
     reservationsSource.includes(code),
     `createReservation debe distinguir fallos internos con ${code}`
