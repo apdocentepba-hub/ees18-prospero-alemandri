@@ -1,5 +1,6 @@
 import json
 import re
+import time
 import urllib.parse
 import urllib.request
 from pathlib import Path
@@ -25,26 +26,58 @@ def get_json(params):
         return json.loads(response.read().decode("utf-8"))
 
 
-health = get_json({"action": "health"})
+def timed_get_json(label, params):
+    started = time.perf_counter()
+    payload = get_json(params)
+    elapsed = time.perf_counter() - started
+    print(f"LATENCY {label}: {elapsed:.3f}s")
+    return payload, elapsed
+
+
+health, health_latency = timed_get_json("health", {"action": "health"})
 assert health.get("ok") is True, health
 assert health.get("service") == "reservas-audiovisuales", health
 assert health.get("environment") == "production", health
 
-availability = get_json({"action": "availability", "date": "2026-09-01"})
+month_cold, month_cold_latency = timed_get_json("month-cold", {
+    "action": "month",
+    "year": "2026",
+    "month": "9",
+})
+assert month_cold.get("ok") is True, month_cold
+assert isinstance(month_cold.get("days"), dict), month_cold
+
+month_warm, month_warm_latency = timed_get_json("month-warm", {
+    "action": "month",
+    "year": "2026",
+    "month": "9",
+})
+assert month_warm.get("ok") is True, month_warm
+assert month_warm.get("days") == month_cold.get("days"), "month responses changed between consecutive reads"
+
+availability, availability_cold_latency = timed_get_json("availability-cold", {
+    "action": "availability",
+    "date": "2026-09-01",
+})
 assert availability.get("ok") is True, availability
 assert availability.get("date") == "2026-09-01", availability
 assert availability.get("status") in {"available", "partial", "full", "blocked"}, availability
 assert isinstance(availability.get("slots"), list), availability
 assert len(availability["slots"]) == 10, availability
 
+availability_warm, availability_warm_latency = timed_get_json("availability-warm", {
+    "action": "availability",
+    "date": "2026-09-01",
+})
+assert availability_warm.get("ok") is True, availability_warm
+assert availability_warm.get("slots") == availability.get("slots"), "availability changed between consecutive reads"
+
 serialized = json.dumps(availability, ensure_ascii=False).lower()
 for forbidden in ("teacher", "profesor", "correo", "email", "materia", "course", "curso"):
     assert forbidden not in serialized, f"Public availability leaked forbidden field: {forbidden}"
 
-# Safe write-path guard probe: the invalid date guarantees the legacy backend
-# cannot create a reservation. The new backend must reject the Gmail address
-# before evaluating the rest of the payload.
-external_email_probe = get_json({
+# Safe guard-path probe: INVALID date guarantees no reservation can be created.
+external_email_probe, guard_latency = timed_get_json("external-email-guard", {
     "action": "create",
     "payload": json.dumps({
         "mode": "single",
@@ -66,4 +99,15 @@ print(
     availability.get("status"),
     f"{availability.get('free')}/{availability.get('total')} free slots",
     "external email blocked",
+)
+print(
+    "LATENCY SUMMARY",
+    json.dumps({
+        "health": round(health_latency, 3),
+        "month_cold": round(month_cold_latency, 3),
+        "month_warm": round(month_warm_latency, 3),
+        "availability_cold": round(availability_cold_latency, 3),
+        "availability_warm": round(availability_warm_latency, 3),
+        "external_email_guard": round(guard_latency, 3),
+    }, sort_keys=True),
 )
