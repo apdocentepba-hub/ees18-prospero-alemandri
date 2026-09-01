@@ -222,6 +222,9 @@
   const API_URL = String(window.EES18_RESERVAS_API_URL || '').trim();
   const apiReady = Boolean(API_URL);
   let requestCounter = 0;
+  const monthAvailabilityCache = new Map();
+  const monthRequestGate = rules.createLatestRequestGate();
+  const dayRequestGate = rules.createLatestRequestGate();
 
   const monthLabel = document.getElementById('calendar-month-label');
   const prevButton = document.getElementById('calendar-prev');
@@ -250,8 +253,7 @@
     selectedSlotIds: [],
     occupiedSlotIds: [],
     monthDays: {},
-    monthLoading: false,
-    dayLoading: false
+    monthLoading: false
   };
 
   function startOfLocalDay(date) {
@@ -269,6 +271,10 @@
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
+  }
+
+  function visibleMonthKey() {
+    return `${state.visibleMonth.getFullYear()}-${String(state.visibleMonth.getMonth() + 1).padStart(2, '0')}`;
   }
 
   function formatLongDate(isoDate) {
@@ -332,7 +338,7 @@
 
   function dateState(date) {
     if (localDateBlocked(date)) return 'blocked';
-    if (!apiReady || state.monthLoading) return 'blocked';
+    if (!apiReady) return 'blocked';
     const dayInfo = state.monthDays[toIsoLocal(date)];
     return dayInfo && ['available', 'partial', 'full', 'blocked'].includes(dayInfo.status)
       ? dayInfo.status
@@ -389,8 +395,8 @@
 
     const minMonth = new Date(today.getFullYear(), today.getMonth(), 1);
     const maxMonth = new Date(maxDate.getFullYear(), maxDate.getMonth(), 1);
-    prevButton.disabled = state.visibleMonth <= minMonth || state.monthLoading;
-    nextButton.disabled = state.visibleMonth >= maxMonth || state.monthLoading;
+    prevButton.disabled = state.visibleMonth <= minMonth;
+    nextButton.disabled = state.visibleMonth >= maxMonth;
   }
 
   function renderSlotList(container, slots) {
@@ -405,7 +411,7 @@
       input.type = 'checkbox';
       input.value = slot.id;
       input.checked = selected;
-      input.disabled = occupied || !state.selectedDate || !apiReady || state.dayLoading;
+      input.disabled = occupied || !state.selectedDate || !apiReady;
       input.setAttribute('aria-label', `${slot.start} a ${slot.end}`);
       input.addEventListener('change', () => toggleSlot(slot.id, input.checked));
 
@@ -432,34 +438,52 @@
       return;
     }
 
-    state.monthLoading = true;
+    const year = state.visibleMonth.getFullYear();
+    const month = state.visibleMonth.getMonth() + 1;
+    const key = visibleMonthKey();
+    const requestVersion = monthRequestGate.next(key);
+    const cached = monthAvailabilityCache.get(key);
+
+    if (cached && cached.days) {
+      state.monthDays = cached.days;
+      state.monthLoading = false;
+    } else {
+      state.monthDays = {};
+      state.monthLoading = true;
+    }
     renderCalendar();
+
     try {
-      const response = await requestJsonp('month', {
-        year: state.visibleMonth.getFullYear(),
-        month: state.visibleMonth.getMonth() + 1
-      });
+      const response = await requestJsonp('month', { year, month });
+      if (!monthRequestGate.isCurrent(requestVersion, key)) return;
       if (!response.ok || !response.days) throw new Error(response.code || 'INVALID_RESPONSE');
       state.monthDays = response.days;
+      monthAvailabilityCache.set(key, { days: response.days, savedAt: Date.now() });
     } catch (error) {
-      state.monthDays = {};
-      setResult('<strong>No pudimos cargar la disponibilidad.</strong><span>Intentá nuevamente en unos minutos. El sistema actual sigue disponible desde Docentes.</span>', 'error');
+      if (!monthRequestGate.isCurrent(requestVersion, key)) return;
+      if (!cached) {
+        state.monthDays = {};
+        setResult('<strong>No pudimos cargar la disponibilidad.</strong><span>Intentá nuevamente en unos minutos. El sistema actual sigue disponible desde Docentes.</span>', 'error');
+      }
     } finally {
+      if (!monthRequestGate.isCurrent(requestVersion, key)) return;
       state.monthLoading = false;
       renderCalendar();
     }
   }
 
   async function selectDate(isoDate) {
-    if (!apiReady || state.dayLoading) return;
+    if (!apiReady) return;
+
+    const requestVersion = dayRequestGate.next(isoDate);
+    const monthDay = state.monthDays[isoDate] || {};
     state.selectedDate = isoDate;
     state.selectedSlotIds = [];
-    state.occupiedSlotIds = [];
-    state.dayLoading = true;
+    state.occupiedSlotIds = rules.occupiedSlotIdsFromMonthDay(state.monthDays[isoDate]);
     selectedDateTitle.textContent = formatLongDate(isoDate);
-    dayStatusBadge.textContent = 'Consultando…';
-    dayHelp.textContent = 'Verificando disponibilidad actualizada.';
-    bookingFields.disabled = true;
+    dayStatusBadge.textContent = dateCaption(monthDay.status || 'available');
+    dayStatusBadge.dataset.state = monthDay.status || 'available';
+    dayHelp.textContent = 'Horarios cargados. Verificando cambios recientes…';
     bookingResult.hidden = true;
     repeatUntilInput.min = isoDate;
     repeatUntilInput.max = toIsoLocal(maxDate);
@@ -469,8 +493,11 @@
 
     try {
       const response = await requestJsonp('availability', { date: isoDate });
+      if (!dayRequestGate.isCurrent(requestVersion, isoDate) || state.selectedDate !== isoDate) return;
       if (!response.ok || !Array.isArray(response.slots)) throw new Error(response.code || 'INVALID_RESPONSE');
+
       state.occupiedSlotIds = response.slots.filter((slot) => slot.available !== true).map((slot) => slot.id);
+      state.selectedSlotIds = state.selectedSlotIds.filter((slotId) => !state.occupiedSlotIds.includes(slotId));
       dayStatusBadge.textContent = dateCaption(response.status);
       dayStatusBadge.dataset.state = response.status;
       dayHelp.textContent = response.status === 'blocked'
@@ -478,17 +505,19 @@
         : 'Marcá uno o varios módulos consecutivos del mismo turno.';
       if (response.status === 'blocked' || response.status === 'full') {
         state.selectedDate = '';
+        state.selectedSlotIds = [];
       }
     } catch (error) {
-      state.selectedDate = '';
-      state.occupiedSlotIds = rules.SLOTS.MANANA.concat(rules.SLOTS.TARDE).map((slot) => slot.id);
-      dayStatusBadge.textContent = 'Sin conexión';
-      dayHelp.textContent = 'No pudimos verificar este día. No se habilitarán reservas sin una comprobación válida.';
+      if (!dayRequestGate.isCurrent(requestVersion, isoDate) || state.selectedDate !== isoDate) return;
+      dayStatusBadge.textContent = 'Sin actualizar';
+      dayStatusBadge.dataset.state = 'partial';
+      dayHelp.textContent = 'Mostramos la última disponibilidad cargada. Antes de guardar, el sistema vuelve a comprobar el horario.';
     } finally {
-      state.dayLoading = false;
+      if (!dayRequestGate.isCurrent(requestVersion, isoDate)) return;
       renderCalendar();
       renderSlots();
       renderSelectionSummary();
+      updateConfirmationSummary();
     }
   }
 
@@ -604,6 +633,7 @@
 
   async function refreshSelectedDateAfterWrite() {
     const selected = state.selectedDate;
+    monthAvailabilityCache.delete(visibleMonthKey());
     await loadMonthAvailability();
     if (selected) await selectDate(selected);
   }
@@ -662,6 +692,8 @@
     state.visibleMonth = new Date(state.visibleMonth.getFullYear(), state.visibleMonth.getMonth() - 1, 1);
     state.selectedDate = '';
     state.selectedSlotIds = [];
+    state.occupiedSlotIds = [];
+    dayRequestGate.next('');
     loadMonthAvailability();
   });
 
@@ -669,6 +701,8 @@
     state.visibleMonth = new Date(state.visibleMonth.getFullYear(), state.visibleMonth.getMonth() + 1, 1);
     state.selectedDate = '';
     state.selectedSlotIds = [];
+    state.occupiedSlotIds = [];
+    dayRequestGate.next('');
     loadMonthAvailability();
   });
 
