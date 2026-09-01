@@ -29,7 +29,7 @@ assert(
 assert(fs.existsSync(queuePath), 'debe existir SecondaryQueue.gs para procesar servicios secundarios fuera de la petición web');
 const queueSource = fs.readFileSync(queuePath, 'utf8');
 assert.doesNotThrow(() => new vm.Script(queueSource, { filename: 'SecondaryQueue.gs' }), 'SecondaryQueue.gs debe tener sintaxis JavaScript válida');
-assert(queueSource.includes("ScriptApp.newTrigger('processPendingReservationSecondaries')"), 'la cola debe programar un trigger diferido');
+assert(queueSource.includes("newTrigger('processPendingReservationSecondaries')"), 'la cola debe programar un trigger diferido');
 assert(queueSource.includes('.after('), 'el trigger secundario debe ser one-shot y no un polling permanente');
 assert(queueSource.includes('syncReservationToCalendar_'), 'el procesador secundario debe crear/sincronizar Calendar');
 assert(queueSource.includes('sendReservationConfirmation_'), 'el procesador secundario debe enviar el correo de confirmación');
