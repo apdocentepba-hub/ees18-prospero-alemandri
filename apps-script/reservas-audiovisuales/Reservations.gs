@@ -215,7 +215,7 @@ function buildReservationRecordForDate_(payload, date, groupId) {
     calendarEventId: '',
     cancellationHash: '',
     cancellationDate: '',
-    syncState: 'PENDIENTE_CALENDAR',
+    syncState: 'PENDIENTE_SECUNDARIOS',
     syncError: ''
   };
 }
@@ -274,18 +274,14 @@ function createReservation(payload) {
     lock.releaseLock();
   }
 
-  for (var secondaryIndex = 0; secondaryIndex < createdRecords.length; secondaryIndex += 1) {
-    var created = createdRecords[secondaryIndex];
-    syncReservationToCalendar_(created);
-    sendReservationConfirmation_(created, created.rawCancellationToken_);
-    delete created.rawCancellationToken_;
-  }
+  var secondaryQueue = queueReservationSecondaryProcessing_(createdRecords);
 
   return {
     ok: true,
     requested: plan.requested,
     confirmed: createdRecords.length,
     conflicts: plan.conflicts,
-    reservations: createdRecords.map(publicCreatedReservation_)
+    reservations: createdRecords.map(publicCreatedReservation_),
+    secondaryProcessing: secondaryQueue.ok ? 'queued' : 'pending'
   };
 }
