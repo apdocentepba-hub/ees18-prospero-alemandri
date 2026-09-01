@@ -171,3 +171,5 @@ print(
         "diagnose_create_no_write": round(diagnostic_latency, 3),
     }, sort_keys=True),
 )
+
+# Rerun marker: runtime dependency diagnostic after production deployment.
