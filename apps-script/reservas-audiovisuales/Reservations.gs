@@ -13,6 +13,13 @@ function isInstitutionalReservationEmail_(email) {
   return /^[^\s@]+@abc\.gob\.ar$/.test(String(email || '').trim().toLowerCase());
 }
 
+function requireInstitutionalReservationEmail_(email) {
+  var normalized = reservationRequiredText_(email, 180, 'INVALID_EMAIL');
+  if (!isValidReservationEmail_(normalized)) throw new Error('INVALID_EMAIL');
+  if (!isInstitutionalReservationEmail_(normalized)) throw new Error('INSTITUTIONAL_EMAIL_REQUIRED');
+  return normalized;
+}
+
 function continuousRangeForSlotIds_(slotIds) {
   if (!Array.isArray(slotIds) || slotIds.length === 0) throw new Error('EMPTY_SELECTION');
 
@@ -65,7 +72,6 @@ function normalizeReservationPayload_(payload, todayIso) {
   var teacher = reservationRequiredText_(input.teacher, 120, 'INVALID_TEACHER');
   var email = reservationRequiredText_(input.email, 180, 'INVALID_EMAIL');
   if (!isValidReservationEmail_(email)) throw new Error('INVALID_EMAIL');
-  if (!isInstitutionalReservationEmail_(email)) throw new Error('INSTITUTIONAL_EMAIL_REQUIRED');
   var course = reservationRequiredText_(input.course, 80, 'INVALID_COURSE');
   var subject = reservationRequiredText_(input.subject, 140, 'INVALID_SUBJECT');
   var mode = input.mode === 'weekly' ? 'weekly' : 'single';
@@ -89,7 +95,7 @@ function normalizeReservationPayload_(payload, todayIso) {
     shift: range.shift,
     teacher: teacher,
     email: email,
-    emailType: 'institucional',
+    emailType: isInstitutionalReservationEmail_(email) ? 'institucional' : 'externo',
     course: course,
     subject: subject,
     resources: {
@@ -225,6 +231,8 @@ function publicCreatedReservation_(record) {
 }
 
 function createReservation(payload) {
+  requireInstitutionalReservationEmail_(payload && payload.email);
+
   var clock = reservationClock_();
   var todayIso = clock.date;
   var normalized = normalizeReservationPayload_(payload, todayIso);
