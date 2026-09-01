@@ -268,6 +268,8 @@ function createReservation(payload) {
       appendReservationRecord_(record);
       createdRecords.push(record);
     }
+
+    if (createdRecords.length > 0) invalidatePublicAvailabilityCache_();
   } finally {
     lock.releaseLock();
   }
