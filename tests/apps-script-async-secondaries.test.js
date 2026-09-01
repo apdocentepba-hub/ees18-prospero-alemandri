@@ -1,6 +1,7 @@
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const vm = require('vm');
 
 const root = path.resolve(__dirname, '..');
 const backendDir = path.join(root, 'apps-script', 'reservas-audiovisuales');
@@ -27,6 +28,7 @@ assert(
 
 assert(fs.existsSync(queuePath), 'debe existir SecondaryQueue.gs para procesar servicios secundarios fuera de la petición web');
 const queueSource = fs.readFileSync(queuePath, 'utf8');
+assert.doesNotThrow(() => new vm.Script(queueSource, { filename: 'SecondaryQueue.gs' }), 'SecondaryQueue.gs debe tener sintaxis JavaScript válida');
 assert(queueSource.includes("ScriptApp.newTrigger('processPendingReservationSecondaries')"), 'la cola debe programar un trigger diferido');
 assert(queueSource.includes('.after('), 'el trigger secundario debe ser one-shot y no un polling permanente');
 assert(queueSource.includes('syncReservationToCalendar_'), 'el procesador secundario debe crear/sincronizar Calendar');
@@ -43,8 +45,8 @@ assert(
   'setupReservationSystem debe autorizar/probar el mecanismo de triggers secundarios'
 );
 assert(
-  frontendSource.includes('El correo de confirmación y el enlace de cancelación llegarán en breve'),
-  'la UI debe explicar que el correo puede llegar unos segundos después de confirmar'
+  frontendSource.includes('La confirmación y el enlace de cancelación se envían al correo indicado.'),
+  'la UI debe dejar claro que el correo se envía después de confirmar la reserva'
 );
 
 console.log('apps-script-async-secondaries.test.js: all assertions passed');
