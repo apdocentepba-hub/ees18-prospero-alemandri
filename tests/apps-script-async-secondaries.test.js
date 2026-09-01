@@ -10,6 +10,7 @@ const dataSource = fs.readFileSync(path.join(backendDir, 'Data.gs'), 'utf8');
 const adminSource = fs.readFileSync(path.join(backendDir, 'AdminSetup.gs'), 'utf8');
 const codeSource = fs.readFileSync(path.join(backendDir, 'Code.gs'), 'utf8');
 const queuePath = path.join(backendDir, 'SecondaryQueue.gs');
+const diagnosticsPath = path.join(backendDir, 'Diagnostics.gs');
 const frontendSource = fs.readFileSync(path.join(root, 'assets', 'js', 'reservas-audiovisuales.js'), 'utf8');
 
 assert.strictEqual(
@@ -50,19 +51,23 @@ assert(
   'la UI debe dejar claro que el correo se envía después de confirmar la reserva'
 );
 
-for (const code of ['CREATE_LOCK_ERROR', 'CREATE_READ_ERROR', 'CREATE_PLAN_ERROR', 'CREATE_WRITE_ERROR', 'CREATE_QUEUE_ERROR']) {
-  assert(
-    reservationsSource.includes(code),
-    `createReservation debe distinguir fallos internos con ${code}`
-  );
-  assert(
-    codeSource.includes(`'${code}'`),
-    `Code.gs debe exponer ${code} como código público seguro`
-  );
+assert(fs.existsSync(diagnosticsPath), 'debe existir Diagnostics.gs para diagnosticar el preflight sin escribir');
+const diagnosticsSource = fs.readFileSync(diagnosticsPath, 'utf8');
+assert.doesNotThrow(() => new vm.Script(diagnosticsSource, { filename: 'Diagnostics.gs' }), 'Diagnostics.gs debe tener sintaxis JavaScript válida');
+for (const stage of ['NORMALIZE', 'LOCK', 'READ', 'PLAN', 'BUILD']) {
+  assert(diagnosticsSource.includes(`'${stage}'`), `el diagnóstico debe distinguir la etapa ${stage}`);
 }
+assert.strictEqual(diagnosticsSource.includes('appendReservationRecord_'), false, 'el diagnóstico no debe escribir una reserva');
+assert.strictEqual(diagnosticsSource.includes('setValues('), false, 'el diagnóstico no debe escribir celdas');
+assert.strictEqual(diagnosticsSource.includes('syncReservationToCalendar_'), false, 'el diagnóstico no debe tocar Calendar');
+assert.strictEqual(diagnosticsSource.includes('sendReservationConfirmation_'), false, 'el diagnóstico no debe enviar correo');
 assert(
-  reservationsSource.includes("console.error('createReservation stage'"),
-  'el backend debe registrar internamente la causa original y la etapa de creación'
+  codeSource.includes("action === 'diagnoseCreate'"),
+  'Code.gs debe exponer el preflight seguro como diagnoseCreate'
+);
+assert(
+  codeSource.includes('diagnoseReservationCreate_(payload)'),
+  'Code.gs debe enviar el payload al diagnóstico sin escritura'
 );
 
 console.log('apps-script-async-secondaries.test.js: all assertions passed');
