@@ -65,6 +65,7 @@ function normalizeReservationPayload_(payload, todayIso) {
   var teacher = reservationRequiredText_(input.teacher, 120, 'INVALID_TEACHER');
   var email = reservationRequiredText_(input.email, 180, 'INVALID_EMAIL');
   if (!isValidReservationEmail_(email)) throw new Error('INVALID_EMAIL');
+  if (!isInstitutionalReservationEmail_(email)) throw new Error('INSTITUTIONAL_EMAIL_REQUIRED');
   var course = reservationRequiredText_(input.course, 80, 'INVALID_COURSE');
   var subject = reservationRequiredText_(input.subject, 140, 'INVALID_SUBJECT');
   var mode = input.mode === 'weekly' ? 'weekly' : 'single';
@@ -88,7 +89,7 @@ function normalizeReservationPayload_(payload, todayIso) {
     shift: range.shift,
     teacher: teacher,
     email: email,
-    emailType: isInstitutionalReservationEmail_(email) ? 'institucional' : 'externo',
+    emailType: 'institucional',
     course: course,
     subject: subject,
     resources: {
