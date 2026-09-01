@@ -92,8 +92,9 @@ assert(estudiantes.includes('ingreso-2027.html'), 'student hub must link to admi
 
 const docentes = read('docentes.html');
 assert(docentes.includes('Docentes'), 'teacher hub must identify its audience');
-assert(docentes.includes('Reserva del Salón de Audiovisuales'), 'teacher hub must expose audiovisual booking');
-assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must use current audiovisual form');
+assert(docentes.includes('Reservar Salón de Audiovisuales'), 'teacher hub must expose active audiovisual booking');
+assert(docentes.includes('reservas-audiovisuales.html'), 'teacher hub must link to active audiovisual booking');
+assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must retain audiovisual contingency form');
 assert(docentes.includes('Carro Tecnológico'), 'teacher hub must expose technological cart access');
 assert(!docentes.includes('Continuidad pedagógica por curso - ENSPA'), 'teacher hub must not expose internal spreadsheet names');
 
