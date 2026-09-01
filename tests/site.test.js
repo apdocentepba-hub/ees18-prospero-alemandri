@@ -61,6 +61,15 @@ assert(navCss.includes('box-shadow: inset 0 0 0 1px'), 'navigation shell must ha
 assert(navCss.includes('.primary-nav a:not(.nav-cta):hover'), 'navigation tabs must have a dedicated hover treatment');
 assert(navCss.includes('.nav-cta:hover'), 'contact CTA must have a dedicated hover treatment');
 
+// Refinamiento del header: menos altura, marca equilibrada y quiebre temprano a hamburguesa.
+assert(navCss.includes('--header-compact-height:'), 'header must define a compact desktop height token');
+assert(navCss.includes('--brand-logo-compact:'), 'header must define a compact brand logo token');
+assert(navCss.includes('min-height: var(--header-compact-height);'), 'desktop header must use compact height');
+assert(navCss.includes('width: var(--brand-logo-compact);'), 'brand logo must use compact sizing');
+assert(navCss.includes('@media(max-width:1180px) and (min-width:1021px)'), 'header must include an intermediate notebook layout');
+assert(navCss.includes('@media(max-width:1020px)'), 'navigation must switch to mobile treatment before it becomes cramped');
+assert(navCss.includes('--nav-mobile-top:'), 'mobile navigation must use a dedicated top offset token');
+
 const expectedNavLinks = [
   'index.html',
   'nuestra-escuela.html',
