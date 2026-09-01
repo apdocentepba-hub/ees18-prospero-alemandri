@@ -62,6 +62,18 @@ assert.strictEqual(diagnosticsSource.includes('setValues('), false, 'el diagnós
 assert.strictEqual(diagnosticsSource.includes('syncReservationToCalendar_'), false, 'el diagnóstico no debe tocar Calendar');
 assert.strictEqual(diagnosticsSource.includes('sendReservationConfirmation_'), false, 'el diagnóstico no debe enviar correo');
 assert(
+  diagnosticsSource.includes("typeof queueReservationSecondaryProcessing_ === 'function'"),
+  'el diagnóstico debe confirmar que la función de cola está cargada en la versión desplegada'
+);
+assert(
+  diagnosticsSource.includes("typeof processPendingReservationSecondaries === 'function'"),
+  'el diagnóstico debe confirmar que el procesador secundario está cargado en la versión desplegada'
+);
+assert(
+  diagnosticsSource.includes('runtimeDependencies'),
+  'el diagnóstico debe devolver el estado de las dependencias de runtime'
+);
+assert(
   codeSource.includes("action === 'diagnoseCreate'"),
   'Code.gs debe exponer el preflight seguro como diagnoseCreate'
 );
