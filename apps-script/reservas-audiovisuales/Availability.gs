@@ -324,7 +324,10 @@ function getMonthAvailability(year, month) {
       status: availability.status,
       free: availability.free,
       total: availability.total,
-      reason: availability.reason
+      reason: availability.reason,
+      occupiedSlotIds: availability.slots
+        .filter(function (slot) { return slot.available !== true; })
+        .map(function (slot) { return slot.id; })
     };
   }
 

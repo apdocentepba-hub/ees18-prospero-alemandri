@@ -1,7 +1,10 @@
 const assert = require('assert');
+const fs = require('fs');
 const path = require('path');
 
-const rules = require(path.join('..', 'assets', 'js', 'reservas-audiovisuales.js'));
+const frontendPath = path.join(__dirname, '..', 'assets', 'js', 'reservas-audiovisuales.js');
+const rules = require(frontendPath);
+const frontendSource = fs.readFileSync(frontendPath, 'utf8');
 
 assert.deepStrictEqual(
   rules.SLOTS.MANANA.map((slot) => slot.id),
@@ -111,5 +114,32 @@ assert.throws(
   ),
   /INVALID_EMAIL/
 );
+
+assert.deepStrictEqual(
+  rules.occupiedSlotIdsFromMonthDay({ occupiedSlotIds: ['M1', 'T2', 'INVALID'] }),
+  ['M1', 'T2'],
+  'la vista diaria debe poder pintar horarios inmediatamente con el resumen mensual'
+);
+assert.deepStrictEqual(
+  rules.occupiedSlotIdsFromMonthDay(null),
+  [],
+  'si el mes no tiene detalle de módulos, la selección optimista debe ser vacía'
+);
+
+const gate = rules.createLatestRequestGate();
+const firstRequest = gate.next('2026-09-02');
+const secondRequest = gate.next('2026-09-03');
+assert.strictEqual(gate.isCurrent(firstRequest, '2026-09-02'), false, 'una respuesta vieja no debe bloquear ni sobrescribir el día nuevo');
+assert.strictEqual(gate.isCurrent(secondRequest, '2026-09-03'), true, 'la última selección debe seguir vigente');
+
+assert.strictEqual(
+  frontendSource.includes('if (!apiReady || state.dayLoading) return;'),
+  false,
+  'el calendario no debe ignorar clics mientras otra consulta diaria está en curso'
+);
+assert(frontendSource.includes('const monthAvailabilityCache = new Map()'), 'los meses ya cargados deben reutilizarse en memoria');
+assert(frontendSource.includes('const dayRequestGate = rules.createLatestRequestGate()'), 'la UI debe descartar respuestas de días viejos');
+assert(frontendSource.includes('rules.occupiedSlotIdsFromMonthDay(state.monthDays[isoDate])'), 'los horarios deben pintarse con el resumen mensual antes de la verificación fresca');
+assert(frontendSource.includes('dayRequestGate.isCurrent'), 'una respuesta diaria vieja no debe sobrescribir la selección actual');
 
 console.log('reservas-audiovisuales.test.js: all assertions passed');

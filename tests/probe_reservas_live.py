@@ -16,6 +16,9 @@ BASE_URL = match.group(1)
 if not BASE_URL.startswith("https://script.google.com/") or not BASE_URL.endswith("/exec"):
     raise SystemExit("Reservation Web App URL is not a valid Apps Script /exec URL")
 
+ALLOWED_SLOT_IDS = {"M1", "M2", "M3", "M4", "M5", "T1", "T2", "T3", "T4", "T5"}
+FORBIDDEN_PUBLIC_FIELDS = ("teacher", "profesor", "correo", "email", "materia", "course", "curso")
+
 
 def get_json(params):
     url = BASE_URL + "?" + urllib.parse.urlencode(params)
@@ -46,6 +49,17 @@ month_cold, month_cold_latency = timed_get_json("month-cold", {
 })
 assert month_cold.get("ok") is True, month_cold
 assert isinstance(month_cold.get("days"), dict), month_cold
+assert month_cold["days"], "month endpoint returned no days"
+for iso_date, day_info in month_cold["days"].items():
+    assert isinstance(day_info, dict), (iso_date, day_info)
+    assert isinstance(day_info.get("occupiedSlotIds"), list), (
+        f"Production month contract missing occupiedSlotIds for {iso_date}: {day_info}"
+    )
+    assert set(day_info["occupiedSlotIds"]).issubset(ALLOWED_SLOT_IDS), (iso_date, day_info)
+
+serialized_month = json.dumps(month_cold, ensure_ascii=False).lower()
+for forbidden in FORBIDDEN_PUBLIC_FIELDS:
+    assert forbidden not in serialized_month, f"Public month availability leaked forbidden field: {forbidden}"
 
 month_warm, month_warm_latency = timed_get_json("month-warm", {
     "action": "month",
@@ -73,7 +87,7 @@ assert availability_warm.get("ok") is True, availability_warm
 assert availability_warm.get("slots") == availability.get("slots"), "availability changed between consecutive reads"
 
 serialized = json.dumps(availability, ensure_ascii=False).lower()
-for forbidden in ("teacher", "profesor", "correo", "email", "materia", "course", "curso"):
+for forbidden in FORBIDDEN_PUBLIC_FIELDS:
     assert forbidden not in serialized, f"Public availability leaked forbidden field: {forbidden}"
 
 # Safe guard-path probe: INVALID date guarantees no reservation can be created.
@@ -98,6 +112,7 @@ print(
     health.get("environment"),
     availability.get("status"),
     f"{availability.get('free')}/{availability.get('total')} free slots",
+    "month slot contract OK",
     "external email blocked",
 )
 print(
