@@ -100,9 +100,10 @@ assert.strictEqual(storedRow[2], 'evt-1');
 assert.strictEqual(storedRow[3], 'OK');
 assert.strictEqual(storedRow[4], 'Sí');
 
-// Regression 2: public availability may be cached briefly, but the cache must contain no PII.
+// Regression 2: public availability may be cached, but the cache must contain no PII.
 let reservationReads = 0;
 let blockedReads = 0;
+let cacheSeconds = null;
 const cacheStore = new Map();
 const availabilityContext = vm.createContext({
   console,
@@ -120,7 +121,10 @@ const availabilityContext = vm.createContext({
     getScriptCache() {
       return {
         get(key) { return cacheStore.has(key) ? cacheStore.get(key) : null; },
-        put(key, value) { cacheStore.set(key, value); },
+        put(key, value, seconds) {
+          cacheSeconds = seconds;
+          cacheStore.set(key, value);
+        },
         remove(key) { cacheStore.delete(key); }
       };
     }
@@ -173,6 +177,7 @@ const serializedSnapshot = JSON.stringify(snapshot1).toLowerCase();
 assert.strictEqual(serializedSnapshot.includes('docente privado'), false, 'el caché público no debe contener nombres');
 assert.strictEqual(serializedSnapshot.includes('privado@abc.gob.ar'), false, 'el caché público no debe contener correos');
 assert.strictEqual(serializedSnapshot.includes('private-id'), false, 'el caché público no debe contener IDs de reserva');
+assert.strictEqual(cacheSeconds, 120, 'el snapshot público debe mantenerse 120 s para amortiguar cold starts de Apps Script');
 
 availabilityContext.invalidatePublicAvailabilityCache_();
 availabilityContext.readPublicAvailabilitySnapshot_();
