@@ -155,10 +155,12 @@ function setupReservationSystem() {
   ensureBlockedDaysSheet_();
   ensureAdministrationSheet_();
   var administration = refreshAdministrationSheet_();
+  var secondaryTrigger = ensureReservationSecondaryTriggerAuthorization_();
 
   return {
     ok: true,
     addedColumns: addedColumns,
-    administrationRows: administration.rows
+    administrationRows: administration.rows,
+    secondaryTrigger: secondaryTrigger
   };
 }

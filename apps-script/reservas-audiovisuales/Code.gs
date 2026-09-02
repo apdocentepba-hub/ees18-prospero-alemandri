@@ -26,6 +26,11 @@ function doGet(e) {
       return publicReservationOutput_(createReservation(payload), params.callback);
     }
 
+    if (action === 'diagnoseCreate') {
+      payload = parsePublicReservationPayload_(params.payload);
+      return publicReservationOutput_(diagnoseReservationCreate_(payload), params.callback);
+    }
+
     if (action === 'cancelLookup') {
       return publicReservationOutput_(getReservationByCancelToken(String(params.token || '')), params.callback);
     }
