@@ -36,6 +36,7 @@
 .primary-nav {
   gap: 4px;
   padding: 5px;
+  font-size: .86rem;
   background: var(--nav-surface);
   border-radius: 14px;
   box-shadow: inset 0 0 0 1px rgba(15, 63, 98, .08), 0 8px 24px rgba(15, 63, 98, .055);
