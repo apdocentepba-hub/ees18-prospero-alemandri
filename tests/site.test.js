@@ -60,6 +60,7 @@ assert(navCss.includes('background: var(--nav-active);'), 'current navigation ta
 assert(navCss.includes('box-shadow: inset 0 0 0 1px'), 'navigation shell must have a subtle inset border');
 assert(navCss.includes('.primary-nav a:not(.nav-cta):hover'), 'navigation tabs must have a dedicated hover treatment');
 assert(navCss.includes('.nav-cta:hover'), 'contact CTA must have a dedicated hover treatment');
+assert(multipageCss.includes('font-size: .86rem;\n  background: var(--nav-surface);'), 'shared navigation must lock the same desktop font size on every page');
 
 // Refinamiento del header: menos altura, marca equilibrada y quiebre temprano a hamburguesa.
 assert(navCss.includes('--header-compact-height:'), 'header must define a compact desktop height token');
