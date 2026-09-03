@@ -4,311 +4,98 @@
   <base target="_top">
   <meta charset="UTF-8">
   <style>
-    :root {
-      --azul-profundo: #0f3f62;
-      --azul: #1e6fa8;
-      --celeste: #5ab8eb;
-      --papel: #f5fafc;
-      --linea: #d4e3eb;
-      --texto: #314d5c;
-      --muted: #637d8b;
-      --ok-bg: #edf9f1;
-      --ok-border: #9bcfa9;
-      --error-bg: #fff1f1;
-      --error-border: #e4b0b0;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; background: var(--papel); color: var(--texto); font-family: Arial, sans-serif; }
-    .top { background: var(--azul-profundo); color: #fff; padding: 30px 20px; }
-    .wrap { width: min(920px, calc(100% - 28px)); margin: 0 auto; }
-    .top small { display: block; color: #a9def6; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
-    .top h1 { margin: 8px 0 10px; font-family: Georgia, serif; font-size: clamp(2rem, 6vw, 3.25rem); }
-    .top p { margin: 0; max-width: 760px; line-height: 1.65; color: #dcebf2; }
-    form { margin: 24px auto 50px; background: #fff; border: 1px solid var(--linea); box-shadow: 0 18px 50px rgba(15,63,98,.08); padding: clamp(20px, 4vw, 38px); }
-    fieldset { border: 0; border-top: 1px solid var(--linea); margin: 0; padding: 28px 0 8px; }
-    fieldset:first-of-type { border-top: 0; padding-top: 0; }
-    legend { padding: 0 0 16px; color: var(--azul-profundo); font-family: Georgia, serif; font-weight: 700; font-size: 1.35rem; }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
-    .full { grid-column: 1 / -1; }
-    .field { display: flex; flex-direction: column; gap: 7px; }
-    label, .label { color: var(--azul-profundo); font-weight: 700; }
-    input, select, textarea { width: 100%; border: 1px solid #aac4d2; background: #fff; color: #253f4e; padding: 12px; font: inherit; }
-    input:focus, select:focus, textarea:focus { outline: 3px solid rgba(90,184,235,.24); border-color: var(--azul); }
-    .radios { display: flex; flex-wrap: wrap; gap: 14px; }
-    .radios label { display: inline-flex; align-items: center; gap: 7px; color: #415f6f; font-weight: 600; }
-    .radios input { width: auto; }
-    .file { padding: 15px; border: 1px solid var(--linea); background: #f4f9fc; }
-    .file small, .hint { color: var(--muted); line-height: 1.45; }
-    .note { margin: 22px 0 0; padding: 16px; border-left: 5px solid var(--celeste); background: #edf8fd; line-height: 1.6; }
-    .actions { margin-top: 24px; display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
-    button { border: 0; background: var(--azul-profundo); color: #fff; padding: 14px 22px; font: inherit; font-weight: 800; cursor: pointer; }
-    button[disabled] { opacity: .55; cursor: wait; }
-    .status { display: none; margin-top: 18px; padding: 15px; border: 1px solid var(--linea); line-height: 1.5; }
-    .status.info { display: block; background: #edf7fc; color: #234e68; }
-    .status.ok { display: block; background: var(--ok-bg); border-color: var(--ok-border); color: #225b34; }
-    .status.error { display: block; background: var(--error-bg); border-color: var(--error-border); color: #7b2929; }
-    [hidden] { display: none !important; }
-    @media (max-width: 680px) {
-      .grid { grid-template-columns: 1fr; }
-      .wrap { width: min(100% - 18px, 920px); }
-      form { margin-top: 12px; }
-    }
+    :root { --azul-profundo:#0f3f62; --azul:#1e6fa8; --celeste:#5ab8eb; --papel:#f5fafc; --linea:#d4e3eb; --texto:#314d5c; --muted:#637d8b; --ok-bg:#edf9f1; --ok-border:#9bcfa9; --error-bg:#fff1f1; --error-border:#e4b0b0; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--papel); color:var(--texto); font-family:Arial,sans-serif; }
+    .top { background:var(--azul-profundo); color:#fff; padding:30px 20px; }
+    .wrap { width:min(920px,calc(100% - 28px)); margin:0 auto; }
+    .top small { display:block; color:#a9def6; font-weight:700; letter-spacing:.08em; text-transform:uppercase; }
+    .top h1 { margin:8px 0 10px; font-family:Georgia,serif; font-size:clamp(2rem,6vw,3.25rem); }
+    .top p { margin:0; max-width:760px; line-height:1.65; color:#dcebf2; }
+    form { margin:24px auto 50px; background:#fff; border:1px solid var(--linea); box-shadow:0 18px 50px rgba(15,63,98,.08); padding:clamp(20px,4vw,38px); }
+    fieldset { border:0; border-top:1px solid var(--linea); margin:0; padding:28px 0 8px; }
+    fieldset:first-of-type { border-top:0; padding-top:0; }
+    legend { padding:0 0 16px; color:var(--azul-profundo); font-family:Georgia,serif; font-weight:700; font-size:1.35rem; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
+    .full { grid-column:1 / -1; }
+    .field { display:flex; flex-direction:column; gap:7px; }
+    label,.label { color:var(--azul-profundo); font-weight:700; }
+    input,select,textarea { width:100%; border:1px solid #aac4d2; background:#fff; color:#253f4e; padding:12px; font:inherit; }
+    input:focus,select:focus,textarea:focus { outline:3px solid rgba(90,184,235,.24); border-color:var(--azul); }
+    .radios { display:flex; flex-wrap:wrap; gap:14px; }
+    .radios label { display:inline-flex; align-items:center; gap:7px; color:#415f6f; font-weight:600; }
+    .radios input { width:auto; }
+    .file { padding:15px; border:1px solid var(--linea); background:#f4f9fc; }
+    .file small,.hint { color:var(--muted); line-height:1.45; }
+    .fixed-value { padding:12px; border:1px solid var(--linea); background:#f4f9fc; font-weight:700; color:var(--azul-profundo); }
+    .note { margin:22px 0 0; padding:16px; border-left:5px solid var(--celeste); background:#edf8fd; line-height:1.6; }
+    .actions { margin-top:24px; display:flex; align-items:center; flex-wrap:wrap; gap:12px; }
+    button { border:0; background:var(--azul-profundo); color:#fff; padding:14px 22px; font:inherit; font-weight:800; cursor:pointer; }
+    button[disabled] { opacity:.55; cursor:wait; }
+    .status { display:none; margin-top:18px; padding:15px; border:1px solid var(--linea); line-height:1.5; }
+    .status.info { display:block; background:#edf7fc; color:#234e68; }
+    .status.ok { display:block; background:var(--ok-bg); border-color:var(--ok-border); color:#225b34; }
+    .status.error { display:block; background:var(--error-bg); border-color:var(--error-border); color:#7b2929; }
+    [hidden] { display:none !important; }
+    @media (max-width:680px) { .grid { grid-template-columns:1fr; } .wrap { width:min(100% - 18px,920px); } form { margin-top:12px; } }
   </style>
 </head>
 <body>
-  <header class="top">
-    <div class="wrap">
-      <small>Secretaría · E.E.S. Nº 18 “Próspero Alemandri”</small>
-      <h1>Solicitud de Analítico Final</h1>
-      <p>Completá tus datos y adjuntá la documentación. No necesitás iniciar sesión. El formulario registra la solicitud para que Secretaría revise la información presentada.</p>
-    </div>
-  </header>
+  <header class="top"><div class="wrap"><small>Secretaría · E.E.S. Nº 18 “Próspero Alemandri”</small><h1>Solicitud de Analítico Final</h1><p>Completá tus datos y adjuntá la documentación. No necesitás iniciar sesión. El formulario registra la solicitud para que Secretaría revise la información presentada.</p></div></header>
 
   <form id="solicitud" class="wrap" onsubmit="enviarSolicitud(this); return false;">
-    <fieldset>
-      <legend>1. Datos personales</legend>
-      <div class="grid">
-        <div class="field">
-          <label for="apellido">Apellido, tal como figura en el DNI *</label>
-          <input id="apellido" name="apellido" autocomplete="family-name" required>
-        </div>
-        <div class="field">
-          <label for="nombre">Nombre, tal como figura en el DNI *</label>
-          <input id="nombre" name="nombre" autocomplete="given-name" required>
-        </div>
-        <div class="field">
-          <label for="dni">DNI *</label>
-          <input id="dni" name="dni" inputmode="numeric" autocomplete="off" pattern="[0-9. ]{6,12}" required>
-        </div>
-        <div class="field">
-          <label for="fechaNacimiento">Fecha de nacimiento *</label>
-          <input id="fechaNacimiento" name="fechaNacimiento" type="date" required>
-        </div>
-        <div class="field full">
-          <label for="localidadNacimiento">Lugar / localidad de nacimiento *</label>
-          <input id="localidadNacimiento" name="localidadNacimiento" required>
-        </div>
-        <div class="field">
-          <label for="email">Correo electrónico *</label>
-          <input id="email" name="email" type="email" autocomplete="email" required>
-          <small class="hint">Revisalo antes de enviar: ahí recibirás únicamente el aviso de recepción.</small>
-        </div>
-        <div class="field">
-          <label for="telefono">Celular / WhatsApp *</label>
-          <input id="telefono" name="telefono" type="tel" autocomplete="tel" required>
-        </div>
-      </div>
+    <fieldset><legend>1. Datos personales</legend><div class="grid">
+      <div class="field"><label for="apellido">Apellido, tal como figura en el DNI *</label><input id="apellido" name="apellido" autocomplete="family-name" required></div>
+      <div class="field"><label for="nombre">Nombre, tal como figura en el DNI *</label><input id="nombre" name="nombre" autocomplete="given-name" required></div>
+      <div class="field"><label for="dni">DNI *</label><input id="dni" name="dni" inputmode="numeric" autocomplete="off" pattern="[0-9. ]{6,12}" required></div>
+      <div class="field"><label for="fechaNacimiento">Fecha de nacimiento *</label><input id="fechaNacimiento" name="fechaNacimiento" type="date" required></div>
+      <div class="field full"><label for="localidadNacimiento">Lugar / localidad de nacimiento *</label><input id="localidadNacimiento" name="localidadNacimiento" required></div>
+      <div class="field"><label for="email">Correo electrónico *</label><input id="email" name="email" type="email" autocomplete="email" required><small class="hint">Revisalo antes de enviar: ahí recibirás únicamente el aviso de recepción.</small></div>
+      <div class="field"><label for="telefono">Celular / WhatsApp *</label><input id="telefono" name="telefono" type="tel" autocomplete="tel" required></div>
+    </div></fieldset>
+
+    <fieldset><legend>2. Motivo de la solicitud</legend><div class="grid">
+      <div class="field full"><label for="motivo">Motivo <span class="hint">(opcional)</span></label><select id="motivo" name="motivo" onchange="actualizarMotivo()"><option value="">Prefiero no especificarlo</option><option value="continuar_estudios">Continuar estudios o inscribirse</option><option value="trabajo">Presentar en un trabajo</option><option value="tramite_personal">Realizar un trámite personal</option><option value="otro">Otro</option></select></div>
+      <div class="field full" id="otro-motivo-wrap" hidden><label for="otroMotivo">Aclarar otro motivo *</label><input id="otroMotivo" name="otroMotivo"></div>
+    </div></fieldset>
+
+    <fieldset><legend>3. Datos de tu trayectoria</legend><div class="grid">
+      <div class="field full"><label for="orientacion">Orientación / modalidad *</label><select id="orientacion" name="orientacion" required onchange="actualizarOrientacion()"><option value="">Seleccionar</option><option value="Comunicación">Comunicación</option><option value="Ciencias Sociales">Ciencias Sociales</option><option value="Lenguas Extranjeras">Lenguas Extranjeras</option><option value="Ciencias Naturales">Ciencias Naturales</option><option value="Otra / No recuerdo">Otra / No recuerdo</option></select></div>
+      <div class="field full" id="otra-orientacion-wrap" hidden><label for="otraOrientacion">Aclaración sobre orientación <span class="hint">(opcional)</span></label><input id="otraOrientacion" name="otraOrientacion"></div>
+      <input type="hidden" name="ultimoCurso" value="6.º año">
+      <div class="field"><span class="label">Curso correspondiente al Analítico Final</span><div class="fixed-value">6.º año</div></div>
+      <div class="field"><label for="division">División de 6.º año *</label><input id="division" name="division" placeholder="Ej.: 1.ª, A, B" required></div>
+      <div class="field"><label for="turno">Turno de 6.º año *</label><select id="turno" name="turno" required><option value="">Seleccionar</option><option value="Mañana">Mañana</option><option value="Tarde">Tarde</option></select></div>
+      <div class="field"><label for="anioCursado">Año en que cursaste 6.º año *</label><input id="anioCursado" name="anioCursado" type="number" min="1950" max="2100" inputmode="numeric" required></div>
+      <div class="field full"><label for="anioUltimaMateria">Año en que aprobaste la última materia *</label><input id="anioUltimaMateria" name="anioUltimaMateria" type="number" min="1950" max="2100" inputmode="numeric" required></div>
+    </div></fieldset>
+
+    <fieldset><legend>4. Estudios en otra escuela</legend>
+      <div class="field full"><span class="label">¿Cursaste algún año de la secundaria en otra escuela? *</span><div class="radios"><label><input type="radio" name="cursoOtraEscuela" value="si" required onchange="actualizarOtraEscuela()"> Sí</label><label><input type="radio" name="cursoOtraEscuela" value="no" required onchange="actualizarOtraEscuela()"> No</label></div></div>
+      <div class="field file" id="analitico-anterior-wrap" hidden style="margin-top:16px"><label for="analiticoAnterior">Analítico parcial / certificado de la escuela anterior *</label><input id="analiticoAnterior" name="analiticoAnterior" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png"><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
     </fieldset>
 
-    <fieldset>
-      <legend>2. Motivo de la solicitud</legend>
-      <div class="grid">
-        <div class="field full">
-          <label for="motivo">Motivo <span class="hint">(opcional)</span></label>
-          <select id="motivo" name="motivo" onchange="actualizarMotivo()">
-            <option value="">Prefiero no especificarlo</option>
-            <option value="continuar_estudios">Continuar estudios o inscribirse</option>
-            <option value="trabajo">Presentar en un trabajo</option>
-            <option value="tramite_personal">Realizar un trámite personal</option>
-            <option value="otro">Otro</option>
-          </select>
-        </div>
-        <div class="field full" id="otro-motivo-wrap" hidden>
-          <label for="otroMotivo">Aclarar otro motivo *</label>
-          <input id="otroMotivo" name="otroMotivo">
-        </div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>3. Datos de tu trayectoria</legend>
-      <div class="grid">
-        <div class="field full">
-          <label for="orientacion">Orientación / modalidad *</label>
-          <select id="orientacion" name="orientacion" required onchange="actualizarOrientacion()">
-            <option value="">Seleccionar</option>
-            <option value="Comunicación">Comunicación</option>
-            <option value="Ciencias Sociales">Ciencias Sociales</option>
-            <option value="Lenguas Extranjeras">Lenguas Extranjeras</option>
-            <option value="Ciencias Naturales">Ciencias Naturales</option>
-            <option value="Otra / No recuerdo">Otra / No recuerdo</option>
-          </select>
-        </div>
-        <div class="field full" id="otra-orientacion-wrap" hidden>
-          <label for="otraOrientacion">Aclaración sobre orientación <span class="hint">(opcional)</span></label>
-          <input id="otraOrientacion" name="otraOrientacion">
-        </div>
-        <div class="field">
-          <label for="ultimoCurso">Último curso cursado *</label>
-          <select id="ultimoCurso" name="ultimoCurso" required>
-            <option value="">Seleccionar</option>
-            <option value="1.º año">1.º año</option>
-            <option value="2.º año">2.º año</option>
-            <option value="3.º año">3.º año</option>
-            <option value="4.º año">4.º año</option>
-            <option value="5.º año">5.º año</option>
-            <option value="6.º año">6.º año</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="division">División *</label>
-          <input id="division" name="division" placeholder="Ej.: 1.ª, A, B" required>
-        </div>
-        <div class="field">
-          <label for="turno">Turno del último año *</label>
-          <select id="turno" name="turno" required>
-            <option value="">Seleccionar</option>
-            <option value="Mañana">Mañana</option>
-            <option value="Tarde">Tarde</option>
-          </select>
-        </div>
-        <div class="field">
-          <label for="anioCursado">Año calendario en que cursaste ese último curso *</label>
-          <input id="anioCursado" name="anioCursado" type="number" min="1950" max="2100" inputmode="numeric" required>
-        </div>
-        <div class="field full">
-          <label for="anioUltimaMateria">Año en que aprobaste la última materia *</label>
-          <input id="anioUltimaMateria" name="anioUltimaMateria" type="number" min="1950" max="2100" inputmode="numeric" required>
-        </div>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>4. Estudios en otra escuela</legend>
-      <div class="field full">
-        <span class="label">¿Cursaste algún año de la secundaria en otra escuela? *</span>
-        <div class="radios">
-          <label><input type="radio" name="cursoOtraEscuela" value="si" required onchange="actualizarOtraEscuela()"> Sí</label>
-          <label><input type="radio" name="cursoOtraEscuela" value="no" required onchange="actualizarOtraEscuela()"> No</label>
-        </div>
-      </div>
-      <div class="field file" id="analitico-anterior-wrap" hidden style="margin-top:16px">
-        <label for="analiticoAnterior">Analítico parcial / certificado de la escuela anterior *</label>
-        <input id="analiticoAnterior" name="analiticoAnterior" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png">
-        <small>PDF, JPG o PNG. Máximo 10 MB.</small>
-      </div>
-    </fieldset>
-
-    <fieldset>
-      <legend>5. Documentación obligatoria</legend>
-      <div class="grid">
-        <div class="field file">
-          <label for="dniFrente">DNI — frente *</label>
-          <input id="dniFrente" name="dniFrente" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required>
-          <small>PDF, JPG o PNG. Máximo 10 MB.</small>
-        </div>
-        <div class="field file">
-          <label for="dniDorso">DNI — dorso *</label>
-          <input id="dniDorso" name="dniDorso" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required>
-          <small>PDF, JPG o PNG. Máximo 10 MB.</small>
-        </div>
-        <div class="field file full">
-          <label for="partida">Partida de nacimiento *</label>
-          <input id="partida" name="partida" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required>
-          <small>PDF, JPG o PNG. Máximo 10 MB.</small>
-        </div>
-      </div>
-    </fieldset>
+    <fieldset><legend>5. Documentación obligatoria</legend><div class="grid">
+      <div class="field file"><label for="dniFrente">DNI — frente *</label><input id="dniFrente" name="dniFrente" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
+      <div class="field file"><label for="dniDorso">DNI — dorso *</label><input id="dniDorso" name="dniDorso" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
+      <div class="field file full"><label for="partida">Partida de nacimiento *</label><input id="partida" name="partida" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required><small>PDF, JPG o PNG. Máximo 10 MB.</small></div>
+    </div></fieldset>
 
     <p class="note"><strong>Importante:</strong> el envío registra la solicitud. Secretaría revisará la documentación antes de continuar con el trámite del analítico final.</p>
-
-    <div class="actions">
-      <button id="enviar" type="submit">Enviar solicitud</button>
-      <span class="hint">No se envían por correo copias de tus respuestas ni de los documentos adjuntos.</span>
-    </div>
+    <div class="actions"><button id="enviar" type="submit">Enviar solicitud</button><span class="hint">No se envían por correo copias de tus respuestas ni de los documentos adjuntos.</span></div>
     <div id="status" class="status" aria-live="polite"></div>
   </form>
 
   <script>
     const MAX_FILE_BYTES = 10 * 1024 * 1024;
     const ALLOWED_TYPES = new Set(['application/pdf', 'image/jpeg', 'image/png']);
-
-    function actualizarMotivo() {
-      const motivo = document.getElementById('motivo').value;
-      const wrap = document.getElementById('otro-motivo-wrap');
-      const input = document.getElementById('otroMotivo');
-      const otro = motivo === 'otro';
-      wrap.hidden = !otro;
-      input.required = otro;
-      if (!otro) input.value = '';
-    }
-
-    function actualizarOrientacion() {
-      const otra = document.getElementById('orientacion').value === 'Otra / No recuerdo';
-      const wrap = document.getElementById('otra-orientacion-wrap');
-      const input = document.getElementById('otraOrientacion');
-      wrap.hidden = !otra;
-      if (!otra) input.value = '';
-    }
-
-    function actualizarOtraEscuela() {
-      const value = document.querySelector('input[name="cursoOtraEscuela"]:checked')?.value;
-      const otraEscuela = value === 'si';
-      const wrap = document.getElementById('analitico-anterior-wrap');
-      const analiticoAnterior = document.getElementById('analiticoAnterior');
-      wrap.hidden = !otraEscuela;
-      analiticoAnterior.required = otraEscuela;
-      if (!otraEscuela) analiticoAnterior.value = '';
-    }
-
-    function validarArchivos(form) {
-      const inputs = form.querySelectorAll('input[type="file"]');
-      for (const input of inputs) {
-        const file = input.files && input.files[0];
-        if (!file) continue;
-        if (!ALLOWED_TYPES.has(file.type)) {
-          throw new Error('Formato no permitido: ' + file.name + '. Usá PDF, JPG o PNG.');
-        }
-        if (file.size > MAX_FILE_BYTES) {
-          throw new Error(file.name + ' supera el máximo de 10 MB.');
-        }
-      }
-    }
-
-    function setStatus(message, type) {
-      const box = document.getElementById('status');
-      box.textContent = message;
-      box.className = 'status ' + type;
-    }
-
-    function enviarSolicitud(form) {
-      actualizarOtraEscuela();
-      if (!form.reportValidity()) return;
-
-      try {
-        validarArchivos(form);
-      } catch (error) {
-        setStatus(error.message, 'error');
-        return;
-      }
-
-      const button = document.getElementById('enviar');
-      button.disabled = true;
-      setStatus('Guardando la solicitud y la documentación…', 'info');
-
-      google.script.run
-        .withSuccessHandler(function(result) {
-          button.disabled = false;
-          if (!result || !result.ok) {
-            setStatus((result && result.message) || 'No se pudo registrar la solicitud.', 'error');
-            return;
-          }
-          setStatus('Tu solicitud fue recibida. Secretaría revisará la documentación y se comunicará si necesita algo más.', 'ok');
-          form.reset();
-          actualizarMotivo();
-          actualizarOrientacion();
-          actualizarOtraEscuela();
-        })
-        .withFailureHandler(function(error) {
-          button.disabled = false;
-          setStatus((error && error.message) || 'No se pudo registrar la solicitud.', 'error');
-        })
-        .crearSolicitudDesdeFormulario(form);
-    }
-
-    actualizarMotivo();
-    actualizarOrientacion();
-    actualizarOtraEscuela();
+    function actualizarMotivo() { const motivo=document.getElementById('motivo').value; const wrap=document.getElementById('otro-motivo-wrap'); const input=document.getElementById('otroMotivo'); const otro=motivo==='otro'; wrap.hidden=!otro; input.required=otro; if(!otro) input.value=''; }
+    function actualizarOrientacion() { const otra=document.getElementById('orientacion').value==='Otra / No recuerdo'; const wrap=document.getElementById('otra-orientacion-wrap'); const input=document.getElementById('otraOrientacion'); wrap.hidden=!otra; if(!otra) input.value=''; }
+    function actualizarOtraEscuela() { const value=document.querySelector('input[name="cursoOtraEscuela"]:checked')?.value; const otraEscuela=value==='si'; const wrap=document.getElementById('analitico-anterior-wrap'); const analiticoAnterior=document.getElementById('analiticoAnterior'); wrap.hidden=!otraEscuela; analiticoAnterior.required=otraEscuela; if(!otraEscuela) analiticoAnterior.value=''; }
+    function validarArchivos(form) { const inputs=form.querySelectorAll('input[type="file"]'); for(const input of inputs){ const file=input.files&&input.files[0]; if(!file) continue; if(!ALLOWED_TYPES.has(file.type)) throw new Error('Formato no permitido: '+file.name+'. Usá PDF, JPG o PNG.'); if(file.size>MAX_FILE_BYTES) throw new Error(file.name+' supera el máximo de 10 MB.'); } }
+    function setStatus(message,type){ const box=document.getElementById('status'); box.textContent=message; box.className='status '+type; }
+    function enviarSolicitud(form){ actualizarOtraEscuela(); if(!form.reportValidity()) return; try{ validarArchivos(form); }catch(error){ setStatus(error.message,'error'); return; } const button=document.getElementById('enviar'); button.disabled=true; setStatus('Guardando la solicitud y la documentación…','info'); google.script.run.withSuccessHandler(function(result){ button.disabled=false; if(!result||!result.ok){ setStatus((result&&result.message)||'No se pudo registrar la solicitud.','error'); return; } setStatus('Tu solicitud fue recibida. Secretaría revisará la documentación y se comunicará si necesita algo más.','ok'); form.reset(); actualizarMotivo(); actualizarOrientacion(); actualizarOtraEscuela(); }).withFailureHandler(function(error){ button.disabled=false; setStatus((error&&error.message)||'No se pudo registrar la solicitud.','error'); }).crearSolicitudDesdeFormulario(form); }
+    actualizarMotivo(); actualizarOrientacion(); actualizarOtraEscuela();
   </script>
 </body>
 </html>

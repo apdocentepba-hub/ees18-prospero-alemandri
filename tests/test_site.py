@@ -170,15 +170,20 @@ def test_no_contenido_terciario_en_portada():
         assert item not in html
 
 
-def test_certificado_analitico_se_conserva():
+def test_analitico_final_publico_se_conserva():
     tramite = read("certificado-analitico.html")
     for item in [
-        "Certificado Analítico", "Solicitud de Certificado de Estudios",
-        "Copia actualizada del DNI", "Copia de la Partida de Nacimiento",
-        "Constancia de solicitud de vacante", "Analítico Parcial",
-        "NO SE RECIBE documentación incompleta", "NO SE INICIA el trámite",
+        "Analítico Final", "Solicitar Analítico Final", "DNI frente y dorso",
+        "Partida de Nacimiento", "Analítico Parcial", "10 MB",
+        "no necesitás iniciar sesión", "no se envían por correo",
     ]:
         assert item in tramite
+    for obsolete in [
+        "Constancia de solicitud de vacante",
+        "NO SE RECIBE documentación incompleta",
+        "NO SE INICIA el trámite",
+    ]:
+        assert obsolete not in tramite
 
 
 def test_boleto_estudiantil_se_conserva():
