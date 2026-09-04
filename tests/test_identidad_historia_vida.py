@@ -35,6 +35,22 @@ def test_historia_institucional_publicada():
         assert item in historia
 
 
+def test_vida_escolar_publica_leer_en_comunidad_2026():
+    path = ROOT / "vida-escolar.html"
+    assert path.exists()
+    vida = path.read_text(encoding="utf-8")
+    for item in [
+        "Leer en Comunidad",
+        "Jornada de Bibliotecas Escolares Abiertas 2026",
+        "4 de septiembre de 2026",
+        "Una comunidad que sigue leyendo",
+        'src="assets/img/leer-en-comunidad-2026.svg"',
+    ]:
+        assert item in vida
+    assert vida.index("Leer en Comunidad") < vida.index("2.º Encuentro de RE Bonaerense")
+    assert (ROOT / "assets/img/leer-en-comunidad-2026.svg").exists()
+
+
 def test_vida_escolar_publica_re_bonaerense():
     path = ROOT / "vida-escolar.html"
     assert path.exists()
