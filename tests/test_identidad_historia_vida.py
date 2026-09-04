@@ -44,11 +44,13 @@ def test_vida_escolar_publica_leer_en_comunidad_2026():
         "Jornada de Bibliotecas Escolares Abiertas 2026",
         "4 de septiembre de 2026",
         "Una comunidad que sigue leyendo",
-        'src="assets/img/leer-en-comunidad-2026.jpg"',
+        'src="assets/img/leer-en-comunidad-2026-01.jpg"',
+        'src="assets/img/leer-en-comunidad-2026-10.jpg"',
     ]:
         assert item in vida
     assert vida.index("Leer en Comunidad") < vida.index("2.º Encuentro de RE Bonaerense")
-    assert (ROOT / "assets/img/leer-en-comunidad-2026.jpg").exists()
+    for part in range(1, 11):
+        assert (ROOT / f"assets/img/leer-en-comunidad-2026-{part:02d}.jpg").exists()
 
 
 def test_vida_escolar_publica_re_bonaerense():
