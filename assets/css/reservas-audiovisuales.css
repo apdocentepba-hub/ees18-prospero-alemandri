@@ -35,7 +35,7 @@
 .shift-heading h3 { margin: 0; font-size: 1rem; }
 .shift-heading span { color: #71808b; font-size: .8rem; }
 .slot-list { display: grid; gap: .55rem; }
-.slot-option { display: grid; grid-template-columns: auto 1fr auto; gap: .7rem; align-items: center; border: 1px solid rgba(15,63,98,.13); border-radius: 13px; padding: .7rem .8rem; background: #fff; cursor: pointer; color: #183446; }
+.slot-option { display: grid; grid-template-columns: auto 1fr auto; gap: .7rem; align-items: center; border: 1px solid rgba(15,63,98,.13); border-radius: 13px; padding: .7rem .8rem; background: #fff; cursor: pointer; }
 .slot-option input { width: 1.05rem; height: 1.05rem; accent-color: #0f6f9b; }
 .slot-option strong { font-size: .93rem; }
 .slot-option small { color: #2f855a; font-weight: 800; }
