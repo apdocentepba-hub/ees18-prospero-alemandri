@@ -4,6 +4,7 @@ const assert = require('assert');
 
 const root = path.resolve(__dirname, '..');
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
+const seed = JSON.parse(read('data/novedades-seed.json'));
 
 const principalPages = [
   'index.html',
@@ -53,7 +54,6 @@ assert(css.includes('@media'), 'responsive rules must exist');
 assert(js.includes('aria-expanded'), 'menu behavior must update aria-expanded');
 assert(js.includes('prefers-reduced-motion'), 'motion preferences must be respected');
 
-// Navegación institucional moderna: superficie suave, pestaña activa clara y CTA separado.
 assert(navCss.includes('--nav-surface:'), 'navigation must define a soft institutional surface token');
 assert(navCss.includes('.primary-nav a[aria-current="page"]'), 'navigation must style the current page');
 assert(navCss.includes('background: var(--nav-active);'), 'current navigation tab must use a soft active background');
@@ -62,7 +62,6 @@ assert(navCss.includes('.primary-nav a:not(.nav-cta):hover'), 'navigation tabs m
 assert(navCss.includes('.nav-cta:hover'), 'contact CTA must have a dedicated hover treatment');
 assert(multipageCss.includes('font-size: .86rem;\n  background: var(--nav-surface);'), 'shared navigation must lock the same desktop font size on every page');
 
-// Refinamiento del header: menos altura, marca equilibrada y quiebre temprano a hamburguesa.
 assert(navCss.includes('--header-compact-height:'), 'header must define a compact desktop height token');
 assert(navCss.includes('--brand-logo-compact:'), 'header must define a compact brand logo token');
 assert(navCss.includes('min-height: var(--header-compact-height);'), 'desktop header must use compact height');
@@ -123,9 +122,12 @@ assert(tramites.includes('estudiantes-familias.html'), 'procedures must be neste
 assert(tramites.includes('docentes.html'), 'procedures page must keep the new primary navigation');
 
 const vida = read('vida-escolar.html');
-assert(vida.includes('2.º Encuentro de RE Bonaerense'), 'Vida escolar must contain RE Bonaerense');
-assert(vida.includes('Estudiantes hacen memoria'), 'Vida escolar must contain project name');
-assert(vida.includes('assets/img/re-bonaerense-2024.jpg'), 'Vida escolar must use the local image');
+assert(vida.includes('data-news-section="vida-escolar"'), 'Vida escolar must expose the dynamic news section');
+assert(vida.includes('assets/js/novedades.js'), 'Vida escolar must load the dynamic news client');
+const re = seed.find((item) => item.ID === 're-bonaerense-2026');
+assert(re && re['Vida escolar'] === 'Sí', 'RE Bonaerense must be seeded for Vida escolar');
+assert(re['Cuerpo'].includes('Estudiantes hacen memoria'), 'Seed must preserve project name');
+assert(re['Imagen'] === 'assets/img/re-bonaerense-2024.jpg', 'Seed must preserve the local image');
 
 const oldAction = read('enspa-en-accion.html');
 assert(oldAction.includes('vida-escolar.html'), 'old ENSPA action URL must redirect to Vida escolar');
