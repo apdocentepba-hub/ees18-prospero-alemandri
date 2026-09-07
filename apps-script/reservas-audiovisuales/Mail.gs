@@ -1,3 +1,8 @@
+var RESERVATION_INTERNAL_NOTIFICATION_RECIPIENTS_ = [
+  'martin.nicolas.podubinio@gmail.com',
+  'audiovisualesenspa@gmail.com'
+];
+
 function reservationCancellationUrl_(rawToken) {
   return 'https://ees18avellaneda.edu.ar/cancelar-reserva.html?token=' + encodeURIComponent(rawToken);
 }
@@ -18,6 +23,23 @@ function reservationConfirmationBody_(reservation, rawToken) {
     'ID de reserva: ' + reservation.id,
     '',
     'E.E.S. Nº 18 “Próspero Alemandri”'
+  ].join('\n');
+}
+
+function reservationInternalNotificationBody_(reservation) {
+  return [
+    'Nueva reserva confirmada del Salón de Audiovisuales.',
+    '',
+    'Fecha: ' + reservationDateDisplay_(reservation.date),
+    'Horario: ' + reservation.start + ' a ' + reservation.end,
+    'Docente: ' + reservation.teacher,
+    'Correo docente: ' + reservation.email,
+    'Curso: ' + reservation.course,
+    'Materia: ' + reservation.subject,
+    'Recursos: ' + reservationResourcesText_(reservation.resources),
+    'Observaciones: ' + (reservation.observations || 'Sin observaciones'),
+    '',
+    'ID de reserva: ' + reservation.id
   ].join('\n');
 }
 
@@ -44,6 +66,21 @@ function sendReservationConfirmation_(reservation, rawToken) {
       syncError: 'MAIL_PENDING: ' + message
     }, reservation.rowNumber);
     return { ok: false, error: message };
+  }
+}
+
+function sendReservationInternalNotification_(reservation) {
+  try {
+    MailApp.sendEmail({
+      to: RESERVATION_INTERNAL_NOTIFICATION_RECIPIENTS_.join(','),
+      subject: 'Nueva reserva confirmada · Salón Audiovisuales',
+      body: reservationInternalNotificationBody_(reservation),
+      name: 'E.E.S. Nº 18 · Reservas'
+    });
+    return { ok: true };
+  } catch (error) {
+    console.error('No se pudo enviar el aviso interno de Audiovisuales', error);
+    return { ok: false, error: String(error && error.message ? error.message : error).slice(0, 220) };
   }
 }
 
