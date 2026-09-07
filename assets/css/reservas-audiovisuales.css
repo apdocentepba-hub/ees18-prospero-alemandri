@@ -35,7 +35,7 @@
 .shift-heading h3 { margin: 0; font-size: 1rem; }
 .shift-heading span { color: #71808b; font-size: .8rem; }
 .slot-list { display: grid; gap: .55rem; }
-.slot-option { display: grid; grid-template-columns: auto 1fr auto; gap: .7rem; align-items: center; border: 1px solid rgba(15,63,98,.13); border-radius: 13px; padding: .7rem .8rem; background: #fff; cursor: pointer; }
+.slot-option { display: grid; grid-template-columns: auto 1fr auto; gap: .7rem; align-items: center; border: 1px solid rgba(15,63,98,.13); border-radius: 13px; padding: .7rem .8rem; background: #fff; cursor: pointer; color: #183446; }
 .slot-option input { width: 1.05rem; height: 1.05rem; accent-color: #0f6f9b; }
 .slot-option strong { font-size: .93rem; }
 .slot-option small { color: #2f855a; font-weight: 800; }
@@ -54,7 +54,7 @@
 .booking-form label { display: grid; gap: .35rem; font-weight: 700; color: #24485e; }
 .booking-form input[type="text"], .booking-form input[type="email"], .booking-form input[type="date"], .booking-form textarea { width: 100%; border: 1px solid rgba(15,63,98,.2); border-radius: 11px; padding: .72rem .8rem; font: inherit; background: #fff; }
 .booking-form small { min-height: 1.1em; color: #607481; font-weight: 600; }
-.booking-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.35rem 0; }
+.booking-options { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin: 1.35rem 0; }
 .booking-field-title { display: block; margin-bottom: .55rem; font-weight: 800; color: #173e57; }
 .resource-grid, .mode-options { display: grid; gap: .55rem; }
 .resource-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
