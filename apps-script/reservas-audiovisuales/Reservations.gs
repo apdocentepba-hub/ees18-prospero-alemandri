@@ -286,6 +286,7 @@ function createReservation(payload) {
     var created = createdRecords[secondaryIndex];
     syncReservationToCalendar_(created);
     sendReservationConfirmation_(created, created.rawCancellationToken_);
+    sendReservationInternalNotification_(created);
     delete created.rawCancellationToken_;
   }
 
