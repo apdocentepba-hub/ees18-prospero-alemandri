@@ -78,7 +78,7 @@
 
   <section class="page-section page-section--soft booking-form-section">
     <div class="container booking-form-shell">
-      <div class="section-heading"><span>Paso 3</span><h2>Completá los datos de la reserva.</h2><p>El formulario se habilita cuando seleccionás una fecha y al menos un módulo disponible.</p></div>
+      <div class="section-heading"><span>Paso 3</span><h2>Completá los datos de la reserva.</h2><p>El formulario se habilita cuando seleccionás una fecha y al menos un módulo disponible. La reserva corresponde únicamente al día elegido.</p></div>
       <form id="booking-form" class="booking-form" novalidate>
         <fieldset id="booking-fields" disabled>
           <div class="booking-form-grid">
@@ -94,11 +94,10 @@
               <label><input type="checkbox" name="schoolNotebook"> <span>Notebook de la escuela</span></label>
               <label><input type="checkbox" name="internet"> <span>Internet</span></label>
             </div></div>
-            <div><span class="booking-field-title">Modalidad</span><div class="mode-options">
-              <label><input type="radio" name="mode" value="single" checked> <span>Solo este día</span></label>
-              <label><input type="radio" name="mode" value="weekly"> <span>Repetir semanalmente</span></label>
-            </div><label id="repeat-until-wrap" class="repeat-until" hidden><span>Repetir hasta</span><input id="repeat-until" name="repeatUntil" type="date"></label></div>
           </div>
+          <input type="hidden" name="mode" value="single">
+          <span id="repeat-until-wrap" hidden></span>
+          <input id="repeat-until" name="repeatUntil" type="hidden" value="">
           <label class="booking-observations"><span>Observaciones</span><textarea id="observations" name="observations" rows="3" maxlength="500"></textarea></label>
           <div class="booking-confirm-box"><div id="confirmation-summary"><strong>Revisá fecha y horario antes de confirmar.</strong></div><button id="booking-submit" class="booking-submit" type="submit">Confirmar reserva</button></div>
         </fieldset>
