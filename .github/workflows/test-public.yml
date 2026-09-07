@@ -32,6 +32,7 @@ jobs:
       - name: Run JavaScript structure checks
         run: |
           node tests/site.test.js
+          node tests/re-bonaerense-year.test.js
           node tests/visitor-counter.test.js
           node tests/reservas-audiovisuales.test.js
           node tests/reservas-single-day-only.test.js
