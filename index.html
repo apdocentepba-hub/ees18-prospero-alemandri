@@ -84,11 +84,28 @@
 
     <section class="page-section page-section--soft" aria-labelledby="news-title">
       <div class="container">
-        <div class="section-heading reveal"><span>Novedad destacada</span><h2 id="news-title">Vida escolar</h2><p>Las actividades que la escuela comparte con su comunidad también quedan registradas en el sitio institucional.</p></div>
-        <article class="home-news reveal">
-          <a class="home-news__image" href="vida-escolar.html" aria-label="Ver actividad 2.º Encuentro de RE Bonaerense"><img src="assets/img/re-bonaerense-2024.jpg" alt="Publicación institucional sobre la participación de la E.E.S. Nº 18 en el 2.º Encuentro de RE Bonaerense" width="280" height="420"></a>
-          <div class="home-news__body"><span class="news-label">Proyecto institucional · 2026</span><h2>2.º Encuentro de RE Bonaerense</h2><p>La E.E.S. Nº 18 participó del encuentro y compartió los <strong>micro relatos</strong> desarrollados por estudiantes en el proyecto <strong>“Estudiantes hacen memoria”</strong>, junto con producciones de otras instituciones de la región.</p><div class="button-row"><a class="simple-button" href="vida-escolar.html">Ver actividad</a><a class="simple-button simple-button--light" href="comunicados.html">Comunicados oficiales</a></div></div>
-        </article>
+        <div class="section-heading reveal">
+          <span>Novedades destacadas</span>
+          <h2 id="news-title">Vida escolar e información institucional</h2>
+          <p>Noticias, proyectos y comunicaciones destacadas de la E.E.S. Nº 18.</p>
+        </div>
+        <div class="news-carousel reveal" data-news-section="inicio" aria-live="polite" role="region" aria-label="Novedades destacadas" tabindex="0">
+          <div class="news-carousel__viewport" data-news-list>
+            <article class="news-fallback">
+              <h3>Novedades de la E.E.S. Nº 18</h3>
+              <p>Consultá los comunicados oficiales y la vida escolar.</p>
+              <div class="button-row">
+                <a class="simple-button" href="comunicados.html">Ver comunicados</a>
+                <a class="simple-button simple-button--light" href="vida-escolar.html">Vida escolar</a>
+              </div>
+            </article>
+          </div>
+          <div class="news-carousel__controls" hidden>
+            <button type="button" data-news-prev aria-label="Novedad anterior">←</button>
+            <div class="news-carousel__dots" data-news-dots aria-label="Selector de novedades"></div>
+            <button type="button" data-news-next aria-label="Novedad siguiente">→</button>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -116,6 +133,8 @@
   </main>
 
   <footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Avellaneda · Provincia de Buenos Aires</span></div><nav aria-label="Enlaces del pie"><a href="nuestra-escuela.html">Nuestra escuela</a><a href="estudiantes-familias.html">Estudiantes y familias</a><a href="docentes.html">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="contacto.html">Contacto</a></nav><div class="visitor-counter" data-visitor-counter hidden aria-live="polite"><span class="visitor-counter__icon" aria-hidden="true">👥</span><span>Visitas al sitio: <strong id="visitor-count">0</strong></span></div><span>© <span id="current-year">2026</span></span></div></footer>
+  <script src="assets/js/novedades-config.js"></script>
+  <script src="assets/js/novedades.js"></script>
   <script src="assets/js/main.js"></script>
   <script src="assets/js/visitor-counter.js"></script>
 </body>
