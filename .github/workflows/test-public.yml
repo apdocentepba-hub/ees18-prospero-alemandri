@@ -51,3 +51,5 @@ jobs:
           node tests/novedades-pages.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
+      - name: Probe deployed novedades Web App
+        run: python tests/probe_novedades_live.py
