@@ -5,6 +5,7 @@
   const result = document.getElementById('contact-result');
   const submit = document.getElementById('contact-submit');
   const apiUrl = String(window.EES18_RESERVAS_API_URL || '').trim();
+  const action = 'contact';
 
   if (!form || !result || !submit) return;
 
@@ -26,7 +27,7 @@
     try { delete window[callbackName]; } catch (_) { window[callbackName] = undefined; }
   }
 
-  function requestJsonp(action, params) {
+  function requestJsonp(actionName, params) {
     return new Promise((resolve, reject) => {
       if (!apiUrl) {
         reject(new Error('SERVICE_NOT_CONFIGURED'));
@@ -36,7 +37,7 @@
       requestCounter += 1;
       const callbackName = `ees18ContactCallback_${Date.now()}_${requestCounter}`;
       const script = document.createElement('script');
-      const query = new URLSearchParams({ action, callback: callbackName });
+      const query = new URLSearchParams({ action: actionName, callback: callbackName });
       Object.entries(params || {}).forEach(([key, value]) => query.set(key, String(value)));
       let timer = null;
 
@@ -93,7 +94,7 @@
     setResult('Enviando mensaje…', 'info');
 
     try {
-      const response = await requestJsonp('contact', { payload: JSON.stringify(payload) });
+      const response = await requestJsonp(action, { payload: JSON.stringify(payload) });
       if (!response.ok) {
         setResult(friendlyError(response.code), 'error');
         return;
