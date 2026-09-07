@@ -29,11 +29,14 @@ jobs:
           node --check assets/js/reservas-audiovisuales.js
           node --check assets/js/reservas-email-policy.js
           node --check assets/js/cancelar-reserva.js
+          if [ -f assets/js/contacto.js ]; then node --check assets/js/contacto.js; fi
       - name: Run JavaScript structure checks
         run: |
           node tests/site.test.js
           node tests/re-bonaerense-year.test.js
           node tests/whatsapp-channel.test.js
+          node tests/contact-and-reservation-mail.test.js
+          node tests/contact-backend.test.js
           node tests/visitor-counter.test.js
           node tests/reservas-audiovisuales.test.js
           node tests/reservas-single-day-only.test.js
