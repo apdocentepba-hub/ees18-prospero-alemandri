@@ -58,13 +58,14 @@ Columnas propuestas:
 | --- | --- |
 | `ID` | Identificador estable y único |
 | `Activa` | `Sí/No`; controla si puede publicarse |
-| `Fecha` | Fecha visible y criterio principal de orden |
-| `Prioridad` | Número opcional para fijar una publicación por encima de otras |
+| `Fecha` | Fecha exacta para publicaciones nuevas y criterio principal de orden |
+| `Fecha visible` | Texto opcional que reemplaza la fecha mostrada, por ejemplo `2026` para contenido histórico sin día/mes confirmado |
+| `Prioridad` | Número opcional; un valor mayor aparece antes que uno menor |
 | `Tipo` | Etiqueta editorial: Institucional, Vida escolar, Proyecto, etc. |
 | `Título` | Título visible |
 | `Bajada` | Resumen corto para tarjetas/carrusel |
 | `Cuerpo` | Texto más completo para Comunicados/Vida escolar cuando corresponda |
-| `Imagen` | URL de imagen opcional |
+| `Imagen` | URL HTTPS o ruta interna de imagen opcional |
 | `Botón texto` | Texto del CTA opcional |
 | `Botón URL` | Destino del CTA opcional |
 | `Inicio` | `Sí/No`; habilita aparición en portada |
@@ -73,6 +74,8 @@ Columnas propuestas:
 | `Actualizada` | Marca temporal de edición/publicación |
 
 No se usará una columna de secciones con texto libre porque tres columnas booleanas reducen errores editoriales y son más fáciles de validar.
+
+Para publicaciones nuevas, `Fecha` será obligatoria. Para contenido histórico ya existente cuya fecha exacta no esté confirmada, se permite `Fecha` vacía si `Fecha visible` está informada; en ese caso la posición se resuelve por `Prioridad` y luego por orden estable de fila. No se inventan fechas.
 
 ### API pública de sólo lectura
 
@@ -83,7 +86,7 @@ Responsabilidades:
 - Normalizar fechas, `Sí/No`, URLs y texto.
 - Ignorar filas incompletas o inactivas.
 - Devolver sólo campos públicos.
-- Ordenar por `Prioridad` y luego por `Fecha` descendente.
+- Ordenar por `Prioridad` descendente, luego por `Fecha` descendente y finalmente por orden estable de fila.
 - Permitir filtro por sección: `inicio`, `comunicados`, `vida-escolar`.
 - Responder JSON y JSONP para compatibilidad segura con el sitio estático.
 - No exponer operaciones de escritura desde la web pública.
@@ -96,7 +99,7 @@ La sección actual `Novedad destacada` se convertirá en `Novedades destacadas`.
 
 Comportamiento:
 - Una tarjeta visible por vez.
-- Orden inicial: más nueva/prioritaria primero.
+- Orden inicial: mayor `Prioridad`; a igualdad, fecha más nueva primero.
 - Flechas anterior/siguiente.
 - Indicadores de posición.
 - Swipe táctil en móvil.
@@ -108,14 +111,14 @@ Comportamiento:
 Carga inicial propuesta:
 1. Canal oficial de WhatsApp — 7/09/2026.
 2. Leer en Comunidad — 4/09/2026.
-3. 2.º Encuentro de RE Bonaerense — 2026, con la fecha exacta disponible si se confirma; mientras tanto no se inventará día/mes.
+3. 2.º Encuentro de RE Bonaerense — fecha visible `2026` mientras no haya un día/mes confirmado.
 
 ## Comunicados
 
 `comunicados.html` dejará de tener cada comunicado escrito manualmente en el HTML y renderizará las filas activas con `Comunicados = Sí`.
 
 Cada comunicado mostrará como mínimo:
-- fecha,
+- fecha o `Fecha visible`,
 - tipo,
 - título,
 - bajada/cuerpo,
@@ -205,8 +208,9 @@ Se crearán tres filas iniciales para validar el flujo completo:
 - Inicio: Sí
 - Comunicados: No
 - Vida escolar: Sí
-- Año: 2026
-- No se inventará una fecha exacta si no está confirmada.
+- Fecha: vacía mientras no esté confirmada
+- Fecha visible: `2026`
+- Prioridad: se define para conservar el orden editorial deseado sin inventar una fecha
 
 ## Testing
 
@@ -223,6 +227,7 @@ Se crearán tres filas iniciales para validar el flujo completo:
 - Sólo filas activas.
 - Filtro de sección.
 - Orden consistente.
+- Soporte de `Fecha visible` sin inventar día/mes.
 - JSONP callback sanitizado.
 - No existe acción de escritura pública.
 
