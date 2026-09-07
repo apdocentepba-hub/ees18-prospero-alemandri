@@ -6,7 +6,7 @@
 
 **Architecture:** Un Google Sheet `Novedades EES18 - BASE` actúa como fuente editorial. Un Apps Script separado, `Novedades EES18 - PRODUCCIÓN`, expone únicamente lectura pública por JSON/JSONP y filtra por sección. El sitio estático consume ese endpoint con un cliente JavaScript aislado que renderiza un carrusel manual en Inicio y listas dinámicas en Comunicados/Vida escolar, con fallback estable si la API falla.
 
-**Tech Stack:** HTML estático, CSS, JavaScript ES2020 sin dependencias, Node.js `assert` + `vm` para tests, Google Sheets, Google Apps Script, GitHub Pages, GitHub Actions.
+**Tech Stack:** HTML estático, CSS, JavaScript ES2020 sin dependencias, Node.js `assert` + `vm`, Python 3 para probes, Google Sheets, Google Apps Script, GitHub Pages, GitHub Actions.
 
 **Spec:** `docs/superpowers/specs/2026-09-07-novedades-sheet-design.md`
 
@@ -21,11 +21,11 @@
 - Texto proveniente de la Sheet se inserta como texto, nunca como HTML sin sanitización.
 - Inicio no usa autoplay; incluye anterior/siguiente, indicadores, teclado y swipe.
 - Una falla de Google/Apps Script no debe romper layout ni dejar la página inutilizable.
-- Los cambios editoriales deben reflejarse sin nuevo deploy del sitio; una caché corta de pocos minutos es aceptable.
+- Los cambios editoriales deben reflejarse sin nuevo deploy del sitio; TTL objetivo 120 segundos.
 
 ---
 
-### Task 1: Contrato de datos y backend Apps Script de sólo lectura
+### Task 1: Backend Apps Script de sólo lectura
 
 **Files:**
 - Create: `apps-script/novedades/Config.gs`
@@ -36,12 +36,12 @@
 
 **Interfaces:**
 - Consumes: Script Property `NOVEDADES_SPREADSHEET_ID`; pestaña `Novedades`.
-- Produces: `getPublicNews_(section)` → `{ ok: true, section, items: PublicNewsItem[] }`; `doGet(e)` JSON/JSONP de sólo lectura.
+- Produces: `getPublicNews_(section)` → `{ ok: true, section, items: PublicNewsItem[] }`.
 - `PublicNewsItem`: `{ id, date, dateDisplay, priority, type, title, summary, body, image, buttonText, buttonUrl }`.
 
-- [ ] **Step 1: Escribir el test RED del backend**
+- [ ] **Step 1: Escribir el test RED**
 
-Crear `tests/novedades-backend.test.js` con un `vm` que cargue `Config.gs`, `Data.gs` y `Code.gs`. El test debe construir filas simuladas con estas cabeceras exactas:
+Crear `tests/novedades-backend.test.js` con `assert`, `fs`, `path` y `vm`. Cabeceras exactas:
 
 ```js
 const HEADERS = [
@@ -51,7 +51,14 @@ const HEADERS = [
 ];
 ```
 
-Casos mínimos:
+El fixture debe incluir:
+- `whatsapp-2026-09-07`, prioridad 30, Inicio/Comunicados Sí;
+- `leer-en-comunidad-2026-09-04`, prioridad 20, Inicio/Vida escolar Sí;
+- `re-bonaerense-2026`, Fecha vacía, Fecha visible `2026`, prioridad 10, Inicio/Vida escolar Sí;
+- una fila inactiva;
+- una fila sólo Comunicados.
+
+Assertions obligatorios:
 
 ```js
 assert.strictEqual(context.normalizeNewsYesNo_('Sí'), true);
@@ -59,28 +66,23 @@ assert.strictEqual(context.normalizeNewsYesNo_('No'), false);
 assert.strictEqual(context.safePublicNewsUrl_('javascript:alert(1)'), '');
 assert.strictEqual(context.safePublicNewsUrl_('assets/img/re-bonaerense-2024.jpg'), 'assets/img/re-bonaerense-2024.jpg');
 assert.strictEqual(context.safePublicNewsUrl_('https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l'), 'https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l');
-
 const result = context.buildPublicNews_('inicio', HEADERS, rows);
-assert.deepStrictEqual(result.map((item) => item.id), ['whatsapp-2026-09-07', 'leer-2026-09-04', 're-bonaerense-2026']);
+assert.deepStrictEqual(result.map((item) => item.id), ['whatsapp-2026-09-07', 'leer-en-comunidad-2026-09-04', 're-bonaerense-2026']);
 assert.strictEqual(result[2].date, '');
 assert.strictEqual(result[2].dateDisplay, '2026');
-assert.strictEqual(result.some((item) => item.id === 'inactiva'), false);
-assert.strictEqual(result.some((item) => item.id === 'solo-comunicados'), false);
 ```
 
-También verificar que `doGet({parameter:{section:'inicio',callback:'cb'}})` devuelve JavaScript `cb({...});`, que un callback inválido no se usa y que no existe `doPost`.
+También verificar JSONP válido, callback inválido ignorado y ausencia total de `doPost`.
 
-- [ ] **Step 2: Ejecutar el test y verificar RED**
-
-Run:
+- [ ] **Step 2: Ejecutar RED**
 
 ```bash
 node tests/novedades-backend.test.js
 ```
 
-Expected: FAIL porque `apps-script/novedades/*.gs` todavía no existe.
+Expected: FAIL porque los archivos todavía no existen.
 
-- [ ] **Step 3: Implementar `Config.gs` mínimo**
+- [ ] **Step 3: Implementar `Config.gs`**
 
 ```javascript
 var NOVEDADES_SETTINGS_ = Object.freeze({
@@ -95,9 +97,7 @@ function novedadesSpreadsheetId_() {
 }
 ```
 
-- [ ] **Step 4: Implementar `Data.gs` con normalización explícita**
-
-Incluir exactamente estas funciones públicas internas:
+- [ ] **Step 4: Implementar normalización en `Data.gs`**
 
 ```javascript
 function normalizeNewsYesNo_(value) {
@@ -114,19 +114,11 @@ function safePublicNewsUrl_(value) {
 }
 ```
 
-`buildPublicNews_(section, headers, rows)` debe:
-- aceptar sólo `inicio`, `comunicados`, `vida-escolar`;
-- omitir `Activa != Sí`;
-- omitir filas sin `ID` o `Título`;
-- requerir `Fecha` o `Fecha visible`;
-- filtrar por la columna de sección correspondiente;
-- mapear sólo campos públicos;
-- ordenar por prioridad numérica desc, fecha ISO desc, índice de fila asc;
-- no devolver `Activa`, `Actualizada` ni otras columnas internas.
+`buildPublicNews_(section, headers, rows)` debe aceptar sólo `inicio`, `comunicados`, `vida-escolar`; omitir filas inactivas o sin ID/título; requerir Fecha o Fecha visible; filtrar por la columna de sección; devolver sólo campos públicos; ordenar prioridad desc, fecha desc, fila asc.
 
-`readPublicNews_(section)` debe abrir la Sheet una sola vez, leer el rango usado y cachear sólo el payload público 120 segundos.
+`getPublicNews_(section)` debe abrir la Sheet una sola vez por ejecución, leer rango usado y cachear el payload público por 120 segundos.
 
-- [ ] **Step 5: Implementar `Code.gs` sólo lectura**
+- [ ] **Step 5: Implementar `Code.gs`**
 
 ```javascript
 function doGet(e) {
@@ -140,37 +132,23 @@ function doGet(e) {
 }
 ```
 
-Agregar `sanitizeNewsJsonpCallback_()` con regex equivalente al backend de Reservas: `^[A-Za-z_$][A-Za-z0-9_$.]{0,100}$`.
-
-No crear `doPost`.
+`sanitizeNewsJsonpCallback_()` debe aceptar sólo `^[A-Za-z_$][A-Za-z0-9_$.]{0,100}$`. `newsOutput_()` debe usar `ContentService` y devolver JSON o JavaScript según callback. No crear `doPost`.
 
 - [ ] **Step 6: Documentar despliegue**
 
-`DEPLOY.md` debe indicar:
-1. crear proyecto Apps Script separado `Novedades EES18 - PRODUCCIÓN`;
-2. copiar `Config.gs`, `Data.gs`, `Code.gs`;
-3. Script Property `NOVEDADES_SPREADSHEET_ID=<ID de la Sheet creada en Task 6>`;
-4. implementar como Web App, ejecutar como propietario, acceso público;
-5. conservar la URL `/exec` y colocarla después en `assets/js/novedades-config.js`.
+`DEPLOY.md` debe indicar: crear proyecto separado `Novedades EES18 - PRODUCCIÓN`; copiar los tres `.gs`; crear Script Property `NOVEDADES_SPREADSHEET_ID` usando el ID real de la Sheet creada en Task 6; implementar como Web App ejecutado por el propietario con acceso público; conservar la URL `/exec`.
 
-- [ ] **Step 7: Ejecutar test GREEN**
+- [ ] **Step 7: GREEN + commit**
 
 ```bash
 node tests/novedades-backend.test.js
-```
-
-Expected: PASS.
-
-- [ ] **Step 8: Commit**
-
-```bash
 git add apps-script/novedades tests/novedades-backend.test.js
 git commit -m "feat: add read-only novedades backend"
 ```
 
 ---
 
-### Task 2: Cliente de novedades y reglas de seguridad en navegador
+### Task 2: Cliente JavaScript y contrato seguro
 
 **Files:**
 - Create: `assets/js/novedades.js`
@@ -179,27 +157,22 @@ git commit -m "feat: add read-only novedades backend"
 
 **Interfaces:**
 - Consumes: `window.EES18_NOVEDADES_API_URL`.
-- Produces: `window.EES18Novedades` con `normalizeItem`, `safeUrl`, `sortItems`, `filterItems`, `createCarouselState` para tests y UI.
+- Produces: `window.EES18Novedades` y `module.exports` con `normalizeItem`, `safeUrl`, `sortItems`, `createCarouselState`.
 
-- [ ] **Step 1: Escribir test RED del módulo puro**
-
-Crear `tests/novedades-client.test.js`:
+- [ ] **Step 1: Escribir test RED**
 
 ```js
 const assert = require('assert');
 const rules = require('../assets/js/novedades.js');
-
 assert.strictEqual(rules.safeUrl('javascript:alert(1)'), '');
 assert.strictEqual(rules.safeUrl('https://example.org/x'), 'https://example.org/x');
 assert.strictEqual(rules.safeUrl('assets/img/re-bonaerense-2024.jpg'), 'assets/img/re-bonaerense-2024.jpg');
-
 const sorted = rules.sortItems([
   { id: 'a', priority: 0, date: '2026-09-04' },
   { id: 'b', priority: 2, date: '2026-09-01' },
   { id: 'c', priority: 0, date: '2026-09-07' }
 ]);
 assert.deepStrictEqual(sorted.map((item) => item.id), ['b', 'c', 'a']);
-
 const state = rules.createCarouselState(3);
 assert.strictEqual(state.current(), 0);
 assert.strictEqual(state.next(), 1);
@@ -214,69 +187,50 @@ assert.strictEqual(state.previous(), 2);
 node tests/novedades-client.test.js
 ```
 
-Expected: FAIL porque no existe `assets/js/novedades.js`.
+- [ ] **Step 3: Implementar módulo exportable**
 
-- [ ] **Step 3: Implementar módulo UMD sin dependencias**
+Usar patrón UMD compatible Node/browser. `normalizeItem(raw)` debe truncar título 180, bajada 400, cuerpo 2400, tipo 80 y CTA 100 caracteres. No aceptar HTML arbitrario.
 
-Usar el mismo patrón exportable que `reservas-audiovisuales.js`: `module.exports` en Node y `window.EES18Novedades` en navegador.
+- [ ] **Step 4: Implementar JSONP browser-only**
 
-`normalizeItem(raw)` debe truncar defensivamente:
-- título 180 caracteres;
-- bajada 400;
-- cuerpo 2400;
-- tipo 80;
-- CTA 100.
+`requestNews(section)` crea callback único, `<script>` dinámico y timeout de 12 segundos. Debe limpiar script, timer y callback tanto en success como error.
 
-No debe aceptar propiedades HTML arbitrarias.
-
-- [ ] **Step 4: Implementar request JSONP con timeout**
-
-Dentro de la parte browser-only, crear `requestNews(section)` con callback único, script dinámico y timeout de 12 segundos. Si falla, rechazar con `NETWORK_ERROR` o `TIMEOUT`; nunca dejar callbacks globales colgados.
-
-- [ ] **Step 5: Crear config vacío hasta deployment**
+- [ ] **Step 5: Crear config predeployment**
 
 ```javascript
 window.EES18_NOVEDADES_API_URL = '';
 ```
 
-La UI debe interpretar URL vacía como “servicio todavía no configurado” y mantener fallback, no lanzar error visible.
+URL vacía mantiene el fallback y no rompe la página.
 
-- [ ] **Step 6: Ejecutar GREEN y syntax check**
+- [ ] **Step 6: GREEN + commit**
 
 ```bash
 node tests/novedades-client.test.js
 node --check assets/js/novedades.js
 node --check assets/js/novedades-config.js
-```
-
-Expected: PASS.
-
-- [ ] **Step 7: Commit**
-
-```bash
 git add assets/js/novedades.js assets/js/novedades-config.js tests/novedades-client.test.js
 git commit -m "feat: add novedades client"
 ```
 
 ---
 
-### Task 3: Carrusel manual de novedades en Inicio
+### Task 3: Carrusel manual en Inicio
 
 **Files:**
 - Modify: `index.html`
 - Modify: `assets/css/home-layout.css`
+- Modify: `assets/js/novedades.js`
 - Test: `tests/novedades-pages.test.js`
 - Modify: `tests/site.test.js`
 - Modify: `tests/whatsapp-channel.test.js`
 - Modify: `tests/re-bonaerense-year.test.js`
 
 **Interfaces:**
-- Consumes: `EES18Novedades.mountHomeCarousel(root, items)`.
-- Produces: contenedor `[data-news-section="inicio"]`, controles `[data-news-prev]`, `[data-news-next]`, indicadores `[data-news-dots]`.
+- Consumes: `requestNews('inicio')`.
+- Produces: `[data-news-section="inicio"]`, `[data-news-prev]`, `[data-news-next]`, `[data-news-dots]`.
 
-- [ ] **Step 1: Escribir assertions RED de estructura**
-
-En `tests/novedades-pages.test.js` comprobar:
+- [ ] **Step 1: RED de estructura**
 
 ```js
 assert(index.includes('data-news-section="inicio"'));
@@ -288,7 +242,7 @@ assert(index.includes('assets/js/novedades.js'));
 assert(/Novedades destacadas/i.test(index));
 ```
 
-Actualizar tests históricos para no exigir que el texto del canal/RE esté hardcodeado en `index.html`; en cambio deben exigir que los contenidos seed existan en la fuente editorial/fixture y que el contenedor dinámico esté presente.
+Actualizar tests viejos para dejar de exigir Canal de WhatsApp/RE hardcodeados en portada; deben validar el contenedor dinámico y los IDs seed en tests de datos.
 
 - [ ] **Step 2: Ejecutar RED**
 
@@ -299,61 +253,36 @@ node tests/whatsapp-channel.test.js
 node tests/re-bonaerense-year.test.js
 ```
 
-Expected: al menos `novedades-pages` falla antes del cambio.
-
-- [ ] **Step 3: Reemplazar la noticia fija de Inicio por shell + fallback**
-
-Usar estructura semántica equivalente a:
+- [ ] **Step 3: Reemplazar noticia fija por shell con fallback**
 
 ```html
-<section class="page-section page-section--soft" aria-labelledby="news-title">
-  <div class="container">
-    <div class="section-heading reveal">
-      <span>Novedades destacadas</span>
-      <h2 id="news-title">Vida escolar e información institucional</h2>
-    </div>
-    <div class="news-carousel reveal" data-news-section="inicio" aria-live="polite">
-      <div class="news-carousel__viewport" data-news-list>
-        <article class="news-fallback">
-          <h3>Novedades de la E.E.S. Nº 18</h3>
-          <p>Consultá los comunicados oficiales y la vida escolar.</p>
-          <a class="simple-button" href="comunicados.html">Ver comunicados</a>
-        </article>
-      </div>
-      <div class="news-carousel__controls">
-        <button type="button" data-news-prev aria-label="Novedad anterior">←</button>
-        <div data-news-dots aria-label="Selector de novedades"></div>
-        <button type="button" data-news-next aria-label="Novedad siguiente">→</button>
-      </div>
-    </div>
+<div class="news-carousel reveal" data-news-section="inicio" aria-live="polite">
+  <div class="news-carousel__viewport" data-news-list>
+    <article class="news-fallback">
+      <h3>Novedades de la E.E.S. Nº 18</h3>
+      <p>Consultá los comunicados oficiales y la vida escolar.</p>
+      <a class="simple-button" href="comunicados.html">Ver comunicados</a>
+    </article>
   </div>
-</section>
+  <div class="news-carousel__controls">
+    <button type="button" data-news-prev aria-label="Novedad anterior">←</button>
+    <div data-news-dots aria-label="Selector de novedades"></div>
+    <button type="button" data-news-next aria-label="Novedad siguiente">→</button>
+  </div>
+</div>
 ```
 
-Cargar al final de `body`, antes de `main.js` o después de él de forma determinista:
+Cargar `novedades-config.js` y `novedades.js` antes del cierre de `body`.
 
-```html
-<script src="assets/js/novedades-config.js"></script>
-<script src="assets/js/novedades.js"></script>
-```
+- [ ] **Step 4: Implementar render accesible**
 
-- [ ] **Step 4: Implementar render de carrusel**
+Crear todos los nodos con `createElement`, `textContent` y atributos seguros. Flechas con wrap, teclado ArrowLeft/ArrowRight, swipe >=45 px, sin autoplay, controles ocultos con 0/1 item, placeholder institucional si no hay imagen.
 
-En `novedades.js`, cada noticia se crea con `document.createElement`, `textContent` y `setAttribute`; no usar `innerHTML` con datos de la Sheet.
+- [ ] **Step 5: CSS responsive**
 
-Controles:
-- flechas circulares;
-- `ArrowLeft` / `ArrowRight` cuando el carrusel tiene foco;
-- swipe mínimo 45 px;
-- sin autoplay;
-- esconder controles si hay 0/1 noticia;
-- imagen ausente → bloque `.news-card__media--placeholder` con texto `E.E.S. Nº 18`.
+Agregar `news-carousel`, `news-card`, `news-card__media`, `news-card__body`, `news-carousel__controls`, `news-carousel__dot`; desktop dos columnas, móvil una columna; `prefers-reduced-motion` sin transición.
 
-- [ ] **Step 5: Estilos responsive**
-
-Agregar a `home-layout.css` clases `news-carousel`, `news-card`, `news-card__media`, `news-card__body`, `news-carousel__controls`, `news-carousel__dot`. Mantener una tarjeta visible; desktop en dos columnas imagen/texto y móvil en una columna. Incluir `@media (prefers-reduced-motion: reduce)` para eliminar transiciones del carrusel.
-
-- [ ] **Step 6: Ejecutar GREEN**
+- [ ] **Step 6: GREEN + commit**
 
 ```bash
 node tests/novedades-pages.test.js
@@ -361,20 +290,13 @@ node tests/site.test.js
 node tests/whatsapp-channel.test.js
 node tests/re-bonaerense-year.test.js
 node --check assets/js/novedades.js
-```
-
-Expected: PASS.
-
-- [ ] **Step 7: Commit**
-
-```bash
 git add index.html assets/css/home-layout.css assets/js/novedades.js tests
 git commit -m "feat: add home news carousel"
 ```
 
 ---
 
-### Task 4: Comunicados dinámicos desde la misma fuente
+### Task 4: Comunicados dinámicos
 
 **Files:**
 - Modify: `comunicados.html`
@@ -384,9 +306,9 @@ git commit -m "feat: add home news carousel"
 
 **Interfaces:**
 - Consumes: `requestNews('comunicados')`.
-- Produces: render en `[data-news-section="comunicados"]`.
+- Produces: `[data-news-section="comunicados"]`.
 
-- [ ] **Step 1: Extender test RED**
+- [ ] **Step 1: RED**
 
 ```js
 assert(comunicados.includes('data-news-section="comunicados"'));
@@ -394,36 +316,11 @@ assert(comunicados.includes('assets/js/novedades-config.js'));
 assert(comunicados.includes('assets/js/novedades.js'));
 ```
 
-Verificar que el panel estático específico del canal de WhatsApp ya no sea la fuente de verdad.
+- [ ] **Step 2: Reemplazar panel estático específico del canal**
 
-- [ ] **Step 2: Ejecutar RED**
+Usar un contenedor dinámico con fallback `actualidad-empty`. Cada item muestra `dateDisplay || fecha formateada`, tipo, título, `body || summary` y CTA seguro.
 
-```bash
-node tests/novedades-pages.test.js
-```
-
-- [ ] **Step 3: Reemplazar comunicado hardcodeado por contenedor dinámico**
-
-Mantener encabezado institucional de la página y usar fallback:
-
-```html
-<div class="news-list" data-news-section="comunicados" data-news-list>
-  <div class="actualidad-empty">
-    <strong>Comunicados oficiales</strong>
-    <p>Si la actualización automática no está disponible, consultá nuevamente en unos minutos.</p>
-  </div>
-</div>
-```
-
-- [ ] **Step 4: Renderizar comunicados**
-
-Cada item debe mostrar `dateDisplay || format(date)`, `type`, `title`, `body || summary` y CTA válido. Sin imagen obligatoria.
-
-- [ ] **Step 5: Estilos**
-
-Agregar `.news-list`, `.news-list__item`, `.news-list__date`, `.news-list__body` a `actualidad.css`, reutilizando variables/colores actuales.
-
-- [ ] **Step 6: GREEN + commit**
+- [ ] **Step 3: Estilos + GREEN + commit**
 
 ```bash
 node tests/novedades-pages.test.js
@@ -435,7 +332,7 @@ git commit -m "feat: render comunicados from novedades feed"
 
 ---
 
-### Task 5: Vida escolar dinámica sin borrar todavía el archivo histórico
+### Task 5: Vida escolar administrable sin borrar archivo histórico
 
 **Files:**
 - Modify: `vida-escolar.html`
@@ -446,9 +343,9 @@ git commit -m "feat: render comunicados from novedades feed"
 
 **Interfaces:**
 - Consumes: `requestNews('vida-escolar')`.
-- Produces: `[data-news-section="vida-escolar"]` con tarjetas administrables; las historias detalladas estáticas existentes permanecen debajo durante esta fase.
+- Produces: `[data-news-section="vida-escolar"]`; historias estáticas existentes permanecen debajo durante esta fase.
 
-- [ ] **Step 1: RED de integración**
+- [ ] **Step 1: RED**
 
 ```js
 assert(vida.includes('data-news-section="vida-escolar"'));
@@ -457,23 +354,11 @@ assert(vida.includes('2.º Encuentro de RE Bonaerense'));
 assert(vida.includes('Leer en Comunidad'));
 ```
 
-Los dos últimos asserts preservan el archivo histórico estático hasta completar validación visual del dinámico.
+- [ ] **Step 2: Insertar sección dinámica antes del archivo histórico**
 
-- [ ] **Step 2: Ejecutar RED**
+Heading `Novedades de Vida escolar`; tarjetas compactas con imagen opcional, fecha visible, tipo, título, bajada y CTA. `body` se presenta como texto, no HTML.
 
-```bash
-node tests/novedades-pages.test.js
-```
-
-- [ ] **Step 3: Insertar sección administrable antes del archivo histórico**
-
-Agregar heading `Novedades de Vida escolar` y contenedor `data-news-section="vida-escolar"`. Las publicaciones dinámicas deben usar tarjetas compactas para no duplicar visualmente las historias detalladas.
-
-- [ ] **Step 4: Render y estilos**
-
-Renderizar imagen opcional, fecha visible, tipo, título, bajada y CTA. No interpretar `body` como HTML.
-
-- [ ] **Step 5: GREEN + commit**
+- [ ] **Step 3: GREEN + commit**
 
 ```bash
 node tests/novedades-pages.test.js
@@ -486,96 +371,90 @@ git commit -m "feat: add managed vida escolar news"
 
 ---
 
-### Task 6: Crear y preparar la Google Sheet editorial con datos iniciales
+### Task 6: Crear Google Sheet editorial y cargar datos iniciales
 
 **Files:**
 - External artifact: Google Sheet `Novedades EES18 - BASE`, tab `Novedades`.
-- Modify after creation: `apps-script/novedades/DEPLOY.md` only if the real sheet title/path needs recording; do not commit credentials.
 
 **Interfaces:**
-- Produces: Spreadsheet ID para `NOVEDADES_SPREADSHEET_ID`.
+- Produces: Spreadsheet ID real para Script Property `NOVEDADES_SPREADSHEET_ID`.
 
-- [ ] **Step 1: Crear Sheet nativa**
+- [ ] **Step 1: Crear Sheet**
 
-Crear `Novedades EES18 - BASE` con una única pestaña `Novedades` y 16 columnas en el orden exacto de Task 1.
-
-- [ ] **Step 2: Aplicar validaciones**
-
-`Activa`, `Inicio`, `Comunicados`, `Vida escolar`: dropdown `Sí/No`.
-
-`Prioridad`: número entero >= 0.
-
-`Fecha`: formato `dd/mm/yyyy`; se permite vacío sólo para histórico con `Fecha visible`.
-
-Congelar fila 1 y activar filtro.
-
-- [ ] **Step 3: Cargar tres filas iniciales**
-
-Fila WhatsApp:
+Columnas, en orden:
 
 ```text
-ID: whatsapp-2026-09-07
-Activa: Sí
-Fecha: 07/09/2026
-Fecha visible: 7 de septiembre de 2026
-Prioridad: 30
-Tipo: Institucional
-Título: Canal oficial de WhatsApp
-Bajada: La E.E.S. Nº 18 incorpora un canal de WhatsApp para compartir novedades y avisos institucionales con la comunidad educativa.
-Cuerpo: La E.E.S. Nº 18 incorpora un canal de WhatsApp para compartir novedades y avisos institucionales con la comunidad educativa.
-Imagen: [vacío]
-Botón texto: 📢 Seguir el canal de WhatsApp
-Botón URL: https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l
-Inicio: Sí
-Comunicados: Sí
-Vida escolar: No
+ID | Activa | Fecha | Fecha visible | Prioridad | Tipo | Título | Bajada | Cuerpo | Imagen | Botón texto | Botón URL | Inicio | Comunicados | Vida escolar | Actualizada
 ```
 
-Fila Leer en Comunidad:
+- [ ] **Step 2: Validaciones**
+
+`Activa`, `Inicio`, `Comunicados`, `Vida escolar`: dropdown `Sí/No`. `Prioridad`: entero >=0. `Fecha`: formato `dd/mm/yyyy`. Congelar fila 1 y activar filtro.
+
+- [ ] **Step 3: Seed WhatsApp**
 
 ```text
-ID: leer-en-comunidad-2026-09-04
-Activa: Sí
-Fecha: 04/09/2026
-Fecha visible: 4 de septiembre de 2026
-Prioridad: 20
-Tipo: Vida escolar
-Título: Leer en Comunidad
-Bajada: Segunda jornada de Leer en Comunidad en el marco de Bibliotecas Escolares Abiertas 2026.
-Imagen: assets/img/leer-en-comunidad-2026-01.jpg
-Botón texto: Ver Vida escolar
-Botón URL: vida-escolar.html
-Inicio: Sí
-Comunicados: No
-Vida escolar: Sí
+ID=whatsapp-2026-09-07
+Activa=Sí
+Fecha=07/09/2026
+Fecha visible=7 de septiembre de 2026
+Prioridad=30
+Tipo=Institucional
+Título=Canal oficial de WhatsApp
+Bajada=La E.E.S. Nº 18 incorpora un canal de WhatsApp para compartir novedades y avisos institucionales con la comunidad educativa.
+Cuerpo=La E.E.S. Nº 18 incorpora un canal de WhatsApp para compartir novedades y avisos institucionales con la comunidad educativa.
+Botón texto=📢 Seguir el canal de WhatsApp
+Botón URL=https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l
+Inicio=Sí
+Comunicados=Sí
+Vida escolar=No
 ```
 
-Fila RE Bonaerense:
+- [ ] **Step 4: Seed Leer en Comunidad**
 
 ```text
-ID: re-bonaerense-2026
-Activa: Sí
-Fecha: [vacío]
-Fecha visible: 2026
-Prioridad: 10
-Tipo: Proyecto institucional
-Título: 2.º Encuentro de RE Bonaerense
-Bajada: La E.E.S. Nº 18 compartió micro relatos del proyecto “Estudiantes hacen memoria” junto con otras instituciones de la región.
-Imagen: assets/img/re-bonaerense-2024.jpg
-Botón texto: Ver Vida escolar
-Botón URL: vida-escolar.html
-Inicio: Sí
-Comunicados: No
-Vida escolar: Sí
+ID=leer-en-comunidad-2026-09-04
+Activa=Sí
+Fecha=04/09/2026
+Fecha visible=4 de septiembre de 2026
+Prioridad=20
+Tipo=Vida escolar
+Título=Leer en Comunidad
+Bajada=Segunda jornada de Leer en Comunidad en el marco de Bibliotecas Escolares Abiertas 2026.
+Imagen=assets/img/leer-en-comunidad-2026-01.jpg
+Botón texto=Ver Vida escolar
+Botón URL=vida-escolar.html
+Inicio=Sí
+Comunicados=No
+Vida escolar=Sí
 ```
 
-- [ ] **Step 4: Verificar permisos**
+- [ ] **Step 5: Seed RE Bonaerense**
 
-La Sheet no debe quedar editable públicamente. Sólo cuentas autorizadas de la escuela/propietario tienen edición. El Web App leerá como propietario.
+```text
+ID=re-bonaerense-2026
+Activa=Sí
+Fecha=[celda vacía]
+Fecha visible=2026
+Prioridad=10
+Tipo=Proyecto institucional
+Título=2.º Encuentro de RE Bonaerense
+Bajada=La E.E.S. Nº 18 compartió micro relatos del proyecto “Estudiantes hacen memoria” junto con otras instituciones de la región.
+Imagen=assets/img/re-bonaerense-2024.jpg
+Botón texto=Ver Vida escolar
+Botón URL=vida-escolar.html
+Inicio=Sí
+Comunicados=No
+Vida escolar=Sí
+```
+
+- [ ] **Step 6: Verificar permisos**
+
+La Sheet no queda editable públicamente. Sólo propietario/cuentas autorizadas editan; Web App lee como propietario.
 
 ---
 
-### Task 7: Desplegar Web App de Novedades y conectar producción
+### Task 7: Desplegar Web App separado y conectar el sitio
 
 **Files:**
 - Modify: `assets/js/novedades-config.js`
@@ -583,76 +462,40 @@ La Sheet no debe quedar editable públicamente. Sólo cuentas autorizadas de la 
 - Modify: `.github/workflows/test-public.yml`
 
 **Interfaces:**
-- Consumes: URL `/exec` real del Apps Script.
-- Produces: endpoint productivo consultable con `?section=inicio`.
+- Consumes: URL `/exec` real devuelta por Apps Script.
+- Produces: endpoint productivo `section=inicio|comunicados|vida-escolar`.
 
-- [ ] **Step 1: Desplegar Apps Script separado**
+- [ ] **Step 1: Desplegar Apps Script**
 
-Seguir `apps-script/novedades/DEPLOY.md`. No reutilizar `Reservas Audiovisuales EES18 - PRODUCCIÓN`.
+Seguir `apps-script/novedades/DEPLOY.md`. Crear la Script Property con el Spreadsheet ID real de Task 6. No reutilizar el proyecto de Reservas.
 
-Antes de publicar, ejecutar desde Apps Script una función de lectura manual o `doGet` de prueba y verificar que el resultado sólo contiene campos públicos.
+- [ ] **Step 2: Probar endpoint directamente**
 
-- [ ] **Step 2: Probar endpoint en navegador**
+Abrir la URL `/exec` real agregando `?section=inicio`. Debe devolver `ok=true` y exactamente los tres IDs seed en orden WhatsApp → Leer → RE.
 
-La URL:
+- [ ] **Step 3: Conectar config**
 
-```text
-<EXEC>?section=inicio
-```
+Reemplazar la cadena vacía de `assets/js/novedades-config.js` por la URL `/exec` real devuelta por Apps Script. Antes de commit verificar que la cadena empieza con `https://script.google.com/macros/s/` y termina en `/exec`.
 
-debe devolver `{ "ok": true, "section": "inicio", "items": [...] }` con exactamente las tres publicaciones activas, en orden WhatsApp → Leer → RE Bonaerense.
+- [ ] **Step 4: Escribir probe live**
 
-- [ ] **Step 3: Configurar URL productiva**
+`tests/probe_novedades_live.py` debe leer la URL del config, hacer GET `section=inicio` con timeout 20 s y exigir:
+- `ok is True`;
+- lista `items` con al menos 3;
+- IDs seed presentes;
+- respuesta sin claves `Activa`/`Actualizada`, sin emails, sin tokens/acciones de escritura.
 
-Reemplazar en `assets/js/novedades-config.js`:
-
-```javascript
-window.EES18_NOVEDADES_API_URL = 'URL_EXEC_REAL';
-```
-
-La implementación debe usar la URL real obtenida en Step 1; no dejar texto sentinel como `URL_EXEC_REAL` en el commit.
-
-- [ ] **Step 4: Escribir probe live antes de añadirlo al workflow**
-
-`tests/probe_novedades_live.py` debe:
-- leer la URL desde `assets/js/novedades-config.js`;
-- GET `section=inicio` con timeout 20 s;
-- exigir `ok=true`;
-- exigir items lista y >= 3;
-- exigir IDs `whatsapp-2026-09-07`, `leer-en-comunidad-2026-09-04`, `re-bonaerense-2026`;
-- verificar que la respuesta no contiene `Activa`, `Actualizada`, direcciones de correo ni claves de escritura.
-
-- [ ] **Step 5: Ejecutar probe local**
+- [ ] **Step 5: Ejecutar probe**
 
 ```bash
 python tests/probe_novedades_live.py
 ```
 
-Expected: PASS contra producción.
+Expected: PASS.
 
 - [ ] **Step 6: Integrar CI**
 
-En `.github/workflows/test-public.yml` agregar:
-
-```yaml
-node --check assets/js/novedades-config.js
-node --check assets/js/novedades.js
-```
-
-Y en structure checks:
-
-```yaml
-node tests/novedades-backend.test.js
-node tests/novedades-client.test.js
-node tests/novedades-pages.test.js
-```
-
-Agregar step separado:
-
-```yaml
-- name: Probe deployed novedades Web App
-  run: python tests/probe_novedades_live.py
-```
+Agregar syntax checks para `novedades-config.js` y `novedades.js`; structure checks para los tres tests de novedades; y step `Probe deployed novedades Web App` ejecutando `python tests/probe_novedades_live.py`.
 
 - [ ] **Step 7: Commit**
 
@@ -663,16 +506,15 @@ git commit -m "chore: connect novedades production endpoint"
 
 ---
 
-### Task 8: Verificación editorial end-to-end y cierre
+### Task 8: Verificación end-to-end y cierre
 
 **Files:**
-- No code change unless a test exposes a defect.
-- Read: `docs/superpowers/specs/2026-09-07-novedades-sheet-design.md`
+- No code change salvo defecto demostrado por test.
 
 **Interfaces:**
-- Verifica el contrato completo Sheet → Apps Script → GitHub Pages.
+- Verifica Sheet → Apps Script → GitHub Pages y aislamiento de Reservas.
 
-- [ ] **Step 1: Ejecutar suite completa**
+- [ ] **Step 1: Suite completa**
 
 ```bash
 pytest -q
@@ -695,39 +537,32 @@ python tests/probe_reservas_live.py
 python tests/probe_novedades_live.py
 ```
 
-Expected: todo PASS. Los probes de Reservas deben seguir sanos, demostrando aislamiento.
+Expected: todo PASS.
 
-- [ ] **Step 2: Probar cambio sin deploy**
+- [ ] **Step 2: Probar edición sin deploy**
 
-En la Sheet, modificar temporalmente la `Bajada` del Canal de WhatsApp agregando `PRUEBA EDITORIAL`, esperar como máximo el TTL documentado y recargar Inicio/Comunicados. Verificar que el texto aparece sin commit ni deploy del sitio. Restaurar el texto original.
+Cambiar temporalmente la Bajada del Canal de WhatsApp agregando `PRUEBA EDITORIAL`, esperar hasta 120 s, recargar Inicio/Comunicados y verificar el cambio sin commit/deploy. Restaurar el texto original.
 
 - [ ] **Step 3: Probar ocultación sin deploy**
 
-Cambiar `Activa` de RE Bonaerense a `No`, esperar TTL y verificar que desaparece de Inicio y Vida escolar dinámica pero el archivo histórico estático sigue disponible. Restaurar `Sí`.
+Cambiar `Activa` de RE Bonaerense a `No`, esperar hasta 120 s y verificar que desaparece del carrusel y sección dinámica de Vida escolar mientras el archivo histórico estático permanece. Restaurar `Sí`.
 
 - [ ] **Step 4: Probar fallback**
 
-En una copia/local de la página o mediante test de unidad, configurar URL vacía/inválida y verificar que cada sección conserva su fallback y enlaces útiles sin error de JavaScript visible.
+Con URL vacía o inválida en test/local, verificar fallback útil y ausencia de errores JavaScript visibles.
 
-- [ ] **Step 5: Revisión visual manual**
+- [ ] **Step 5: Revisión visual**
 
-Desktop y móvil:
-- una tarjeta por vez en Inicio;
-- flechas y puntos visibles;
-- swipe móvil;
-- links no abren pestaña nueva;
-- imagen faltante usa placeholder;
-- `prefers-reduced-motion` sin animación innecesaria;
-- Comunicados y Vida escolar legibles.
+Desktop/móvil: una tarjeta visible; flechas/puntos; swipe; teclado; links sin `target="_blank"`; placeholder sin imagen; reduced motion; Comunicados y Vida escolar legibles.
 
-- [ ] **Step 6: Verificar criterios del spec**
+- [ ] **Step 6: Criterios de aceptación**
 
-Confirmar explícitamente los 7 criterios de aceptación del spec, especialmente: edición sólo en Sheet, una sola fuente, backend independiente de Reservas y degradación segura.
+Confirmar los 7 criterios del spec: edición sólo en Sheet, cero deploy editorial, carrusel manual, fuente única para las tres áreas, canal WhatsApp administrable, backend independiente de Reservas/Contacto y degradación segura.
 
-- [ ] **Step 7: Commit final sólo si hubo ajustes de verificación**
+- [ ] **Step 7: Commit sólo si hubo correcciones**
 
 ```bash
 git status --short
 ```
 
-Si no hay cambios: no crear commit vacío. Si hubo correcciones derivadas de tests, volver a ejecutar la suite focalizada + completa antes de commit.
+No crear commit vacío. Si hubo una corrección, repetir suite focalizada y completa antes de commit.
