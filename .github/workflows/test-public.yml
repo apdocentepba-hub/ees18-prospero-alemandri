@@ -34,6 +34,7 @@ jobs:
           node tests/site.test.js
           node tests/visitor-counter.test.js
           node tests/reservas-audiovisuales.test.js
+          node tests/reservas-single-day-only.test.js
           node tests/apps-script-reservas.test.js
           node tests/abc-email-policy.test.js
           node tests/apps-script-performance.test.js
