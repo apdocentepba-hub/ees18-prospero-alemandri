@@ -22,6 +22,7 @@ jobs:
       - name: Check JavaScript syntax
         run: |
           node --check assets/js/main.js
+          node --check assets/js/visitor-counter.js
           node --check assets/js/estado-publico.js
           node --check assets/js/status-config.js
           node --check assets/js/reservas-config.js
