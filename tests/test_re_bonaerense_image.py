@@ -16,15 +16,21 @@ def test_re_bonaerense_es_jpeg_valido_y_no_un_archivo_roto():
         image.verify()
 
 
-def test_re_bonaerense_se_muestra_a_resolucion_nativa():
-    index = (ROOT / "index.html").read_text(encoding="utf-8")
+def test_re_bonaerense_se_muestra_a_resolucion_nativa_en_vida_escolar():
     vida = (ROOT / "vida-escolar.html").read_text(encoding="utf-8")
     css = (ROOT / "assets" / "css" / "multipage.css").read_text(encoding="utf-8")
 
-    for html in (index, vida):
-        assert 'src="assets/img/re-bonaerense-2024.jpg"' in html
-        assert 'width="280" height="420"' in html
-        assert 'summary_large_image' not in html
-
-    assert '.home-news__image img{display:block;width:280px;max-width:100%;height:auto' in css
+    assert 'src="assets/img/re-bonaerense-2024.jpg"' in vida
+    assert 'width="280" height="420"' in vida
+    assert 'summary_large_image' not in vida
     assert '.feature-story img{display:block;width:280px;max-width:100%;height:auto' in css
+
+
+def test_portada_usa_fuente_dinamica_para_imagenes_de_novedades():
+    index = (ROOT / "index.html").read_text(encoding="utf-8")
+    news_js = (ROOT / "assets" / "js" / "novedades.js").read_text(encoding="utf-8")
+
+    assert 'data-news-section="inicio"' in index
+    assert 'assets/js/novedades.js' in index
+    assert 'createHomeNewsCard' in news_js
+    assert 'image.src = item.image' in news_js
