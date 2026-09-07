@@ -1,0 +1,1 @@
+window.EES18_NOVEDADES_API_URL = '';
