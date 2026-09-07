@@ -30,6 +30,8 @@ jobs:
           node --check assets/js/reservas-email-policy.js
           node --check assets/js/cancelar-reserva.js
           if [ -f assets/js/contacto.js ]; then node --check assets/js/contacto.js; fi
+          node --check assets/js/novedades.js
+          node --check assets/js/novedades-config.js
       - name: Run JavaScript structure checks
         run: |
           node tests/site.test.js
