@@ -162,11 +162,181 @@
     });
   }
 
+  function appendTextElement(parent, tagName, className, value) {
+    if (!root || !root.document || !value) return null;
+    var node = root.document.createElement(tagName);
+    if (className) node.className = className;
+    node.textContent = value;
+    parent.appendChild(node);
+    return node;
+  }
+
+  function createHomeNewsCard(item) {
+    var article = root.document.createElement('article');
+    article.className = 'news-card';
+    article.dataset.newsId = item.id;
+
+    var media = root.document.createElement('div');
+    media.className = 'news-card__media';
+    if (item.image) {
+      var image = root.document.createElement('img');
+      image.src = item.image;
+      image.alt = 'Imagen de ' + item.title;
+      image.loading = 'lazy';
+      media.appendChild(image);
+    } else {
+      media.classList.add('news-card__media--placeholder');
+      appendTextElement(media, 'span', '', 'E.E.S. Nº 18');
+    }
+    article.appendChild(media);
+
+    var body = root.document.createElement('div');
+    body.className = 'news-card__body';
+    var metaParts = [];
+    if (item.type) metaParts.push(item.type);
+    if (item.dateDisplay || item.date) metaParts.push(item.dateDisplay || item.date);
+    appendTextElement(body, 'span', 'news-card__meta', metaParts.join(' · '));
+    appendTextElement(body, 'h3', '', item.title);
+    appendTextElement(body, 'p', '', item.summary || item.body);
+
+    if (item.buttonText && item.buttonUrl) {
+      var link = root.document.createElement('a');
+      link.className = 'simple-button news-card__cta';
+      link.href = item.buttonUrl;
+      link.textContent = item.buttonText;
+      body.appendChild(link);
+    }
+
+    article.appendChild(body);
+    return article;
+  }
+
+  function mountHomeCarousel(container, items) {
+    if (!root || !root.document || !container) return false;
+
+    var list = container.querySelector('[data-news-list]');
+    var previousButton = container.querySelector('[data-news-prev]');
+    var nextButton = container.querySelector('[data-news-next]');
+    var dotsRoot = container.querySelector('[data-news-dots]');
+    var normalizedItems = sortItems(Array.isArray(items) ? items : [])
+      .map(normalizeItem)
+      .filter(function (item) {
+        return item.id && item.title && (item.date || item.dateDisplay);
+      });
+
+    if (!list || !previousButton || !nextButton || !dotsRoot || normalizedItems.length === 0) {
+      return false;
+    }
+
+    list.textContent = '';
+    dotsRoot.textContent = '';
+
+    var cards = normalizedItems.map(function (item) {
+      var card = createHomeNewsCard(item);
+      list.appendChild(card);
+      return card;
+    });
+
+    var dots = normalizedItems.map(function (item, index) {
+      var dot = root.document.createElement('button');
+      dot.type = 'button';
+      dot.className = 'news-carousel__dot';
+      dot.setAttribute('aria-label', 'Ver novedad ' + (index + 1) + ': ' + item.title);
+      dot.addEventListener('click', function () {
+        state.goTo(index);
+        render();
+      });
+      dotsRoot.appendChild(dot);
+      return dot;
+    });
+
+    var state = createCarouselState(cards.length);
+
+    function render() {
+      var current = state.current();
+      cards.forEach(function (card, index) {
+        card.hidden = index !== current;
+      });
+      dots.forEach(function (dot, index) {
+        var active = index === current;
+        dot.classList.toggle('is-active', active);
+        dot.setAttribute('aria-current', active ? 'true' : 'false');
+      });
+      container.dataset.newsIndex = String(current);
+    }
+
+    function previous() {
+      state.previous();
+      render();
+    }
+
+    function next() {
+      state.next();
+      render();
+    }
+
+    previousButton.addEventListener('click', previous);
+    nextButton.addEventListener('click', next);
+    container.addEventListener('keydown', function (event) {
+      if (event.key === 'ArrowLeft') {
+        event.preventDefault();
+        previous();
+      } else if (event.key === 'ArrowRight') {
+        event.preventDefault();
+        next();
+      }
+    });
+
+    var touchStartX = null;
+    list.addEventListener('touchstart', function (event) {
+      if (event.touches && event.touches.length === 1) touchStartX = event.touches[0].clientX;
+    }, { passive: true });
+    list.addEventListener('touchend', function (event) {
+      if (touchStartX == null || !event.changedTouches || event.changedTouches.length !== 1) return;
+      var delta = event.changedTouches[0].clientX - touchStartX;
+      touchStartX = null;
+      if (Math.abs(delta) < 45) return;
+      if (delta < 0) next();
+      else previous();
+    }, { passive: true });
+
+    var showControls = cards.length > 1;
+    var controls = container.querySelector('.news-carousel__controls');
+    if (controls) controls.hidden = !showControls;
+    previousButton.disabled = !showControls;
+    nextButton.disabled = !showControls;
+    render();
+    return true;
+  }
+
+  function initHomeNews() {
+    if (!root || !root.document) return;
+    var container = root.document.querySelector('[data-news-section="inicio"]');
+    if (!container) return;
+
+    requestNews('inicio')
+      .then(function (items) {
+        mountHomeCarousel(container, items);
+      })
+      .catch(function () {
+        // The static fallback remains visible when the service is unavailable.
+      });
+  }
+
+  if (root && root.document) {
+    if (root.document.readyState === 'loading') {
+      root.document.addEventListener('DOMContentLoaded', initHomeNews, { once: true });
+    } else {
+      initHomeNews();
+    }
+  }
+
   return {
     normalizeItem: normalizeItem,
     safeUrl: safeUrl,
     sortItems: sortItems,
     createCarouselState: createCarouselState,
-    requestNews: requestNews
+    requestNews: requestNews,
+    mountHomeCarousel: mountHomeCarousel
   };
 });
