@@ -237,6 +237,7 @@
       return card;
     });
 
+    var state = createCarouselState(cards.length);
     var dots = normalizedItems.map(function (item, index) {
       var dot = root.document.createElement('button');
       dot.type = 'button';
@@ -249,8 +250,6 @@
       dotsRoot.appendChild(dot);
       return dot;
     });
-
-    var state = createCarouselState(cards.length);
 
     function render() {
       var current = state.current();
@@ -309,25 +308,77 @@
     return true;
   }
 
-  function initHomeNews() {
-    if (!root || !root.document) return;
-    var container = root.document.querySelector('[data-news-section="inicio"]');
-    if (!container) return;
+  function createNewsListItem(item) {
+    var article = root.document.createElement('article');
+    article.className = 'news-list__item';
+    article.dataset.newsId = item.id;
 
-    requestNews('inicio')
-      .then(function (items) {
-        mountHomeCarousel(container, items);
-      })
-      .catch(function () {
-        // The static fallback remains visible when the service is unavailable.
+    var meta = [];
+    if (item.dateDisplay || item.date) meta.push(item.dateDisplay || item.date);
+    if (item.type) meta.push(item.type);
+    appendTextElement(article, 'small', 'news-list__meta', meta.join(' · '));
+    appendTextElement(article, 'h3', '', item.title);
+    appendTextElement(article, 'p', '', item.body || item.summary);
+
+    if (item.buttonText && item.buttonUrl) {
+      var actions = root.document.createElement('div');
+      actions.className = 'button-row';
+      var link = root.document.createElement('a');
+      link.className = 'simple-button';
+      link.href = item.buttonUrl;
+      link.textContent = item.buttonText;
+      actions.appendChild(link);
+      article.appendChild(actions);
+    }
+
+    return article;
+  }
+
+  function mountNewsList(container, items) {
+    if (!root || !root.document || !container) return false;
+    var list = container.querySelector('[data-news-list]');
+    var normalizedItems = sortItems(Array.isArray(items) ? items : [])
+      .map(normalizeItem)
+      .filter(function (item) {
+        return item.id && item.title && (item.date || item.dateDisplay);
       });
+
+    if (!list || normalizedItems.length === 0) return false;
+
+    list.textContent = '';
+    normalizedItems.forEach(function (item) {
+      list.appendChild(createNewsListItem(item));
+    });
+    return true;
+  }
+
+  function initNewsSections() {
+    if (!root || !root.document) return;
+
+    var homeContainer = root.document.querySelector('[data-news-section="inicio"]');
+    if (homeContainer) {
+      requestNews('inicio')
+        .then(function (items) { mountHomeCarousel(homeContainer, items); })
+        .catch(function () {
+          // Static fallback stays visible.
+        });
+    }
+
+    var comunicadosContainer = root.document.querySelector('[data-news-section="comunicados"]');
+    if (comunicadosContainer) {
+      requestNews('comunicados')
+        .then(function (items) { mountNewsList(comunicadosContainer, items); })
+        .catch(function () {
+          // Static fallback stays visible.
+        });
+    }
   }
 
   if (root && root.document) {
     if (root.document.readyState === 'loading') {
-      root.document.addEventListener('DOMContentLoaded', initHomeNews, { once: true });
+      root.document.addEventListener('DOMContentLoaded', initNewsSections, { once: true });
     } else {
-      initHomeNews();
+      initNewsSections();
     }
   }
 
@@ -337,6 +388,7 @@
     sortItems: sortItems,
     createCarouselState: createCarouselState,
     requestNews: requestNews,
-    mountHomeCarousel: mountHomeCarousel
+    mountHomeCarousel: mountHomeCarousel,
+    mountNewsList: mountNewsList
   };
 });
