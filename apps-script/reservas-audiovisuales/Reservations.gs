@@ -20,6 +20,13 @@ function requireInstitutionalReservationEmail_(email) {
   return normalized;
 }
 
+function requireSingleReservationMode_(payload) {
+  var mode = String(payload && payload.mode != null ? payload.mode : 'single').trim().toLowerCase();
+  if (!mode) mode = 'single';
+  if (mode !== 'single') throw new Error('RECURRING_RESERVATIONS_DISABLED');
+  return mode;
+}
+
 function continuousRangeForSlotIds_(slotIds) {
   if (!Array.isArray(slotIds) || slotIds.length === 0) throw new Error('EMPTY_SELECTION');
 
@@ -231,6 +238,7 @@ function publicCreatedReservation_(record) {
 }
 
 function createReservation(payload) {
+  requireSingleReservationMode_(payload);
   requireInstitutionalReservationEmail_(payload && payload.email);
 
   var clock = reservationClock_();
