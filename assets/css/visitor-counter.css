@@ -1,0 +1,33 @@
+.visitor-counter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 11px;
+  color: #d9e7ee;
+  background: rgba(255, 255, 255, .06);
+  border: 1px solid rgba(255, 255, 255, .14);
+  border-radius: 999px;
+  font-size: .78rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.visitor-counter[hidden] {
+  display: none;
+}
+
+.visitor-counter__icon {
+  font-size: .9rem;
+  line-height: 1;
+}
+
+.visitor-counter strong {
+  color: #fff;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 760px) {
+  .visitor-counter {
+    align-self: flex-start;
+  }
+}
