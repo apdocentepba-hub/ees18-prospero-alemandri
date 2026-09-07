@@ -27,7 +27,15 @@ def fetch_json(url: str) -> dict:
     request = urllib.request.Request(url, headers={"User-Agent": "EES18-Novedades-Probe/1.0"})
     with urllib.request.urlopen(request, timeout=20) as response:
         assert 200 <= response.status < 300, f"HTTP inesperado: {response.status}"
-        return json.loads(response.read().decode("utf-8"))
+        raw = response.read().decode("utf-8", errors="replace")
+        try:
+            return json.loads(raw)
+        except json.JSONDecodeError as error:
+            content_type = response.headers.get("Content-Type", "")
+            preview = re.sub(r"\s+", " ", raw[:500]).strip()
+            raise AssertionError(
+                f"El endpoint no devolvió JSON. Content-Type={content_type!r}. Inicio={preview!r}"
+            ) from error
 
 
 def main() -> None:
