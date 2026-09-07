@@ -52,8 +52,9 @@ def test_portada_es_resumen_y_distribuidor():
     html = read("index.html")
     for href in NAV_LINKS:
         assert f'href="{href}"' in html, f"La portada debe enlazar {href}"
-    assert "2.º Encuentro de RE Bonaerense" in html
-    assert 'src="assets/img/re-bonaerense-2024.jpg"' in html
+    assert 'data-news-section="inicio"' in html
+    assert 'assets/js/novedades-config.js' in html
+    assert 'assets/js/novedades.js' in html
     assert 'href="vida-escolar.html"' in html
     assert 'href="tramites.html"' in html
     assert 'href="propuesta-educativa.html"' in html
@@ -139,9 +140,10 @@ def test_centro_de_tramites_enlaza_detalles():
 def test_vida_escolar_publicada_y_visible():
     home = read("index.html")
     vida = read("vida-escolar.html")
-    for html in [home, vida]:
-        assert "2.º Encuentro de RE Bonaerense" in html
-        assert 'assets/img/re-bonaerense-2024.jpg' in html
+    assert 'data-news-section="inicio"' in home
+    assert 'assets/js/novedades.js' in home
+    assert "2.º Encuentro de RE Bonaerense" in vida
+    assert 'assets/img/re-bonaerense-2024.jpg' in vida
     assert "Estudiantes hacen memoria" in vida
     assert "micro relatos" in vida
 
