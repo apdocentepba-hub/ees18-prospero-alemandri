@@ -352,6 +352,67 @@
     return true;
   }
 
+  function createLifeSchoolItem(item) {
+    var article = root.document.createElement('article');
+    article.className = 'life-news-list__item';
+    article.dataset.newsId = item.id;
+
+    if (item.image) {
+      var media = root.document.createElement('figure');
+      media.className = 'life-news-list__media';
+      var image = root.document.createElement('img');
+      image.src = item.image;
+      image.alt = 'Imagen de ' + item.title;
+      image.loading = 'lazy';
+      media.appendChild(image);
+      article.appendChild(media);
+    }
+
+    var content = root.document.createElement('div');
+    content.className = 'life-news-list__content';
+    var meta = [];
+    if (item.type) meta.push(item.type);
+    if (item.dateDisplay || item.date) meta.push(item.dateDisplay || item.date);
+    appendTextElement(content, 'small', 'life-news-list__meta', meta.join(' · '));
+    appendTextElement(content, 'h3', '', item.title);
+    appendTextElement(content, 'p', 'life-news-list__summary', item.summary);
+    if (item.body && item.body !== item.summary) {
+      appendTextElement(content, 'p', 'life-news-list__body', item.body);
+    }
+
+    if (item.buttonText && item.buttonUrl) {
+      var actions = root.document.createElement('div');
+      actions.className = 'button-row';
+      var link = root.document.createElement('a');
+      link.className = 'simple-button';
+      link.href = item.buttonUrl;
+      link.textContent = item.buttonText;
+      actions.appendChild(link);
+      content.appendChild(actions);
+    }
+
+    article.appendChild(content);
+    return article;
+  }
+
+  function mountLifeSchoolList(container, items) {
+    if (!root || !root.document || !container) return false;
+    var list = container.querySelector('[data-news-list]');
+    var normalizedItems = sortItems(Array.isArray(items) ? items : [])
+      .map(normalizeItem)
+      .filter(function (item) {
+        return item.id && item.title && (item.date || item.dateDisplay);
+      });
+
+    if (!list || normalizedItems.length === 0) return false;
+
+    list.textContent = '';
+    normalizedItems.forEach(function (item) {
+      list.appendChild(createLifeSchoolItem(item));
+    });
+    return true;
+  }
+
   function initNewsSections() {
     if (!root || !root.document) return;
 
@@ -372,6 +433,15 @@
           // Static fallback stays visible.
         });
     }
+
+    var vidaContainer = root.document.querySelector('[data-news-section="vida-escolar"]');
+    if (vidaContainer) {
+      requestNews('vida-escolar')
+        .then(function (items) { mountLifeSchoolList(vidaContainer, items); })
+        .catch(function () {
+          // Static fallback and historical archive stay visible.
+        });
+    }
   }
 
   if (root && root.document) {
@@ -389,6 +459,7 @@
     createCarouselState: createCarouselState,
     requestNews: requestNews,
     mountHomeCarousel: mountHomeCarousel,
-    mountNewsList: mountNewsList
+    mountNewsList: mountNewsList,
+    mountLifeSchoolList: mountLifeSchoolList
   };
 });
