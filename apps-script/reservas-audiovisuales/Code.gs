@@ -3,6 +3,11 @@ function doGet(e) {
   var action = String(params.action || 'health').trim();
 
   try {
+    if (action === 'contact') {
+      var contactPayload = parsePublicReservationPayload_(params.payload);
+      return publicReservationOutput_(sendPublicContact_(contactPayload), params.callback);
+    }
+
     var environmentCheck = validateReservationEnvironmentConfiguration_();
 
     if (action === 'health') {
@@ -50,14 +55,18 @@ function doPost(e) {
   var callback = params.callback;
 
   try {
-    validateReservationEnvironmentConfiguration_();
-
     var body = {};
     if (e && e.postData && e.postData.contents) {
       body = JSON.parse(e.postData.contents);
     }
 
     var action = String(body.action || params.action || '').trim();
+    if (action === 'contact') {
+      return publicReservationOutput_(sendPublicContact_(body.payload || {}), callback);
+    }
+
+    validateReservationEnvironmentConfiguration_();
+
     if (action === 'create') {
       return publicReservationOutput_(createReservation(body.payload || {}), callback);
     }
@@ -97,6 +106,8 @@ function publicReservationErrorCode_(error) {
     'NON_CONTIGUOUS_SELECTION', 'INVALID_REPEAT_RANGE', 'REPEAT_WINDOW_EXCEEDED',
     'RECURRING_RESERVATIONS_DISABLED',
     'CONFLICT', 'INVALID_TOKEN', 'ALREADY_CANCELLED',
+    'CONTACT_INVALID_EMAIL', 'CONTACT_INVALID_SUBJECT', 'CONTACT_INVALID_MESSAGE',
+    'CONTACT_SPAM_REJECTED', 'CONTACT_RATE_LIMITED',
     'MISSING_ENVIRONMENT_CONFIGURATION', 'MISSING_SPREADSHEET_CONFIGURATION',
     'MISSING_CALENDAR_CONFIGURATION', 'ENVIRONMENT_CONFIGURATION_MISMATCH'
   ];
