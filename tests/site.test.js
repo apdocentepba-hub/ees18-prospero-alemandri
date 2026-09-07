@@ -95,8 +95,8 @@ for (const page of detailPages) {
   assert(!source.includes('target="_blank"'), `${page} must not open links in a new tab`);
 }
 
-assert(html.includes('2.º Encuentro de RE Bonaerense'), 'home must feature RE Bonaerense');
-assert(html.includes('assets/img/re-bonaerense-2024.jpg'), 'home must show RE Bonaerense image');
+assert(html.includes('data-news-section="inicio"'), 'home must expose the dynamic news section');
+assert(html.includes('assets/js/novedades.js'), 'home must load the dynamic news client');
 assert(html.includes('vida-escolar.html'), 'home must visibly link to Vida escolar');
 assert(html.includes('estudiantes-familias.html'), 'home must link to Estudiantes y familias');
 assert(html.includes('docentes.html'), 'home must link to Docentes');
