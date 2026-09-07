@@ -7,9 +7,11 @@ const read = (file) => fs.readFileSync(path.join(root, file), 'utf8');
 
 const index = read('index.html');
 const comunicados = read('comunicados.html');
+const vida = read('vida-escolar.html');
 const newsJs = read('assets/js/novedades.js');
 const homeCss = read('assets/css/home-layout.css');
 const actualidadCss = read('assets/css/actualidad.css');
+const multipageCss = read('assets/css/multipage.css');
 
 assert(index.includes('data-news-section="inicio"'), 'Inicio debe incluir el contenedor dinámico de novedades');
 assert(index.includes('data-news-list'), 'Inicio debe incluir el viewport/lista del carrusel');
@@ -27,6 +29,13 @@ assert(comunicados.includes('assets/js/novedades-config.js'), 'Comunicados debe 
 assert(comunicados.includes('assets/js/novedades.js'), 'Comunicados debe cargar el cliente de Novedades');
 assert(/Consultá nuevamente en unos minutos/i.test(comunicados), 'Comunicados debe tener fallback estable ante caída del servicio');
 
+assert(vida.includes('data-news-section="vida-escolar"'), 'Vida escolar debe tener una fuente dinámica de actividades');
+assert(vida.includes('data-news-list'), 'Vida escolar debe incluir el contenedor de actividades');
+assert(vida.includes('assets/js/novedades-config.js'), 'Vida escolar debe cargar la configuración de Novedades');
+assert(vida.includes('assets/js/novedades.js'), 'Vida escolar debe cargar el cliente de Novedades');
+assert(/Actividades destacadas/i.test(vida), 'Vida escolar debe identificar el bloque dinámico de actividades');
+assert(/function\s+mountLifeSchoolList\s*\(/.test(newsJs), 'El cliente debe renderizar actividades de Vida escolar con imagen y texto');
+
 assert(/function\s+mountHomeCarousel\s*\(/.test(newsJs), 'El cliente debe montar el carrusel de Inicio');
 assert(/function\s+mountNewsList\s*\(/.test(newsJs), 'El cliente debe montar listas dinámicas de novedades');
 assert(/ArrowLeft/.test(newsJs) && /ArrowRight/.test(newsJs), 'El carrusel debe responder a teclado');
@@ -41,5 +50,6 @@ assert(homeCss.includes('.news-card'), 'Inicio debe incluir estilos de las tarje
 assert(homeCss.includes('prefers-reduced-motion'), 'El carrusel debe respetar reducción de movimiento');
 assert(actualidadCss.includes('.news-list'), 'Comunicados debe incluir estilos para la lista dinámica');
 assert(actualidadCss.includes('.news-list__item'), 'Comunicados debe incluir estilos para cada publicación');
+assert(multipageCss.includes('.life-news-list'), 'Vida escolar debe incluir estilos para publicaciones dinámicas');
 
 console.log('novedades-pages.test.js: all assertions passed');
