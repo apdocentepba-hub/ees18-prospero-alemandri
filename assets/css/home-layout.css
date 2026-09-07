@@ -209,6 +209,90 @@
 }
 .school-spaces span:last-child { grid-column: 1 / -1; }
 
+.news-carousel { position: relative; }
+.news-carousel__viewport { min-height: 340px; }
+.news-card {
+  display: grid;
+  grid-template-columns: minmax(280px, .82fr) minmax(0, 1.18fr);
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid var(--linea);
+  box-shadow: var(--sombra-suave);
+}
+.news-card[hidden] { display: none; }
+.news-card__media { min-height: 360px; background: #eaf3f7; }
+.news-card__media img { width: 100%; height: 100%; min-height: 360px; object-fit: cover; }
+.news-card__media--placeholder {
+  display: grid;
+  place-items: center;
+  min-height: 360px;
+  padding: 32px;
+  color: #d7edf7;
+  background: linear-gradient(145deg, var(--azul-profundo), var(--azul));
+}
+.news-card__media--placeholder span {
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: clamp(2rem, 5vw, 4rem);
+  font-weight: 700;
+  text-align: center;
+}
+.news-card__body { align-self: center; padding: clamp(28px, 5vw, 54px); }
+.news-card__meta {
+  display: block;
+  color: var(--azul);
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+.news-card__body h3 {
+  margin: 10px 0 16px;
+  color: var(--azul-profundo);
+  font-family: "Libre Baskerville", Georgia, serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.15;
+}
+.news-card__body p { margin-bottom: 22px; color: #566f7e; font-size: 1.02rem; line-height: 1.72; }
+.news-card__cta { display: inline-flex; }
+.news-fallback {
+  padding: 34px;
+  background: #fff;
+  border: 1px dashed #a9c7d6;
+}
+.news-fallback h3 { margin: 0 0 10px; color: var(--azul-profundo); font-family: "Libre Baskerville", Georgia, serif; }
+.news-fallback p { color: #607986; }
+.news-carousel__controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+.news-carousel__controls[hidden] { display: none; }
+.news-carousel__controls > button {
+  width: 46px;
+  height: 46px;
+  border: 1px solid #c8dce7;
+  background: #fff;
+  color: var(--azul-profundo);
+  font-size: 1.35rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.news-carousel__controls > button:focus-visible,
+.news-carousel__dot:focus-visible { outline: 3px solid var(--celeste); outline-offset: 3px; }
+.news-carousel__dots { display: flex; align-items: center; gap: 8px; }
+.news-carousel__dot {
+  width: 12px;
+  height: 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: #b8cbd5;
+  cursor: pointer;
+}
+.news-carousel__dot.is-active { background: var(--azul-profundo); transform: scale(1.18); }
+
 @media (max-width: 1180px) {
   .brand-copy__legacy { display: none; }
   .primary-nav { gap: 11px; font-size: .79rem; }
@@ -243,6 +327,14 @@
   .plan-card { min-height: 165px; }
 }
 
+@media (max-width: 800px) {
+  .news-card { grid-template-columns: 1fr; }
+  .news-card__media,
+  .news-card__media img,
+  .news-card__media--placeholder { min-height: 240px; max-height: 320px; }
+  .news-card__body { padding: 28px 24px; }
+}
+
 @media (max-width: 640px) {
   .header-shell { min-height: 72px; }
   .brand-logo { width: 48px; height: 48px; }
@@ -266,4 +358,14 @@
   .authority-list article { grid-template-columns: 1fr; gap: 4px; }
   .school-spaces { grid-template-columns: 1fr; }
   .school-spaces span:last-child { grid-column: auto; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .news-carousel *,
+  .news-carousel *::before,
+  .news-carousel *::after {
+    scroll-behavior: auto !important;
+    transition: none !important;
+    animation: none !important;
+  }
 }
