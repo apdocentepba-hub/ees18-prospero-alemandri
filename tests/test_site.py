@@ -6,12 +6,14 @@ PRINCIPAL = [
     "index.html",
     "nuestra-escuela.html",
     "propuesta-educativa.html",
-    "tramites.html",
+    "estudiantes-familias.html",
+    "docentes.html",
     "vida-escolar.html",
     "ingreso-2027.html",
     "contacto.html",
 ]
 DETAIL = [
+    "tramites.html",
     "historia.html",
     "plan-estudios.html",
     "comunicados.html",
@@ -25,7 +27,8 @@ NAV_LINKS = [
     "index.html",
     "nuestra-escuela.html",
     "propuesta-educativa.html",
-    "tramites.html",
+    "estudiantes-familias.html",
+    "docentes.html",
     "vida-escolar.html",
     "ingreso-2027.html",
     "contacto.html",
@@ -75,6 +78,7 @@ def test_nuestra_escuela_reune_informacion_institucional():
         "061097100",
         "Ana Lanni",
         "Adriana Celeste Caceres",
+        "Motyl Nadezhda",
         "Anabella Centurión",
         "María de los Ángeles Dimola",
         "Biblioteca",
@@ -143,7 +147,7 @@ def test_vida_escolar_publicada_y_visible():
     assert 'data-news-section="inicio"' in home
     assert 'assets/js/novedades.js' in home
     assert "2.º Encuentro de RE Bonaerense" in vida
-    assert 'assets/img/re-bonaerense-2024.jpg' in vida
+    assert 'assets/img/re-bonaerense-2026.jpg' in vida
     assert "Estudiantes hacen memoria" in vida
     assert "micro relatos" in vida
 

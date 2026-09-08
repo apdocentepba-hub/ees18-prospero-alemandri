@@ -27,13 +27,13 @@
     "Título": "Leer en Comunidad",
     "Bajada": "Una jornada para encontrarnos alrededor de los libros, la lectura y la biblioteca escolar.",
     "Cuerpo": "El 4 de septiembre de 2026, en la E.E.S. Nº 18 “Próspero Alemandri”, se llevó a cabo la segunda jornada de Leer en Comunidad, en el marco de la Jornada de Bibliotecas Escolares Abiertas 2026. Estudiantes y docentes compartieron un espacio de lectura y encuentro en la biblioteca de la escuela. Una propuesta que fortalece el vínculo con los libros, la lectura compartida y la vida cultural de nuestra comunidad educativa.",
-    "Imagen": "assets/img/leer-en-comunidad-2026-01.jpg",
+    "Imagen": "assets/img/leer-en-comunidad-2026.svg",
     "Botón texto": "Ver Vida escolar",
     "Botón URL": "vida-escolar.html",
     "Inicio": "Sí",
     "Comunicados": "No",
     "Vida escolar": "Sí",
-    "Actualizada": "2026-09-07"
+    "Actualizada": "2026-09-08"
   },
   {
     "ID": "re-bonaerense-2026",
@@ -45,12 +45,12 @@
     "Título": "2.º Encuentro de RE Bonaerense",
     "Bajada": "La E.E.S. Nº 18 participó del encuentro y compartió los micro relatos desarrollados por estudiantes en el proyecto “Estudiantes hacen memoria”.",
     "Cuerpo": "La E.E.S. Nº 18 “Próspero Alemandri” participó del 2.º Encuentro de RE Bonaerense, junto con otras instituciones de la región. Durante el encuentro se compartieron los micro relatos que estudiantes vienen trabajando en el proyecto “Estudiantes hacen memoria”, junto con producciones de otras escuelas. Felicitamos a docentes y estudiantes por el compromiso y el nivel de trabajo demostrado.",
-    "Imagen": "assets/img/re-bonaerense-2024.jpg",
+    "Imagen": "assets/img/re-bonaerense-2026.jpg",
     "Botón texto": "Ver Vida escolar",
     "Botón URL": "vida-escolar.html",
     "Inicio": "Sí",
     "Comunicados": "No",
     "Vida escolar": "Sí",
-    "Actualizada": "2026-09-07"
+    "Actualizada": "2026-09-08"
   }
 ]

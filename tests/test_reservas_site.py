@@ -45,14 +45,14 @@ def test_public_reservation_page_does_not_expose_private_booking_fields():
         assert value not in html
 
 
-def test_docentes_promotes_new_system_and_keeps_old_form_as_contingency():
+def test_docentes_promotes_only_current_reservation_system():
     html = read("docentes.html")
-    assert "1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform" in html
+    assert "1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform" not in html
     assert 'href="reservas-audiovisuales.html"' in html
     assert "Reservar Salón de Audiovisuales" in html
-    assert "Contingencia" in html
+    assert "Contingencia" not in html
+    assert "Carro Tecnológico" not in html
     assert "Piloto" not in html
-    assert "Sistema actual" not in html
     assert "Probar nuevo sistema de reservas" not in html
 
 

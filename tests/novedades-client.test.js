@@ -11,8 +11,8 @@ assert.strictEqual(rules.safeUrl('javascript:alert(1)'), '');
 assert.strictEqual(rules.safeUrl('http://example.org/x'), '');
 assert.strictEqual(rules.safeUrl('https://example.org/x'), 'https://example.org/x');
 assert.strictEqual(
-  rules.safeUrl('assets/img/re-bonaerense-2024.jpg'),
-  'assets/img/re-bonaerense-2024.jpg'
+  rules.safeUrl('assets/img/re-bonaerense-2026.jpg'),
+  'assets/img/re-bonaerense-2026.jpg'
 );
 assert.strictEqual(rules.safeUrl('../privado.html'), '');
 
@@ -62,20 +62,11 @@ assert.strictEqual(emptyState.current(), 0);
 assert.strictEqual(emptyState.next(), 0);
 assert.strictEqual(emptyState.previous(), 0);
 
-assert.strictEqual(typeof rules.posterStripUrls, 'function', 'Debe existir un helper para recomponer afiches segmentados');
-const posterUrls = rules.posterStripUrls({
-  id: 'leer-en-comunidad-2026-09-04',
-  image: 'assets/img/leer-en-comunidad-2026-01.jpg'
-});
-assert.strictEqual(posterUrls.length, 10, 'Leer en Comunidad debe recomponerse con sus 10 tiras');
-assert.strictEqual(posterUrls[0], 'assets/img/leer-en-comunidad-2026-01.jpg');
-assert.strictEqual(posterUrls[9], 'assets/img/leer-en-comunidad-2026-10.jpg');
-assert.deepStrictEqual(
-  rules.posterStripUrls({ id: 'otra-noticia', image: 'assets/img/re-bonaerense-2024.jpg' }),
-  [],
-  'Las imágenes normales no deben convertirse en afiches segmentados'
+assert.strictEqual(
+  rules.posterStripUrls,
+  undefined,
+  'El cliente ya no debe exponer lógica especial para recomponer afiches en tiras'
 );
-
 assert.strictEqual(typeof rules.requestNews, 'function');
 
 console.log('novedades-client.test.js: all assertions passed');

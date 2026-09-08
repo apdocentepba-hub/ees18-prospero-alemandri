@@ -22,27 +22,28 @@ def test_seo_and_share_metadata():
     assert (ROOT / "site.webmanifest").exists()
 
 
-def test_ingreso_has_faq_visits_and_whatsapp_share():
+def test_ingreso_has_faq_contact_whatsapp_and_no_unconfirmed_visit_cta():
     ingreso = read("ingreso-2027.html")
     assert '<details' in ingreso
     assert 'Preguntas frecuentes' in ingreso
-    assert 'href="visitas-ees18.html"' in ingreso
-    assert 'wa.me/?text=' in ingreso
-    assert 'mailto:secundaria18avellaneda@abc.gob.ar' in ingreso
+    assert 'https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l' in ingreso
+    assert 'mailto:secundaria18avellaneda@abc.gob.ar' in ingreso or 'href="contacto.html"' in ingreso
+    assert 'href="visitas-ees18.html"' not in ingreso
+
     visitas = ROOT / "visitas-ees18.html"
     assert visitas.exists()
     visitas_html = read("visitas-ees18.html")
-    assert 'Vení a conocer la E.E.S. Nº 18' in visitas_html
-    assert 'fecha a confirmar' in visitas_html.lower()
+    assert 'no hay jornadas' in visitas_html.lower()
+    assert 'fecha a confirmar' not in visitas_html.lower()
     assert 'secundaria18avellaneda@abc.gob.ar' in visitas_html
 
 
 def test_reputation_pages_have_publishable_structure():
-    accion = read("vida-escolar.html")
+    vida = read("vida-escolar.html")
     comunicados = read("comunicados.html")
-    for category in ["Proyectos", "Ciencias", "Comunicación", "Lenguas", "Sociales", "Cultura y deporte"]:
-        assert category in accion
-    assert 'Ingreso 2027' in accion
+    assert 'data-news-section="vida-escolar"' in vida
+    assert 'Archivo de actividades destacadas' in vida
+    assert 'Ingreso 2027' in vida
     assert 'información confirmada' in comunicados.lower()
     assert 'Ingreso 2027' in comunicados
 

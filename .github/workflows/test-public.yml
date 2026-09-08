@@ -35,6 +35,7 @@ jobs:
       - name: Run JavaScript structure checks
         run: |
           node tests/site.test.js
+          node tests/site-cleanup.test.js
           node tests/re-bonaerense-year.test.js
           node tests/whatsapp-channel.test.js
           node tests/contact-and-reservation-mail.test.js

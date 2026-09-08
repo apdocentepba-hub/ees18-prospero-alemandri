@@ -34,7 +34,8 @@ const detailPages = [
 });
 assert(fs.existsSync(path.join(root, 'assets/css/styles.css')), 'styles.css must exist');
 assert(fs.existsSync(path.join(root, 'assets/js/main.js')), 'main.js must exist');
-assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2024.jpg')), 'RE Bonaerense image must exist');
+assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2024.jpg')), 'Legacy RE Bonaerense image must remain for compatibility');
+assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2026.jpg')), 'Normalized RE Bonaerense image must exist');
 
 const html = read('index.html');
 const css = read('assets/css/styles.css');
@@ -113,8 +114,8 @@ const docentes = read('docentes.html');
 assert(docentes.includes('Docentes'), 'teacher hub must identify its audience');
 assert(docentes.includes('Reservar Salón de Audiovisuales'), 'teacher hub must expose active audiovisual booking');
 assert(docentes.includes('reservas-audiovisuales.html'), 'teacher hub must link to active audiovisual booking');
-assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must retain audiovisual contingency form');
-assert(docentes.includes('Carro Tecnológico'), 'teacher hub must expose technological cart access');
+assert(!docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must remove obsolete contingency form');
+assert(!docentes.includes('Carro Tecnológico'), 'teacher hub must not advertise unavailable public cart interface');
 assert(!docentes.includes('Continuidad pedagógica por curso - ENSPA'), 'teacher hub must not expose internal spreadsheet names');
 
 const tramites = read('tramites.html');
@@ -127,7 +128,7 @@ assert(vida.includes('assets/js/novedades.js'), 'Vida escolar must load the dyna
 const re = seed.find((item) => item.ID === 're-bonaerense-2026');
 assert(re && re['Vida escolar'] === 'Sí', 'RE Bonaerense must be seeded for Vida escolar');
 assert(re['Cuerpo'].includes('Estudiantes hacen memoria'), 'Seed must preserve project name');
-assert(re['Imagen'] === 'assets/img/re-bonaerense-2024.jpg', 'Seed must preserve the local image');
+assert(re['Imagen'] === 'assets/img/re-bonaerense-2026.jpg', 'Seed must use the normalized 2026 image');
 
 const oldAction = read('enspa-en-accion.html');
 assert(oldAction.includes('vida-escolar.html'), 'old ENSPA action URL must redirect to Vida escolar');
