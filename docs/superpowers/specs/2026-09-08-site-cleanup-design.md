@@ -20,6 +20,7 @@ No se modifica la lógica productiva de:
 - Consulta pública de estado por DNI.
 - Solicitud de Analítico Final.
 - Backend de Novedades ni el esquema/estructura de su Google Sheet.
+- Contador público de visitas de Inicio.
 
 La única escritura prevista sobre la Sheet de Novedades es editorial: reemplazar en la fila de Leer en Comunidad la ruta de las tiras por la ruta de la imagen consolidada, una vez que ese asset ya esté publicado y verificado.
 
@@ -62,13 +63,13 @@ Todas las páginas con layout institucional completo usan el mismo footer concep
 - acceso al canal oficial de WhatsApp.
 - año dinámico.
 
-Se elimina el contador público de visitas de Inicio y su dependencia de `counterapi.com`. También se eliminan sus CSS/JS/tests si quedan sin consumidores.
+El contador público de visitas de Inicio se conserva. Mantiene el comportamiento actual: si `counterapi.com` responde correctamente se muestra el valor; si el servicio externo falla, el contador se oculta silenciosamente sin afectar la navegación ni el resto de la página.
 
 ## 5. Limpieza editorial por página
 
 ### Inicio
 
-- Mantener hero, accesos rápidos, Novedades y “Lo más consultado”.
+- Mantener hero, accesos rápidos, Novedades, “Lo más consultado” y contador de visitas.
 - Eliminar por completo la sección “Agenda” mientras no existan fechas institucionales reales.
 - Mantener WhatsApp como canal institucional visible.
 - No mostrar textos de tipo “Próximamente” o “A confirmar” como contenido principal.
@@ -202,7 +203,7 @@ Se mantiene metadata canonical y se completa `og:image`/Twitter image en las pá
 
 Cuando un CSS o JS compartido cambie de forma visible, las páginas que lo consumen deben usar un identificador/versionado coherente para evitar que navegadores o CDN combinen HTML nuevo con assets viejos.
 
-Se eliminan dependencias sin consumidores, especialmente las del contador de visitas y la lógica temporal de recomposición del afiche cuando quede reemplazada por una imagen consolidada.
+Se eliminan dependencias sin consumidores derivadas de esta limpieza, especialmente la lógica temporal de recomposición del afiche cuando quede reemplazada por una imagen consolidada. El contador de visitas y sus assets se conservan.
 
 ## 10. Reglas editoriales resultantes
 
@@ -235,7 +236,7 @@ La entrega se considera terminada sólo si se verifica todo lo siguiente:
 2. `Motyl Nadezhda` figura como Vicedirectora de Turno Tarde.
 3. Contacto no muestra un teléfono inexistente.
 4. Docentes no menciona reservas semanales ni contiene el Google Form viejo ni la tarjeta pública de Carro Tecnológico.
-5. Inicio no contiene la sección Agenda ni el contador público de visitas.
+5. Inicio no contiene la sección Agenda y conserva el contador público de visitas con su fallback silencioso actual.
 6. Vida escolar diferencia novedades actuales de archivo y no tiene seis categorías vacías.
 7. Comunicados muestra la lista real sin tres tarjetas introductorias innecesarias.
 8. Todas las páginas con header institucional comparten el mismo menú principal.
