@@ -171,6 +171,53 @@
     return node;
   }
 
+  function posterStripUrls(item) {
+    var input = item && typeof item === 'object' ? item : {};
+    if (text(input.id, 120) !== 'leer-en-comunidad-2026-09-04') return [];
+
+    var image = safeUrl(input.image);
+    var match = image.match(/^(.*leer-en-comunidad-2026-)(\d{2})(\.jpg(?:[?#].*)?)$/i);
+    if (!match) return [];
+
+    var urls = [];
+    for (var index = 1; index <= 10; index += 1) {
+      var suffix = String(index).padStart(2, '0');
+      urls.push(match[1] + suffix + match[3]);
+    }
+    return urls;
+  }
+
+  function appendNewsImage(parent, item) {
+    var strips = posterStripUrls(item);
+    if (strips.length) {
+      var poster = root.document.createElement('div');
+      poster.className = 'news-poster-strips';
+      poster.setAttribute('role', 'img');
+      poster.setAttribute('aria-label', 'Afiche de ' + item.title);
+
+      strips.forEach(function (src) {
+        var strip = root.document.createElement('img');
+        strip.src = src;
+        strip.alt = '';
+        strip.loading = 'lazy';
+        strip.decoding = 'async';
+        poster.appendChild(strip);
+      });
+
+      parent.appendChild(poster);
+      return true;
+    }
+
+    if (!item.image) return false;
+
+    var image = root.document.createElement('img');
+    image.src = item.image;
+    image.alt = 'Imagen de ' + item.title;
+    image.loading = 'lazy';
+    parent.appendChild(image);
+    return true;
+  }
+
   function createHomeNewsCard(item) {
     var article = root.document.createElement('article');
     article.className = 'news-card';
@@ -178,13 +225,7 @@
 
     var media = root.document.createElement('div');
     media.className = 'news-card__media';
-    if (item.image) {
-      var image = root.document.createElement('img');
-      image.src = item.image;
-      image.alt = 'Imagen de ' + item.title;
-      image.loading = 'lazy';
-      media.appendChild(image);
-    } else {
+    if (!appendNewsImage(media, item)) {
       media.classList.add('news-card__media--placeholder');
       appendTextElement(media, 'span', '', 'E.E.S. Nº 18');
     }
@@ -360,11 +401,7 @@
     if (item.image) {
       var media = root.document.createElement('figure');
       media.className = 'life-news-list__media';
-      var image = root.document.createElement('img');
-      image.src = item.image;
-      image.alt = 'Imagen de ' + item.title;
-      image.loading = 'lazy';
-      media.appendChild(image);
+      appendNewsImage(media, item);
       article.appendChild(media);
     }
 
@@ -457,6 +494,7 @@
     safeUrl: safeUrl,
     sortItems: sortItems,
     createCarouselState: createCarouselState,
+    posterStripUrls: posterStripUrls,
     requestNews: requestNews,
     mountHomeCarousel: mountHomeCarousel,
     mountNewsList: mountNewsList,
