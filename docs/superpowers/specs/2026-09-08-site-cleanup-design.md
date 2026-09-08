@@ -22,7 +22,7 @@ No se modifica la lógica productiva de:
 - Backend de Novedades ni el esquema/estructura de su Google Sheet.
 - Contador público de visitas de Inicio.
 
-La única escritura prevista sobre la Sheet de Novedades es editorial: reemplazar en la fila de Leer en Comunidad la ruta de las tiras por la ruta de la imagen consolidada, una vez que ese asset ya esté publicado y verificado.
+Las únicas escrituras previstas sobre la Sheet de Novedades son editoriales y se realizan después de publicar los nuevos assets: reemplazar la ruta de imagen de Leer en Comunidad por la imagen consolidada y reemplazar la ruta de RE Bonaerense `...-2024.jpg` por `...-2026.jpg`. No se cambia ninguna otra celda, columna, validación ni estructura de la planilla.
 
 No se crea un sistema de templates, framework, CMS, generador estático ni pipeline de build adicional. El sitio continúa siendo HTML/CSS/JS estático sobre GitHub Pages.
 
@@ -159,7 +159,7 @@ Inicio, Ingreso 2027 y Vida escolar deben declarar `og:image` y `twitter:image` 
 
 El archivo `assets/img/re-bonaerense-2024.jpg` se normaliza a un nombre coherente con el contenido publicado en 2026, por ejemplo `assets/img/re-bonaerense-2026.jpg`.
 
-Se actualizan todas las referencias en HTML, seed editorial y tests. No debe quedar una referencia productiva al nombre 2024 para una publicación identificada como 2026.
+Se actualizan todas las referencias en HTML, seed editorial, Sheet y tests. No debe quedar una referencia productiva al nombre 2024 para una publicación identificada como 2026. El archivo viejo puede conservarse temporalmente como compatibilidad durante el despliegue, siempre que deje de tener consumidores productivos.
 
 ### Leer en Comunidad
 
@@ -171,7 +171,7 @@ Después de la consolidación:
 - el seed editorial usa esa imagen única.
 - la Sheet de Novedades se actualiza para apuntar a esa imagen única.
 - se elimina del renderer la lógica especial de recomposición de 10 tiras.
-- los assets segmentados pueden eliminarse una vez que no tengan consumidores.
+- los assets segmentados pueden conservarse temporalmente como compatibilidad durante el despliegue y eliminarse más adelante cuando no tengan consumidores.
 
 El cambio no altera texto, colores ni contenido del afiche.
 
@@ -221,10 +221,10 @@ Se implementará en una rama aislada desde `main` y mediante TDD/regresión estr
 2. limpieza de contenido y navegación;
 3. identidad local y normalización de assets;
 4. SEO/noindex/sitemap;
-5. actualización editorial de una única ruta de imagen en la Sheet de Novedades para el afiche consolidado;
-6. suite completa y probes productivos existentes;
-7. revisión final del diff;
-8. PR y merge sólo con evidencia GREEN.
+5. publicación del PR y verificación de GitHub Pages;
+6. actualización editorial exclusiva de las dos rutas de imagen en la Sheet de Novedades;
+7. probes productivos de Reservas y Novedades después del cambio editorial;
+8. revisión final de producción.
 
 No se realizan escrituras en los backends de Reservas, Contacto, Estado, Analítico Final ni Novedades.
 
@@ -246,7 +246,7 @@ La entrega se considera terminada sólo si se verifica todo lo siguiente:
 12. Ninguna página institucional depende del dominio del ISFD 100 para mostrar el logo.
 13. Manifest/favicon/iconos están configurados con assets locales.
 14. Inicio, Ingreso 2027 y Vida escolar tienen imagen social local.
-15. RE Bonaerense usa un nombre de asset coherente con 2026.
+15. RE Bonaerense usa un nombre de asset coherente con 2026 y la Sheet publica esa ruta.
 16. Leer en Comunidad usa una sola imagen final y la Sheet apunta a ella.
 17. Páginas operativas/puente/auxiliares definidas llevan `noindex,follow` y no están en sitemap.
 18. La suite automatizada completa pasa.
@@ -255,4 +255,4 @@ La entrega se considera terminada sólo si se verifica todo lo siguiente:
 
 ## 13. Rollback
 
-La limpieza se entrega mediante PR único y commits lógicos. Si una parte visual produce una regresión, puede revertirse el PR sin afectar los backends productivos. La Sheet sólo se modifica para reemplazar la ruta de imagen de Leer en Comunidad una vez que la imagen única ya esté publicada y verificada.
+La limpieza se entrega mediante PR único y commits lógicos. Si una parte visual produce una regresión, puede revertirse el PR sin afectar los backends productivos. Las dos rutas de imagen de la Sheet se actualizan sólo después de que los nuevos assets estén publicados; si fuera necesario revertir el sitio, las rutas editoriales también se restauran a sus valores anteriores.
