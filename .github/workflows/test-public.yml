@@ -30,6 +30,8 @@ jobs:
           node --check assets/js/reservas-email-policy.js
           node --check assets/js/cancelar-reserva.js
           if [ -f assets/js/contacto.js ]; then node --check assets/js/contacto.js; fi
+          node --check assets/js/novedades.js
+          node --check assets/js/novedades-config.js
       - name: Run JavaScript structure checks
         run: |
           node tests/site.test.js
@@ -44,5 +46,10 @@ jobs:
           node tests/abc-email-policy.test.js
           node tests/apps-script-performance.test.js
           node tests/analitico-final.test.js
+          node tests/novedades-backend.test.js
+          node tests/novedades-client.test.js
+          node tests/novedades-pages.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
+      - name: Probe deployed novedades Web App
+        run: python tests/probe_novedades_live.py

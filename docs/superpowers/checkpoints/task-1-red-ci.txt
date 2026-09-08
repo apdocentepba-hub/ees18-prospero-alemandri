@@ -1,0 +1,1 @@
+Task 1 is ready for RED verification in GitHub Actions.

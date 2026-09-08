@@ -3,20 +3,15 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const home = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
-const vida = fs.readFileSync(path.join(root, 'vida-escolar.html'), 'utf8');
+const seed = JSON.parse(fs.readFileSync(path.join(root, 'data', 'novedades-seed.json'), 'utf8'));
+const re = seed.find((item) => item.ID === 're-bonaerense-2026');
 
-assert(
-  home.includes('<span class="news-label">Proyecto institucional · 2026</span><h2>2.º Encuentro de RE Bonaerense</h2>'),
-  'la portada debe mostrar RE Bonaerense como actividad de 2026'
-);
-assert(
-  vida.includes('<span>Actividad destacada · 2026</span><h2>2.º Encuentro de RE Bonaerense</h2>'),
-  'Vida escolar debe mostrar RE Bonaerense como actividad destacada de 2026'
-);
-assert(
-  vida.includes('<span class="feature-story__label">Proyecto institucional · 2026</span><h2>Compartimos y celebramos</h2>'),
-  'Vida escolar debe rotular RE Bonaerense como proyecto institucional 2026'
-);
+assert(re, 'El seed editorial debe incluir RE Bonaerense');
+assert.strictEqual(re['Fecha'], '', 'No se debe inventar una fecha exacta para RE Bonaerense');
+assert.strictEqual(re['Fecha visible'], '2026', 'RE Bonaerense debe conservar 2026 como fecha visible');
+assert.strictEqual(re['Tipo'], 'Proyecto institucional');
+assert.strictEqual(re['Título'], '2.º Encuentro de RE Bonaerense');
+assert.strictEqual(re['Vida escolar'], 'Sí');
+assert.strictEqual(re['Inicio'], 'Sí');
 
 console.log('re-bonaerense-year.test.js: all assertions passed');

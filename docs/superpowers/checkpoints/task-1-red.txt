@@ -1,0 +1,1 @@
+Task 1 RED state: tests/novedades-backend.test.js exists; apps-script/novedades backend intentionally absent until CI confirms expected failure.
