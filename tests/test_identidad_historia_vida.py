@@ -36,36 +36,30 @@ def test_historia_institucional_publicada():
 
 
 def test_vida_escolar_publica_leer_en_comunidad_2026():
-    path = ROOT / "vida-escolar.html"
-    assert path.exists()
-    vida = path.read_text(encoding="utf-8")
+    vida = read("vida-escolar.html")
     for item in [
         "Leer en Comunidad",
         "Jornada de Bibliotecas Escolares Abiertas 2026",
         "4 de septiembre de 2026",
         "Una comunidad que sigue leyendo",
-        'src="assets/img/leer-en-comunidad-2026-01.jpg"',
-        'src="assets/img/leer-en-comunidad-2026-10.jpg"',
+        'src="assets/img/leer-en-comunidad-2026.svg"',
     ]:
         assert item in vida
     assert vida.index("Leer en Comunidad") < vida.index("2.º Encuentro de RE Bonaerense")
-    for part in range(1, 11):
-        assert (ROOT / f"assets/img/leer-en-comunidad-2026-{part:02d}.jpg").exists()
+    assert (ROOT / "assets/img/leer-en-comunidad-2026.svg").exists()
 
 
 def test_vida_escolar_publica_re_bonaerense():
-    path = ROOT / "vida-escolar.html"
-    assert path.exists()
-    vida = path.read_text(encoding="utf-8")
+    vida = read("vida-escolar.html")
     for item in [
         "Vida escolar",
         "2.º Encuentro de RE Bonaerense",
         "Estudiantes hacen memoria",
         "micro relatos",
-        'src="assets/img/re-bonaerense-2024.jpg"',
+        'src="assets/img/re-bonaerense-2026.jpg"',
     ]:
         assert item in vida
-    assert (ROOT / "assets/img/re-bonaerense-2024.jpg").exists()
+    assert (ROOT / "assets/img/re-bonaerense-2026.jpg").exists()
 
 
 def test_url_anterior_de_actividades_redirige():
@@ -74,9 +68,9 @@ def test_url_anterior_de_actividades_redirige():
     assert 'href="vida-escolar.html"' in legacy
 
 
-def test_visitas_usa_identidad_actual():
-    path = ROOT / "visitas-ees18.html"
-    assert path.exists()
-    visitas = path.read_text(encoding="utf-8")
-    assert "Vení a conocer la E.E.S. Nº 18" in visitas
+def test_visitas_conserva_identidad_y_no_promete_fecha():
+    visitas = read("visitas-ees18.html")
+    assert "E.E.S. Nº 18" in visitas
     assert "Vení a conocer ENSPA" not in visitas
+    assert "Actualmente no hay jornadas de visita publicadas" in visitas
+    assert "Fecha a confirmar" not in visitas
