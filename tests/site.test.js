@@ -113,8 +113,8 @@ const docentes = read('docentes.html');
 assert(docentes.includes('Docentes'), 'teacher hub must identify its audience');
 assert(docentes.includes('Reservar Salón de Audiovisuales'), 'teacher hub must expose active audiovisual booking');
 assert(docentes.includes('reservas-audiovisuales.html'), 'teacher hub must link to active audiovisual booking');
-assert(docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must retain audiovisual contingency form');
-assert(docentes.includes('Carro Tecnológico'), 'teacher hub must expose technological cart access');
+assert(!docentes.includes('1HR7ok7hQN-RQJx8bdS8ld2MRbA1dAMv8bazhk_KQrXw/viewform'), 'teacher hub must remove obsolete contingency form');
+assert(!docentes.includes('Carro Tecnológico'), 'teacher hub must not advertise unavailable public cart interface');
 assert(!docentes.includes('Continuidad pedagógica por curso - ENSPA'), 'teacher hub must not expose internal spreadsheet names');
 
 const tramites = read('tramites.html');
