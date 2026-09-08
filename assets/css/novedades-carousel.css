@@ -39,23 +39,6 @@
   object-fit: cover;
 }
 
-.news-card__media .news-poster-strips {
-  width: min(70%, 200px);
-  margin: 4px auto 0;
-  overflow: hidden;
-  font-size: 0;
-  line-height: 0;
-}
-
-.news-card__media .news-poster-strips img {
-  display: block;
-  width: 100%;
-  height: auto;
-  min-height: 0;
-  margin: 0;
-  object-fit: fill;
-}
-
 .news-card__media--placeholder {
   display: grid;
   place-items: center;
@@ -184,11 +167,6 @@
   .news-card__media--placeholder {
     height: 220px;
     min-height: 220px;
-  }
-
-  .news-card__media .news-poster-strips {
-    width: min(58%, 145px);
-    margin-top: 4px;
   }
 
   .news-card__body {
