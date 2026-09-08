@@ -58,12 +58,14 @@ assert(carouselCss.includes('.news-card'), 'El CSS aislado debe estilizar las ta
 assert(!carouselCss.includes('.news-poster-strips'), 'El carrusel no debe conservar CSS del afiche segmentado');
 assert(/\.news-carousel__viewport\s*\{[^}]*min-height:\s*0/s.test(carouselCss), 'El viewport del carrusel no debe reservar altura vacía fija');
 assert(/\.news-card__media\s*\{[^}]*min-height:\s*300px/s.test(carouselCss), 'La imagen del carrusel debe mantener una altura compacta en escritorio');
+assert(/\.news-card__media img\s*\{[^}]*object-fit:\s*contain/s.test(carouselCss), 'Inicio debe mostrar el afiche completo sin recortarlo');
 assert(/\[data-news-prev\][^}]*left:/s.test(carouselCss) && /\[data-news-next\][^}]*right:/s.test(carouselCss), 'Las flechas deben quedar ubicadas a los costados del carrusel');
 assert(carouselCss.includes('prefers-reduced-motion'), 'El carrusel debe respetar reducción de movimiento');
 assert(actualidadCss.includes('.news-list'), 'Comunicados debe incluir estilos para la lista dinámica');
 assert(actualidadCss.includes('.news-list__item'), 'Comunicados debe incluir estilos para cada publicación');
 assert(actualidadCss.includes('.life-news-list'), 'Vida escolar debe incluir estilos para publicaciones dinámicas');
 assert(actualidadCss.includes('.life-news-list__item'), 'Vida escolar debe estilizar cada actividad dinámica');
+assert(/\.life-news-list__media img\s*\{[^}]*object-fit:\s*contain/s.test(actualidadCss), 'Vida escolar debe mostrar el afiche completo sin recortarlo');
 assert(!actualidadCss.includes('.news-poster-strips'), 'Vida escolar no debe conservar CSS del afiche segmentado');
 
 const leer = seed.find((item) => item.ID === 'leer-en-comunidad-2026-09-04');
