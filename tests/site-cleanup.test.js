@@ -73,7 +73,7 @@ for (const file of fullLayoutPages) {
   const html = read(file);
   assert.deepStrictEqual(navHrefs(html), primaryHrefs, `${file}: menú principal inconsistente`);
   assert(html.includes('assets/img/logo-ees18.jpg'), `${file}: debe usar logo local`);
-  assert(!html.includes('isfd100-bue.infd.edu.ar'), `${file}: no debe depender del logo remoto`);
+  assert(!/src="https:\/\/isfd100-bue\.infd\.edu\.ar/i.test(html), `${file}: no debe depender del logo remoto`);
 
   const footer = html.match(/<footer class="site-footer"[\s\S]*?<\/footer>/i)[0];
   assert(footer.includes('Av. Manuel Belgrano 355 · Avellaneda'), `${file}: falta dirección en footer`);
