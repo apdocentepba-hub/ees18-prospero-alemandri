@@ -19,7 +19,9 @@ No se modifica la lógica productiva de:
 - Formulario de contacto.
 - Consulta pública de estado por DNI.
 - Solicitud de Analítico Final.
-- Backend y Google Sheet de Novedades.
+- Backend de Novedades ni el esquema/estructura de su Google Sheet.
+
+La única escritura prevista sobre la Sheet de Novedades es editorial: reemplazar en la fila de Leer en Comunidad la ruta de las tiras por la ruta de la imagen consolidada, una vez que ese asset ya esté publicado y verificado.
 
 No se crea un sistema de templates, framework, CMS, generador estático ni pipeline de build adicional. El sitio continúa siendo HTML/CSS/JS estático sobre GitHub Pages.
 
@@ -218,12 +220,12 @@ Se implementará en una rama aislada desde `main` y mediante TDD/regresión estr
 2. limpieza de contenido y navegación;
 3. identidad local y normalización de assets;
 4. SEO/noindex/sitemap;
-5. actualización de Sheet de Novedades para el afiche consolidado;
+5. actualización editorial de una única ruta de imagen en la Sheet de Novedades para el afiche consolidado;
 6. suite completa y probes productivos existentes;
 7. revisión final del diff;
 8. PR y merge sólo con evidencia GREEN.
 
-No se realizan escrituras en los backends de Reservas, Contacto, Estado o Analítico Final.
+No se realizan escrituras en los backends de Reservas, Contacto, Estado, Analítico Final ni Novedades.
 
 ## 12. Criterios de aceptación
 
