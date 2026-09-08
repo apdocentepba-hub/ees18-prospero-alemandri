@@ -34,7 +34,8 @@ const detailPages = [
 });
 assert(fs.existsSync(path.join(root, 'assets/css/styles.css')), 'styles.css must exist');
 assert(fs.existsSync(path.join(root, 'assets/js/main.js')), 'main.js must exist');
-assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2024.jpg')), 'RE Bonaerense image must exist');
+assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2024.jpg')), 'Legacy RE Bonaerense image must remain for compatibility');
+assert(fs.existsSync(path.join(root, 'assets/img/re-bonaerense-2026.jpg')), 'Normalized RE Bonaerense image must exist');
 
 const html = read('index.html');
 const css = read('assets/css/styles.css');
@@ -127,7 +128,7 @@ assert(vida.includes('assets/js/novedades.js'), 'Vida escolar must load the dyna
 const re = seed.find((item) => item.ID === 're-bonaerense-2026');
 assert(re && re['Vida escolar'] === 'Sí', 'RE Bonaerense must be seeded for Vida escolar');
 assert(re['Cuerpo'].includes('Estudiantes hacen memoria'), 'Seed must preserve project name');
-assert(re['Imagen'] === 'assets/img/re-bonaerense-2024.jpg', 'Seed must preserve the local image');
+assert(re['Imagen'] === 'assets/img/re-bonaerense-2026.jpg', 'Seed must use the normalized 2026 image');
 
 const oldAction = read('enspa-en-accion.html');
 assert(oldAction.includes('vida-escolar.html'), 'old ENSPA action URL must redirect to Vida escolar');
