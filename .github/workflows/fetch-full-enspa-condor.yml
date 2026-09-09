@@ -2,15 +2,15 @@ name: Recover full ENSPA condor logo
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+    paths:
+      - '.github/workflows/fetch-full-enspa-condor.yml'
 
 permissions:
   contents: write
 
 jobs:
   recover-logo:
-    if: github.actor != 'github-actions[bot]' && contains(github.event.head_commit.message, 'ci: fetch full ENSPA condor logo')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,26 +26,12 @@ jobs:
 
       - name: Download original ENSPA shield from Profesorado
         run: |
-          curl --fail --location --retry 4 --retry-delay 2 \
-            'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2018/08/untitled_1.bmp' \
-            --output /tmp/enspa-condor.bmp
+          curl --fail --location --retry 4 --retry-delay 2 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2018/08/untitled_1.bmp' --output /tmp/enspa-condor.bmp
           file /tmp/enspa-condor.bmp
 
       - name: Validate and restore full-resolution logo
         run: |
-          python - <<'PY'
-          from PIL import Image
-          src = '/tmp/enspa-condor.bmp'
-          dst = 'assets/img/logo-ees18.jpg'
-          im = Image.open(src)
-          print(f'Original ENSPA shield: {im.width}x{im.height} mode={im.mode} format={im.format}')
-          if im.width < 200 or im.height < 200:
-              raise SystemExit(f'Unexpectedly small source image: {im.width}x{im.height}')
-          rgb = im.convert('RGB')
-          rgb.save(dst, 'JPEG', quality=96, subsampling=0, optimize=True)
-          check = Image.open(dst)
-          print(f'Restored local logo: {check.width}x{check.height} mode={check.mode} format={check.format}')
-          PY
+          python -c "from PIL import Image; im=Image.open('/tmp/enspa-condor.bmp'); print(f'Original ENSPA shield: {im.width}x{im.height} mode={im.mode} format={im.format}'); assert im.width >= 200 and im.height >= 200; im.convert('RGB').save('assets/img/logo-ees18.jpg','JPEG',quality=96,subsampling=0,optimize=True); check=Image.open('assets/img/logo-ees18.jpg'); print(f'Restored local logo: {check.width}x{check.height}')"
 
       - name: Commit restored logo
         run: |
@@ -54,5 +40,3 @@ jobs:
           git add assets/img/logo-ees18.jpg
           git commit -m 'asset: restore full ENSPA condor logo'
           git push origin HEAD:main
-
-# one-time recovery trigger
