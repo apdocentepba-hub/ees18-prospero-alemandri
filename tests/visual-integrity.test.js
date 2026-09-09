@@ -7,16 +7,20 @@ const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
 const index = read('index.html');
 const vida = read('vida-escolar.html');
+const stylesCss = read('assets/css/styles.css');
 const carouselCss = read('assets/css/novedades-carousel.css');
 const actualidadCss = read('assets/css/actualidad.css');
+const fullOriginalLogo = 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/Logo-Superior-863x1000.jpg';
 
-assert(fs.existsSync(path.join(root, 'assets/img/logo-ees18.jpg')), 'original local JPG logo must exist');
-assert(index.includes('assets/img/logo-ees18.jpg'), 'home must use the original local JPG logo');
-assert(vida.includes('assets/img/logo-ees18.jpg'), 'Vida escolar must use the original local JPG logo');
+assert(fs.existsSync(path.join(root, 'assets/img/logo-ees18.jpg')), 'local fallback JPG logo must exist');
+assert(index.includes(fullOriginalLogo), 'home must use the full original ENSPA logo from the Profesorado source');
+assert((index.match(/Logo-Superior-863x1000\.jpg/g) || []).length >= 2, 'home header and hero must both use the full original logo');
+assert(index.includes("this.src='assets/img/logo-ees18.jpg'"), 'home must keep a local fallback if the source image fails');
 assert(!index.includes('assets/img/logo-ees18.svg'), 'home must not replace the original logo with the generated SVG');
+assert(vida.includes('assets/img/logo-ees18.jpg'), 'Vida escolar keeps the local original-logo fallback');
 assert(!vida.includes('assets/img/logo-ees18.svg'), 'Vida escolar must not replace the original logo with the generated SVG');
-assert(!index.includes('isfd100-bue.infd.edu.ar'), 'home must not depend on the external ENSPA logo');
-assert(!vida.includes('isfd100-bue.infd.edu.ar'), 'Vida escolar must not depend on the external ENSPA logo');
+assert(/\.enspa-logo\s*\{[^}]*object-fit:\s*contain/s.test(stylesCss), 'logos must render complete without cropping');
+assert(/\.enspa-logo--hero\s*\{[^}]*object-fit:\s*contain/s.test(stylesCss), 'hero logo must render complete without cropping');
 
 assert(carouselCss.includes('aspect-ratio: 16 / 10;'), 'home banners must use a controlled landscape ratio');
 assert(carouselCss.includes('object-fit: cover;'), 'home banner images must crop cleanly instead of letterboxing');
