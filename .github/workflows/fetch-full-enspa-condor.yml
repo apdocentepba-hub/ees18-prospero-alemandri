@@ -54,3 +54,5 @@ jobs:
           git add assets/img/logo-ees18.jpg
           git commit -m 'asset: restore full ENSPA condor logo'
           git push origin HEAD:main
+
+# one-time recovery trigger
