@@ -1,6 +1,6 @@
 /* Vida escolar + Historia + Comunicados oficiales */
 .actualidad-hero {
-  padding: 78px 0 68px;
+  padding: 68px 0 60px;
   color: #fff;
   background: linear-gradient(135deg, #0f3f62 0%, #176a99 100%);
 }
@@ -38,6 +38,7 @@
   padding: 24px;
   background: rgba(255,255,255,.09);
   border: 1px solid rgba(255,255,255,.18);
+  border-radius: 18px;
 }
 .actualidad-hero__note strong { display:block; color:#fff; font-size:1.2rem; }
 .actualidad-hero__note span { display:block; margin-top:8px; color:#d8e8f0; line-height:1.55; }
@@ -56,14 +57,16 @@
   padding:24px;
   background:#fff;
   border:1px solid #dfe9ee;
+  border-radius: 16px;
   box-shadow:0 12px 30px rgba(15,63,98,.06);
 }
 .actualidad-card small { color:#2b7da9; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
 .actualidad-card h3 { margin:10px 0 8px; color:#0f3f62; font-family:"Libre Baskerville", Georgia, serif; }
 .actualidad-card p { margin:0; color:#617887; line-height:1.62; }
 .actualidad-empty {
-  padding:30px;
+  padding:26px;
   border:1px dashed #aac6d5;
+  border-radius: 16px;
   background:#f7fbfd;
   color:#536d7b;
   line-height:1.65;
@@ -83,6 +86,7 @@
   padding:30px;
   color:#fff;
   background:#0f3f62;
+  border-radius: 18px;
 }
 .actualidad-cta--light {
   color: #0f3f62;
@@ -93,7 +97,7 @@
 .actualidad-cta--light h2 { color: #0f3f62; }
 .actualidad-cta p { margin:8px 0 0; color:#d8e7ee; }
 .actualidad-cta--light p { color: #607986; }
-.actualidad-cta a { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0 18px; background:#fff; color:#0f3f62; font-weight:800; text-decoration:none; white-space:nowrap; }
+.actualidad-cta a { display:inline-flex; align-items:center; justify-content:center; min-height:46px; padding:0 18px; background:#fff; color:#0f3f62; font-weight:800; text-decoration:none; white-space:nowrap; border-radius:10px; }
 .actualidad-cta--light a { color: #fff; background: #176a99; }
 
 .actualidad-feature {
@@ -102,6 +106,7 @@
   overflow:hidden;
   background:#fff;
   border:1px solid #d9e6ec;
+  border-radius:18px;
   box-shadow:0 18px 45px rgba(15,63,98,.08);
 }
 .actualidad-feature__media { margin:0; background:#eaf2f5; }
@@ -118,6 +123,7 @@
   background:#fff;
   border:1px solid #dbe7ed;
   border-left:5px solid #176a99;
+  border-radius:14px;
   box-shadow:0 12px 32px rgba(15,63,98,.06);
 }
 .news-list__meta {
@@ -137,38 +143,104 @@
 .news-list__item p { max-width:900px; margin:0 0 18px; color:#536f7e; line-height:1.72; white-space:pre-line; }
 .news-list__item .button-row { margin-top:18px; }
 
-.life-news-list { display:grid; gap:20px; }
+/* Vida escolar: tarjetas compactas, proporciones controladas y lectura rápida. */
+.life-news-list { display:grid; gap:18px; }
 .life-news-list__item {
   display:grid;
-  grid-template-columns:minmax(180px,280px) minmax(0,1fr);
-  gap:28px;
+  grid-template-columns:minmax(220px, 34%) minmax(0,1fr);
+  align-items:stretch;
+  min-height:260px;
   overflow:hidden;
   background:#fff;
   border:1px solid #dbe7ed;
-  box-shadow:0 14px 36px rgba(15,63,98,.07);
+  border-radius: 18px;
+  box-shadow:0 16px 38px rgba(15,63,98,.08);
 }
 .life-news-list__item:not(:has(.life-news-list__media)) { grid-template-columns:1fr; }
-.life-news-list__media { margin:0; min-height:220px; background:#edf5f8; }
-.life-news-list__media img { display:block; width:100%; height:100%; max-height:360px; object-fit:contain; }
-.life-news-list__content { align-self:center; padding:30px 30px 30px 0; }
+.life-news-list__media {
+  margin:0;
+  min-height:0;
+  aspect-ratio: 4 / 3;
+  overflow:hidden;
+  background:linear-gradient(145deg,#eaf4f8,#dcecf4);
+}
+.life-news-list__media img {
+  display:block;
+  width:100%;
+  height:100%;
+  min-height:100%;
+  object-fit: cover;
+  object-position:center;
+}
+.life-news-list__content {
+  align-self:center;
+  padding:28px 30px;
+}
 .life-news-list__item:not(:has(.life-news-list__media)) .life-news-list__content { padding:30px; }
 .life-news-list__meta {
   display:block;
   color:#176a99;
-  font-size:.75rem;
+  font-size:.73rem;
   font-weight:800;
-  letter-spacing:.09em;
+  letter-spacing:.1em;
   text-transform:uppercase;
 }
 .life-news-list__content h3 {
-  margin:8px 0 12px;
+  max-width:780px;
+  margin:8px 0 11px;
   color:#0f3f62;
   font-family:"Libre Baskerville", Georgia, serif;
-  font-size:clamp(1.55rem,3vw,2.2rem);
+  font-size:clamp(1.45rem,2.6vw,2.05rem);
+  line-height:1.18;
 }
 .life-news-list__summary,
-.life-news-list__body { margin:0 0 14px; color:#536f7e; line-height:1.72; white-space:pre-line; }
-.life-news-list__content .button-row { margin-top:18px; }
+.life-news-list__body { margin:0 0 12px; color:#536f7e; line-height:1.62; white-space:pre-line; }
+.life-news-list__content .button-row { margin-top:16px; }
+
+/* Archivo histórico de Vida escolar: evita afiches flotando y grandes vacíos. */
+.page-section--soft .feature-story {
+  grid-template-columns: minmax(210px, 250px) minmax(0,1fr);
+  gap:0;
+  align-items:stretch;
+  overflow:hidden;
+  background:#fff;
+  border:1px solid #dbe7ed;
+  border-radius:18px;
+  box-shadow:0 14px 34px rgba(15,63,98,.07);
+}
+.page-section--soft .feature-story + .feature-story { margin-top:22px; }
+.page-section--soft .feature-story figure {
+  width:100%;
+  max-width:none;
+  min-height:310px;
+  margin:0;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
+  background:#edf5f8;
+  border:0;
+}
+.page-section--soft .feature-story img {
+  width:100%;
+  max-width:none;
+  height:100%;
+  max-height:380px;
+  object-fit:contain;
+  padding:14px;
+}
+.page-section--soft .feature-story__content {
+  align-self:center;
+  padding:30px 34px;
+}
+.page-section--soft .feature-story__content h2 {
+  margin:8px 0 12px;
+  font-size:clamp(1.6rem,3vw,2.15rem);
+  line-height:1.18;
+}
+.page-section--soft .feature-story__content p {
+  margin:0 0 12px;
+  line-height:1.65;
+}
 
 .history-timeline { position:relative; display:grid; gap:18px; max-width:980px; }
 .history-event { display:grid; grid-template-columns:130px 1fr; gap:28px; padding:26px; background:#fff; border:1px solid #dfe9ee; box-shadow:0 10px 28px rgba(15,63,98,.05); }
@@ -177,17 +249,35 @@
 .history-event p { margin:0; color:#5c7482; line-height:1.7; }
 .history-event--current { border-left:5px solid #176a99; background:#f4fafc; }
 
+/* La página multipágina carga después: estas reglas usan más especificidad a propósito. */
+body .page-hero {
+  padding:58px 0;
+  background:linear-gradient(135deg,#eef8fc 0%,#f9fcfe 52%,#e5f3fa 100%);
+}
+body .page-note {
+  border-radius:18px;
+  background:linear-gradient(145deg,#0f3f62,#176a99);
+  box-shadow:0 18px 42px rgba(15,63,98,.16);
+}
+body .page-section { padding:68px 0; }
+
 @media (max-width: 900px) {
   .actualidad-hero__grid,
   .actualidad-grid,
   .actualidad-links-grid,
   .actualidad-feature,
-  .life-news-list__item { grid-template-columns:1fr; }
+  .life-news-list__item,
+  .page-section--soft .feature-story { grid-template-columns:1fr; }
   .actualidad-cta { align-items:flex-start; flex-direction:column; }
   .actualidad-feature__media img { min-height:auto; }
-  .life-news-list__media { min-height:0; }
-  .life-news-list__media img { height:auto; max-height:none; object-fit:contain; }
+  .life-news-list__media { aspect-ratio:16 / 9; }
+  .life-news-list__media img { height:100%; min-height:0; }
   .life-news-list__content,
   .life-news-list__item:not(:has(.life-news-list__media)) .life-news-list__content { padding:24px; }
+  .page-section--soft .feature-story figure { min-height:0; max-height:340px; }
+  .page-section--soft .feature-story img { height:auto; max-height:320px; }
+  .page-section--soft .feature-story__content { padding:26px 24px; }
   .history-event { grid-template-columns:1fr; gap:8px; }
+  body .page-hero { padding:48px 0; }
+  body .page-section { padding:58px 0; }
 }
