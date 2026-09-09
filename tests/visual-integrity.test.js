@@ -10,9 +10,11 @@ const vida = read('vida-escolar.html');
 const carouselCss = read('assets/css/novedades-carousel.css');
 const actualidadCss = read('assets/css/actualidad.css');
 
-assert(fs.existsSync(path.join(root, 'assets/img/logo-ees18.svg')), 'local SVG logo must exist');
-assert(index.includes('assets/img/logo-ees18.svg'), 'home must use the local SVG logo');
-assert(vida.includes('assets/img/logo-ees18.svg'), 'Vida escolar must use the local SVG logo');
+assert(fs.existsSync(path.join(root, 'assets/img/logo-ees18.jpg')), 'original local JPG logo must exist');
+assert(index.includes('assets/img/logo-ees18.jpg'), 'home must use the original local JPG logo');
+assert(vida.includes('assets/img/logo-ees18.jpg'), 'Vida escolar must use the original local JPG logo');
+assert(!index.includes('assets/img/logo-ees18.svg'), 'home must not replace the original logo with the generated SVG');
+assert(!vida.includes('assets/img/logo-ees18.svg'), 'Vida escolar must not replace the original logo with the generated SVG');
 assert(!index.includes('isfd100-bue.infd.edu.ar'), 'home must not depend on the external ENSPA logo');
 assert(!vida.includes('isfd100-bue.infd.edu.ar'), 'Vida escolar must not depend on the external ENSPA logo');
 
