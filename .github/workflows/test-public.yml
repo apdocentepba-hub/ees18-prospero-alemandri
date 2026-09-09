@@ -17,6 +17,19 @@ jobs:
           python-version: '3.12'
       - name: Install test dependencies
         run: python -m pip install pytest pillow
+      - name: Recover original ENSPA shield for one-time migration
+        if: github.head_ref == 'recovery/fetch-enspa-condor-source-2026-09-09'
+        run: |
+          curl --fail --location --retry 4 --retry-delay 2 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2018/08/untitled_1.bmp' --output /tmp/enspa-condor.bmp
+          file /tmp/enspa-condor.bmp
+          python -c "from PIL import Image; im=Image.open('/tmp/enspa-condor.bmp'); print(f'ENSPA shield source: {im.width}x{im.height} mode={im.mode} format={im.format}'); im.convert('RGB').save('/tmp/enspa-condor.jpg','JPEG',quality=96,subsampling=0,optimize=True)"
+      - name: Upload recovered ENSPA shield
+        if: github.head_ref == 'recovery/fetch-enspa-condor-source-2026-09-09'
+        uses: actions/upload-artifact@v4
+        with:
+          name: enspa-condor-original
+          path: /tmp/enspa-condor.jpg
+          if-no-files-found: error
       - name: Run Python tests
         run: pytest -q
       - name: Check JavaScript syntax
