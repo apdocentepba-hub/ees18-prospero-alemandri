@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Emblema E.E.S. Nº 18 Próspero Alemandri</title>
+  <desc id="desc">Emblema institucional en azul y celeste con el número 18 y la sigla ENSPA.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fcfe"/>
+      <stop offset="1" stop-color="#e7f4fb"/>
+    </linearGradient>
+  </defs>
+  <rect x="18" y="18" width="476" height="476" rx="92" fill="url(#bg)" stroke="#c9e3ef" stroke-width="12"/>
+  <circle cx="256" cy="250" r="166" fill="#ffffff" stroke="#0f3f62" stroke-width="14"/>
+  <path d="M139 178c44-29 78-37 117-18 39-19 73-11 117 18v117c-43-24-78-29-117-9-39-20-74-15-117 9z" fill="none" stroke="#5ab8eb" stroke-width="14" stroke-linejoin="round"/>
+  <path d="M256 160v126" stroke="#5ab8eb" stroke-width="10" stroke-linecap="round"/>
+  <text x="256" y="132" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="33" font-weight="800" letter-spacing="8" fill="#1e6fa8">ENSPA</text>
+  <text x="256" y="289" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="126" font-weight="700" fill="#0f3f62">18</text>
+  <path d="M171 335h170" stroke="#0f3f62" stroke-width="9" stroke-linecap="round"/>
+  <text x="256" y="381" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="800" letter-spacing="2.5" fill="#0f3f62">PRÓSPERO ALEMANDRI</text>
+  <text x="256" y="418" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="4" fill="#1e6fa8">E.E.S. Nº 18</text>
+</svg>

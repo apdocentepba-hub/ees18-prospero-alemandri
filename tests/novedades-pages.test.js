@@ -23,7 +23,7 @@ assert(index.includes('assets/js/novedades-config.js'), 'Inicio debe cargar la c
 assert(index.includes('assets/js/novedades.js?v=20260908-4'), 'Inicio debe forzar la versión del renderer de imagen única');
 assert(/Novedades destacadas/i.test(index), 'La sección debe titularse Novedades destacadas');
 assert(index.includes('Ver comunicados'), 'El fallback debe mantener acceso a Comunicados');
-assert(index.includes('assets/css/novedades-carousel.css?v=20260908-4'), 'Inicio debe forzar la versión nueva del CSS del carrusel');
+assert(index.includes('assets/css/novedades-carousel.css?v=20260909-1'), 'Inicio debe forzar la versión compacta del CSS del carrusel');
 
 assert(comunicados.includes('data-news-section="comunicados"'), 'Comunicados debe tener una lista dinámica');
 assert(comunicados.includes('data-news-list'), 'Comunicados debe incluir el contenedor de publicaciones');
@@ -35,7 +35,7 @@ assert(vida.includes('data-news-section="vida-escolar"'), 'Vida escolar debe ten
 assert(vida.includes('data-news-list'), 'Vida escolar debe incluir el contenedor de actividades');
 assert(vida.includes('assets/js/novedades-config.js'), 'Vida escolar debe cargar la configuración de Novedades');
 assert(vida.includes('assets/js/novedades.js?v=20260908-4'), 'Vida escolar debe cargar el renderer de imagen única');
-assert(vida.includes('assets/css/actualidad.css?v=20260908-4'), 'Vida escolar debe cargar el CSS actualizado');
+assert(vida.includes('assets/css/actualidad.css?v=20260909-1'), 'Vida escolar debe cargar el CSS visual actualizado');
 assert(/Actividades destacadas/i.test(vida), 'Vida escolar debe identificar el bloque dinámico de actividades');
 assert(vida.includes('2.º Encuentro de RE Bonaerense'), 'Vida escolar debe conservar el archivo histórico de RE Bonaerense');
 assert(vida.includes('Leer en Comunidad'), 'Vida escolar debe conservar el archivo histórico de Leer en Comunidad');
@@ -57,15 +57,16 @@ assert(carouselCss.includes('.news-carousel'), 'Inicio debe cargar estilos aisla
 assert(carouselCss.includes('.news-card'), 'El CSS aislado debe estilizar las tarjetas de novedades');
 assert(!carouselCss.includes('.news-poster-strips'), 'El carrusel no debe conservar CSS del afiche segmentado');
 assert(/\.news-carousel__viewport\s*\{[^}]*min-height:\s*0/s.test(carouselCss), 'El viewport del carrusel no debe reservar altura vacía fija');
-assert(/\.news-card__media\s*\{[^}]*min-height:\s*300px/s.test(carouselCss), 'La imagen del carrusel debe mantener una altura compacta en escritorio');
-assert(/\.news-card__media img\s*\{[^}]*object-fit:\s*contain/s.test(carouselCss), 'Inicio debe mostrar el afiche completo sin recortarlo');
+assert(/\.news-card__media\s*\{[^}]*aspect-ratio:\s*16\s*\/\s*10/s.test(carouselCss), 'La imagen del carrusel debe mantener una proporción panorámica controlada');
+assert(/\.news-card__media img\s*\{[^}]*object-fit:\s*cover/s.test(carouselCss), 'Inicio debe llenar el banner sin bandas vacías');
 assert(/\[data-news-prev\][^}]*left:/s.test(carouselCss) && /\[data-news-next\][^}]*right:/s.test(carouselCss), 'Las flechas deben quedar ubicadas a los costados del carrusel');
 assert(carouselCss.includes('prefers-reduced-motion'), 'El carrusel debe respetar reducción de movimiento');
 assert(actualidadCss.includes('.news-list'), 'Comunicados debe incluir estilos para la lista dinámica');
 assert(actualidadCss.includes('.news-list__item'), 'Comunicados debe incluir estilos para cada publicación');
 assert(actualidadCss.includes('.life-news-list'), 'Vida escolar debe incluir estilos para publicaciones dinámicas');
 assert(actualidadCss.includes('.life-news-list__item'), 'Vida escolar debe estilizar cada actividad dinámica');
-assert(/\.life-news-list__media img\s*\{[^}]*object-fit:\s*contain/s.test(actualidadCss), 'Vida escolar debe mostrar el afiche completo sin recortarlo');
+assert(/\.life-news-list__media\s*\{[^}]*aspect-ratio:\s*4\s*\/\s*3/s.test(actualidadCss), 'Vida escolar debe usar una proporción estable para las imágenes');
+assert(/\.life-news-list__media img\s*\{[^}]*object-fit:\s*cover/s.test(actualidadCss), 'Vida escolar debe llenar la tarjeta sin bandas vacías');
 assert(!actualidadCss.includes('.news-poster-strips'), 'Vida escolar no debe conservar CSS del afiche segmentado');
 
 const leer = seed.find((item) => item.ID === 'leer-en-comunidad-2026-09-04');
