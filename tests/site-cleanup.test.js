@@ -55,8 +55,6 @@ const footerHrefs = [
   'https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l'
 ];
 
-const fullOriginalLogo = 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/Logo-Superior-863x1000.jpg';
-
 function navHrefs(html) {
   const match = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/i);
   assert(match, 'Falta primary-nav');
@@ -74,13 +72,9 @@ function footerLinks(html) {
 for (const file of fullLayoutPages) {
   const html = read(file);
   assert.deepStrictEqual(navHrefs(html), primaryHrefs, `${file}: menú principal inconsistente`);
-  assert(html.includes('assets/img/logo-ees18.jpg'), `${file}: debe conservar fallback/logo local`);
-  if (file === 'index.html') {
-    assert(html.includes(fullOriginalLogo), 'index.html: debe usar el logo completo original del Profesorado');
-    assert(html.includes("this.src='assets/img/logo-ees18.jpg'"), 'index.html: debe conservar fallback local si falla el servidor del Profesorado');
-  } else {
-    assert(!/src="https:\/\/isfd100-bue\.infd\.edu\.ar/i.test(html), `${file}: no debe depender del logo remoto`);
-  }
+  assert(html.includes('assets/img/logo-ees18.jpg'), `${file}: debe usar el logo local del ENSPA`);
+  assert(!/src="https:\/\/isfd100-bue\.infd\.edu\.ar/i.test(html), `${file}: no debe depender de ningún logo remoto del Profesorado`);
+  assert(!html.includes('Logo-Superior-863x1000.jpg'), `${file}: no debe usar el logo de 100 años`);
 
   const footer = html.match(/<footer class="site-footer"[\s\S]*?<\/footer>/i)[0];
   assert(footer.includes('Av. Manuel Belgrano 355 · Avellaneda'), `${file}: falta dirección en footer`);
