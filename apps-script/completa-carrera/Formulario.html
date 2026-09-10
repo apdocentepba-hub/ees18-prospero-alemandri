@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <style>
+    *{box-sizing:border-box} body{margin:0;background:#f5f7f9;color:#263746;font-family:Arial,sans-serif}.wrap{width:min(760px,calc(100% - 24px));margin:0 auto}.top{background:#173f5f;color:#fff;padding:24px 18px}.top h1{margin:4px 0 6px;font-size:1.9rem}.top p{margin:0;color:#e6eef4;line-height:1.5}.card{background:#fff;border:1px solid #d9e1e7;margin:18px auto 36px;padding:22px}.section{padding:18px 0;border-top:1px solid #e1e6ea}.section:first-child{border-top:0;padding-top:0}.section h2{font-size:1.05rem;margin:0 0 14px;color:#173f5f}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.full{grid-column:1/-1}.field{display:flex;flex-direction:column;gap:6px}label,.label{font-weight:700;color:#274b63}input,select{width:100%;padding:11px;border:1px solid #b8c6cf;border-radius:4px;font:inherit;background:#fff}.checks{display:flex;flex-wrap:wrap;gap:12px}.checks label{font-weight:500;display:flex;gap:6px;align-items:center}.checks input{width:auto}.materia{padding:12px;border:1px solid #dce3e8;border-radius:5px;background:#fafcfd}.materia+.materia{margin-top:10px}.file{padding:12px;border:1px dashed #a9bbc6;background:#f8fbfd;border-radius:5px}.hint{font-size:.88rem;color:#667985;line-height:1.4}.note{padding:12px;background:#eef6fb;border-left:4px solid #3d8bb3;margin:16px 0}.actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:18px}button{border:0;border-radius:4px;background:#173f5f;color:#fff;padding:12px 20px;font-weight:700;font-size:1rem;cursor:pointer}button:disabled{opacity:.55;cursor:wait}.status{display:none;padding:12px;margin-top:15px;border-radius:4px}.status.info{display:block;background:#edf6fb}.status.ok{display:block;background:#edf8f0;color:#245b34}.status.error{display:block;background:#fff0f0;color:#7a2929}[hidden]{display:none!important}@media(max-width:620px){.grid{grid-template-columns:1fr}.card{padding:16px}.top h1{font-size:1.55rem}}
+  </style>
+</head>
+<body>
+  <header class="top"><div class="wrap"><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><h1>Completa Carrera</h1><p>Solicitud de inscripción. No necesitás iniciar sesión.</p></div></header>
+
+  <form id="formulario" class="card wrap" onsubmit="enviar(this); return false;">
+    <section class="section"><h2>1. Datos personales</h2><div class="grid">
+      <div class="field"><label for="apellido">Apellido *</label><input id="apellido" name="apellido" autocomplete="family-name" required></div>
+      <div class="field"><label for="nombre">Nombre *</label><input id="nombre" name="nombre" autocomplete="given-name" required></div>
+      <div class="field"><label for="dni">DNI *</label><input id="dni" name="dni" inputmode="numeric" pattern="[0-9. ]{6,12}" required></div>
+      <div class="field"><label for="telefono">Teléfono / WhatsApp *</label><input id="telefono" name="telefono" type="tel" required></div>
+      <div class="field full"><label for="email">Correo electrónico *</label><input id="email" name="email" type="email" required></div>
+    </div></section>
+
+    <section class="section"><h2>2. Trayectoria escolar</h2><div class="grid">
+      <div class="field"><label for="ultimoAnio">Último año cursado *</label><select id="ultimoAnio" name="ultimoAnio" required><option value="">Seleccionar</option><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option></select></div>
+      <div class="field"><label for="turno">Turno *</label><select id="turno" name="turno" required><option value="">Seleccionar</option><option>Mañana</option><option>Tarde</option></select></div>
+      <div class="field"><label for="anioEgreso">Año de egreso <span class="hint">(si corresponde)</span></label><input id="anioEgreso" name="anioEgreso" type="number" min="1950" max="2100"></div>
+      <div class="field"><label for="orientacion">Orientación *</label><select id="orientacion" name="orientacion" required onchange="actualizarOrientacion()"><option value="">Seleccionar</option><option>Ciencias Naturales</option><option>Ciencias Sociales</option><option>Comunicación</option><option>Lenguas Extranjeras</option><option>Otra</option></select></div>
+      <div class="field full" id="otraOrientacionWrap" hidden><label for="otraOrientacion">Escribí la orientación *</label><input id="otraOrientacion" name="otraOrientacion"></div>
+      <div class="field full"><span class="label">Plan de estudios *</span><div class="checks"><label><input type="radio" name="planTipo" value="vigente" required onchange="actualizarPlan()"> Plan vigente</label><label><input type="radio" name="planTipo" value="otro" required onchange="actualizarPlan()"> Otro plan / otro año</label></div></div>
+      <div class="field full" id="planOtroWrap" hidden><label for="planOtro">Escribí el plan de estudios / año *</label><input id="planOtro" name="planOtro" placeholder="Ej.: Plan 1998, Plan 2010, etc."></div>
+    </div></section>
+
+    <section class="section"><h2>3. Materias a rendir — máximo 3</h2>
+      <div class="materia"><div class="grid"><div class="field"><label for="materia1Anio">Año de la materia *</label><select id="materia1Anio" name="materia1Anio" required><option value="">Seleccionar</option><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option></select></div><div class="field"><label for="materia1">Materia *</label><input id="materia1" name="materia1" required></div></div></div>
+      <div class="materia"><div class="grid"><div class="field"><label for="materia2Anio">Año de la materia</label><select id="materia2Anio" name="materia2Anio"><option value="">Seleccionar</option><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option></select></div><div class="field"><label for="materia2">Materia</label><input id="materia2" name="materia2"></div></div></div>
+      <div class="materia"><div class="grid"><div class="field"><label for="materia3Anio">Año de la materia</label><select id="materia3Anio" name="materia3Anio"><option value="">Seleccionar</option><option>1º</option><option>2º</option><option>3º</option><option>4º</option><option>5º</option><option>6º</option></select></div><div class="field"><label for="materia3">Materia</label><input id="materia3" name="materia3"></div></div></div>
+      <p class="hint">Si cursaste otro plan, escribí el nombre de la materia tal como figura en tu documentación.</p>
+    </section>
+
+    <section class="section"><h2>4. Fotocopia de DNI</h2><div class="grid">
+      <div class="field file"><label for="dniFrente">DNI — frente *</label><input id="dniFrente" name="dniFrente" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required><span class="hint">PDF, JPG o PNG. Máximo 10 MB.</span></div>
+      <div class="field file"><label for="dniDorso">DNI — dorso *</label><input id="dniDorso" name="dniDorso" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/jpeg,image/png" required><span class="hint">PDF, JPG o PNG. Máximo 10 MB.</span></div>
+    </div></section>
+
+    <p class="note"><strong>Importante:</strong> la inscripción queda sujeta a revisión de Secretaría.</p>
+    <div class="actions"><button id="enviarBtn" type="submit">Enviar inscripción</button><span class="hint">Los archivos se guardan en la carpeta del alumno.</span></div>
+    <div id="status" class="status" aria-live="polite"></div>
+  </form>
+
+  <script>
+    const MAX_FILE_BYTES=10*1024*1024; const ALLOWED_TYPES=new Set(['application/pdf','image/jpeg','image/png']);
+    function actualizarOrientacion(){const otra=document.getElementById('orientacion').value==='Otra'; const wrap=document.getElementById('otraOrientacionWrap'); const input=document.getElementById('otraOrientacion'); wrap.hidden=!otra; input.required=otra; if(!otra) input.value='';}
+    function actualizarPlan(){const value=document.querySelector('input[name="planTipo"]:checked')?.value; const otro=value==='otro'; const wrap=document.getElementById('planOtroWrap'); const input=document.getElementById('planOtro'); wrap.hidden=!otro; input.required=otro; if(!otro) input.value='';}
+    function validarPares(){[['materia2Anio','materia2'],['materia3Anio','materia3']].forEach(function(ids){const a=document.getElementById(ids[0]); const m=document.getElementById(ids[1]); if((a.value&&!m.value)||(!a.value&&m.value)) throw new Error('Completá año y materia en cada materia que agregues.');});}
+    function validarArchivos(){for(const id of ['dniFrente','dniDorso']){const file=document.getElementById(id).files[0]; if(!file) throw new Error('Falta adjuntar DNI frente y dorso.'); if(!ALLOWED_TYPES.has(file.type)) throw new Error('Usá PDF, JPG o PNG para el DNI.'); if(file.size>MAX_FILE_BYTES) throw new Error(file.name+' supera 10 MB.');}}
+    function estado(msg,tipo){const box=document.getElementById('status'); box.textContent=msg; box.className='status '+tipo;}
+    function enviar(form){actualizarOrientacion(); actualizarPlan(); if(!form.reportValidity()) return; try{validarPares(); validarArchivos();}catch(e){estado(e.message,'error'); return;} const btn=document.getElementById('enviarBtn'); btn.disabled=true; estado('Guardando inscripción y archivos…','info'); google.script.run.withSuccessHandler(function(r){btn.disabled=false; if(!r||!r.ok){estado((r&&r.message)||'No se pudo registrar la inscripción.','error'); return;} estado('Inscripción recibida. Código: '+r.idSolicitud,'ok'); form.reset(); actualizarOrientacion(); actualizarPlan();}).withFailureHandler(function(e){btn.disabled=false; estado((e&&e.message)||'No se pudo registrar la inscripción.','error');}).crearSolicitudCompletaCarrera(form);}
+    actualizarOrientacion(); actualizarPlan();
+  </script>
+</body>
+</html>
