@@ -1,3 +1,9 @@
+const ENSPA_LOGO_SRC = 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg';
+
+document.querySelectorAll('.enspa-logo').forEach((logo) => {
+  if (logo.getAttribute('src') !== ENSPA_LOGO_SRC) logo.src = ENSPA_LOGO_SRC;
+});
+
 const menuToggle = document.getElementById('menu-toggle');
 const primaryNav = document.getElementById('primary-nav');
 

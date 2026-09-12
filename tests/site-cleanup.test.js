@@ -55,7 +55,10 @@ const footerHrefs = [
   'https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l'
 ];
 
-const fullOriginalLogo = 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/Logo-Superior-863x1000.jpg';
+const canonicalLogo = 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg';
+const mainJs = read('assets/js/main.js');
+assert(mainJs.includes(canonicalLogo), 'main.js debe definir el logo ENSPA canónico');
+assert(mainJs.includes("querySelectorAll('.enspa-logo')"), 'main.js debe mantener el mismo logo ENSPA en todas las páginas');
 
 function navHrefs(html) {
   const match = html.match(/<nav class="primary-nav"[\s\S]*?<\/nav>/i);
@@ -74,19 +77,17 @@ function footerLinks(html) {
 for (const file of fullLayoutPages) {
   const html = read(file);
   assert.deepStrictEqual(navHrefs(html), primaryHrefs, `${file}: menú principal inconsistente`);
-  assert(html.includes('assets/img/logo-ees18.jpg'), `${file}: debe conservar fallback/logo local`);
-  if (file === 'index.html') {
-    assert(html.includes(fullOriginalLogo), 'index.html: debe usar el logo completo original del Profesorado');
-    assert(html.includes("this.src='assets/img/logo-ees18.jpg'"), 'index.html: debe conservar fallback local si falla el servidor del Profesorado');
-  } else {
-    assert(!/src="https:\/\/isfd100-bue\.infd\.edu\.ar/i.test(html), `${file}: no debe depender del logo remoto`);
-  }
+  assert(html.includes('class="enspa-logo'), `${file}: falta logo ENSPA en el encabezado`);
+  assert(html.includes('assets/js/main.js'), `${file}: debe cargar main.js para mantener el logo ENSPA consistente`);
 
   const footer = html.match(/<footer class="site-footer"[\s\S]*?<\/footer>/i)[0];
   assert(footer.includes('Av. Manuel Belgrano 355 · Avellaneda'), `${file}: falta dirección en footer`);
   assert(footer.includes('secundaria18avellaneda@abc.gob.ar'), `${file}: falta correo en footer`);
   assert.deepStrictEqual(footerLinks(html), footerHrefs, `${file}: footer inconsistente`);
 }
+
+const index = read('index.html');
+assert(index.includes(canonicalLogo), 'index.html: debe cargar directamente el mismo logo ENSPA canónico');
 
 for (const file of normalPublicPages) {
   const html = read(file);
@@ -95,7 +96,6 @@ for (const file of normalPublicPages) {
   }
 }
 
-const index = read('index.html');
 assert(!index.includes('id="agenda-title"'), 'Inicio no debe conservar Agenda');
 assert(index.includes('data-visitor-counter'), 'El contador de visitas debe conservarse');
 assert(index.includes('assets/js/visitor-counter.js'), 'El script del contador debe conservarse');
