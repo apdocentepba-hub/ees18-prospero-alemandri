@@ -16,7 +16,7 @@ function vaciarDocumentoActa_(docId) {
   doc.saveAndClose();
 }
 
-function limpiarActasSinConfirmados_() {
+function limpiarActasSinInscriptos_() {
   const config = getConfig_();
   const ss = SpreadsheetApp.openById(config.spreadsheetId);
   const registry = ss.getSheetByName(REGISTRY_SHEET);
@@ -24,7 +24,7 @@ function limpiarActasSinConfirmados_() {
   const values = registry.getRange(2, 1, registry.getLastRow() - 1, ACTAS_REGISTRY_HEADERS.length).getValues();
   let cleared = 0;
   values.forEach(function(row, offset) {
-    if (String(row[7] || '') !== 'SIN ALUMNOS CONFIRMADOS' || !row[4]) return;
+    if (String(row[7] || '') !== 'SIN ALUMNOS INSCRIPTOS' || !row[4]) return;
     try {
       vaciarDocumentoActa_(String(row[4]));
       registry.getRange(offset + 2, 7).setValue(new Date());
@@ -38,5 +38,5 @@ function limpiarActasSinConfirmados_() {
 
 function alEditarCompletaCarrera(e) {
   alEditarSolicitudes(e);
-  limpiarActasSinConfirmados_();
+  limpiarActasSinInscriptos_();
 }
