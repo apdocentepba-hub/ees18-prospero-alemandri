@@ -2,11 +2,16 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Centro de trámites de la E.E.S. Nº 18 Próspero Alemandri: pases, analíticos, consulta de estado y boleto estudiantil.">
+  <meta name="description" content="Centro de trámites de la E.E.S. Nº 18 Próspero Alemandri: pases, analíticos, consulta de estado, Completa Carrera y boleto estudiantil.">
   <meta name="theme-color" content="#0f3f62"><title>Trámites · E.E.S. Nº 18 “Próspero Alemandri”</title>
   <link rel="canonical" href="https://ees18avellaneda.edu.ar/tramites.html"><link rel="manifest" href="site.webmanifest"><link rel="icon" type="image/svg+xml" href="favicon.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css"><link rel="stylesheet" href="assets/css/multipage.css?v=20260908-3">
+  <style>
+    .completa-status{display:inline-flex;align-items:center;gap:.45rem;margin:.2rem 0 .7rem;padding:.3rem .65rem;border-radius:999px;font-size:.82rem;font-weight:800;letter-spacing:.02em;background:#eef3f6;color:#3f5968}
+    .completa-status[data-state="open"]{background:#e8f6ed;color:#176b3b}.completa-status[data-state="closed"]{background:#fff4df;color:#8a5b00}.completa-status[data-state="error"]{background:#f3f4f5;color:#59656c}
+    .completa-period{min-height:2.8em}.completa-action[hidden]{display:none!important}
+  </style>
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a><div class="government-bar"><div class="container government-bar__inner"><span>Educación Pública · Provincia de Buenos Aires</span><span>Avellaneda · Nivel Secundario</span></div></div>
@@ -14,8 +19,35 @@
 <main id="contenido">
 <nav class="breadcrumbs container" aria-label="Ruta de navegación"><a href="index.html">Inicio</a><span aria-hidden="true">›</span><a href="estudiantes-familias.html">Estudiantes y familias</a><span aria-hidden="true">›</span><span aria-current="page">Trámites</span></nav>
 <section class="page-hero"><div class="container page-hero__grid"><div><span class="page-kicker">Estudiantes y familias · Secretaría</span><h1>Trámites</h1><p>Un punto de entrada único para encontrar requisitos, formularios, solicitudes y seguimiento de gestiones escolares de la E.E.S. Nº 18.</p></div><aside class="page-note"><small>Atención</small><strong>Secretaría</strong><span>Lunes a viernes · 9:00 a 11:00 y 14:00 a 16:00.</span></aside></div></section>
-<section class="page-section"><div class="container"><div class="section-heading"><span>Gestiones disponibles</span><h2>Elegí el trámite que necesitás.</h2><p>Cada tarjeta lleva a una página específica con la información correspondiente.</p></div><div class="link-grid"><article class="link-card link-card--accent"><small>Pases</small><h3>Pases y equivalencias</h3><p>Analíticos parciales, continuidad en otra institución, reposiciones y documentación requerida.</p><a href="pases-equivalencias.html">Ver requisitos →</a></article><article class="link-card"><small>Seguimiento</small><h3>Consultar por DNI</h3><p>Ingresá el DNI del estudiante para ver el estado público y la fecha de última actualización del Pase / Analítico Parcial.</p><a href="consultar-estado.html">Consultar estado →</a></article><article class="link-card"><small>Egresados</small><h3>Solicitar Analítico Final</h3><p>Requisitos, documentación obligatoria y acceso al formulario digital para egresados de la E.E.S. Nº 18.</p><a href="certificado-analitico.html">Ver requisitos e iniciar solicitud →</a></article><article class="link-card"><small>Transporte</small><h3>Boleto estudiantil</h3><p>Guía para iniciar el Boleto Especial Educativo desde los canales oficiales de la Provincia.</p><a href="boleto-estudiantil.html">Ver guía →</a></article></div></div></section>
+<section class="page-section"><div class="container"><div class="section-heading"><span>Gestiones disponibles</span><h2>Elegí el trámite que necesitás.</h2><p>Cada tarjeta lleva a una página específica con la información correspondiente.</p></div><div class="link-grid"><article class="link-card link-card--accent"><small>Pases</small><h3>Pases y equivalencias</h3><p>Analíticos parciales, continuidad en otra institución, reposiciones y documentación requerida.</p><a href="pases-equivalencias.html">Ver requisitos →</a></article><article class="link-card"><small>Seguimiento</small><h3>Consultar por DNI</h3><p>Ingresá el DNI del estudiante para ver el estado público y la fecha de última actualización del Pase / Analítico Parcial.</p><a href="consultar-estado.html">Consultar estado →</a></article><article class="link-card"><small>Egresados</small><h3>Solicitar Analítico Final</h3><p>Requisitos, documentación obligatoria y acceso al formulario digital para egresados de la E.E.S. Nº 18.</p><a href="certificado-analitico.html">Ver requisitos e iniciar solicitud →</a></article><article class="link-card link-card--accent" data-completa-carrera><small>Egresados · Mesa</small><h3>Completa Carrera</h3><span class="completa-status" data-completa-status data-state="loading">Consultando período…</span><p class="completa-period" data-completa-period>Consultando fechas de inscripción.</p><a class="completa-action" data-completa-action href="https://script.google.com/macros/s/AKfycbyOZtxw5pfuq5RwkjdzZyOCjPvuboFSbvH23RlKgj5yiPeq23YAaqfSr6M6hHLvsoOv/exec" hidden>Inscribirme →</a></article><article class="link-card"><small>Transporte</small><h3>Boleto estudiantil</h3><p>Guía para iniciar el Boleto Especial Educativo desde los canales oficiales de la Provincia.</p><a href="boleto-estudiantil.html">Ver guía →</a></article></div></div></section>
 <section class="page-section page-section--soft"><div class="container"><div class="section-heading"><span>Canal institucional</span><h2>¿Necesitás comunicarte con Secretaría?</h2><p>Usá los horarios y el correo institucional publicados por la escuela.</p></div><div class="button-row"><a class="simple-button" href="estudiantes-familias.html">Volver a Estudiantes y familias</a><a class="simple-button simple-button--light" href="contacto.html">Ver contacto y horarios</a><a class="simple-button simple-button--light" href="mailto:secundaria18avellaneda@abc.gob.ar">Escribir al correo institucional</a></div></div></section>
 </main>
-<footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Av. Manuel Belgrano 355 · Avellaneda</span><br><a href="mailto:secundaria18avellaneda@abc.gob.ar">secundaria18avellaneda@abc.gob.ar</a></div><nav aria-label="Enlaces del pie"><a href="index.html">Inicio</a><a href="nuestra-escuela.html">Nuestra escuela</a><a href="estudiantes-familias.html">Estudiantes y familias</a><a href="docentes.html">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="contacto.html">Contacto</a><a href="https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l">WhatsApp</a></nav><span>© <span id="current-year">2026</span></span></div></footer><script src="assets/js/main.js"></script>
+<footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Av. Manuel Belgrano 355 · Avellaneda</span><br><a href="mailto:secundaria18avellaneda@abc.gob.ar">secundaria18avellaneda@abc.gob.ar</a></div><nav aria-label="Enlaces del pie"><a href="index.html">Inicio</a><a href="nuestra-escuela.html">Nuestra escuela</a><a href="estudiantes-familias.html">Estudiantes y familias</a><a href="docentes.html">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="contacto.html">Contacto</a><a href="https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l">WhatsApp</a></nav><span>© <span id="current-year">2026</span></span></div></footer>
+<script src="assets/js/main.js"></script>
+<script>
+(function(){
+  const WEBAPP='https://script.google.com/macros/s/AKfycbyOZtxw5pfuq5RwkjdzZyOCjPvuboFSbvH23RlKgj5yiPeq23YAaqfSr6M6hHLvsoOv/exec';
+  const status=document.querySelector('[data-completa-status]');
+  const period=document.querySelector('[data-completa-period]');
+  const action=document.querySelector('[data-completa-action]');
+  if(!status||!period||!action)return;
+
+  window.completaCarreraStatus=function(data){
+    if(!data||data.ok!==true){
+      status.textContent='Estado no disponible';status.dataset.state='error';period.textContent='Consultá el formulario para verificar el período vigente.';action.hidden=false;action.textContent='Consultar Completa Carrera →';return;
+    }
+    status.textContent=data.abierto?'Inscripción abierta':'Inscripción cerrada';
+    status.dataset.state=data.abierto?'open':'closed';
+    period.textContent=data.texto||((data.desde&&data.hasta)?('Período: '+data.desde+' al '+data.hasta+'.'):'Período aún no informado.');
+    action.hidden=!data.abierto;
+    if(data.abierto)action.textContent='Inscribirme →';
+  };
+
+  const script=document.createElement('script');
+  script.src=WEBAPP+'?status=1&callback=completaCarreraStatus&_='+Date.now();
+  script.async=true;
+  script.onerror=function(){window.completaCarreraStatus({ok:false});};
+  document.head.appendChild(script);
+})();
+</script>
 </body></html>
