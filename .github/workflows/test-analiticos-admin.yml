@@ -1,0 +1,20 @@
+name: Test analiticos admin
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  analiticos-admin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check Apps Script syntax
+        run: |
+          node --check < apps-script/analiticos-pases/AdminSeguimiento.gs
+          node --check < apps-script/analiticos-pases/EnviosInspectora_SHEETS.gs
+      - name: Run analiticos regression tests
+        run: |
+          node tests/admin-seguimiento.test.cjs
+          node tests/libro-folio-sync.test.cjs
+          node tests/envios-inspectora.test.cjs
