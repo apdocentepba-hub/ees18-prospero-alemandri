@@ -2,18 +2,27 @@ const MAX_FILE_BYTES = 10 * 1024 * 1024;
 const ALLOWED_FILE_TYPES = ['application/pdf', 'image/jpeg', 'image/png'];
 const TURNOS = ['Mañana', 'Tarde'];
 const ORIENTACIONES = ['Ciencias Naturales', 'Ciencias Sociales', 'Comunicación', 'Lenguas Extranjeras', 'Otra'];
+const INSTITUTIONAL_SENDER = 'secundaria18avellaneda@abc.gob.ar';
 const SOLICITUD_HEADERS = [
   'ID solicitud','Fecha recepción','Estado','Apellido','Nombre','DNI','Teléfono / WhatsApp','Correo electrónico',
   'Último año cursado','Turno','Año de egreso','Orientación','Otra orientación','Plan de estudios',
   'Materia 1 año','Materia 1','Materia 2 año','Materia 2','Materia 3 año','Materia 3',
   'DNI frente adjunto','DNI dorso adjunto','Carpeta Drive','Observaciones','Fecha revisión','Revisado por',
-  'CONFIRMAR PARA ACTA','RESULTADO ACTA'
+  'CANCELAR','MOTIVO CANCELACIÓN','RESULTADO ACTA','TOKEN CANCELACIÓN','FECHA CANCELACIÓN','ESTADO CORREO'
 ];
 const ACTAS_REGISTRY_HEADERS = ['Clave parte','Clave grupo','Parte','ID acta','Documento ID','URL','Actualizado','Estado'];
 const REGISTRY_SHEET = '_ACTAS_REGISTRO';
 const MAX_ALUMNOS_ACTA = 30;
 
-function doGet() {
+function doGet(e) {
+  const token = e && e.parameter ? normalizeCancelToken_(e.parameter.cancel) : '';
+  if (token) {
+    const template = HtmlService.createTemplateFromFile('Cancelar');
+    template.token = token;
+    return template.evaluate()
+      .setTitle('Cancelar inscripción · Completa Carrera')
+      .addMetaTag('viewport', 'width=device-width, initial-scale=1');
+  }
   return HtmlService.createTemplateFromFile('Formulario').evaluate()
     .setTitle('Completa Carrera · E.E.S. Nº 18')
     .addMetaTag('viewport', 'width=device-width, initial-scale=1');
@@ -29,7 +38,11 @@ function getConfig_() {
     actasFolderId: props.getProperty('COMPLETA_ACTAS_FOLDER_ID'),
     instancia: props.getProperty('COMPLETA_ACTA_INSTANCIA') || 'A completar',
     fechaActa: props.getProperty('COMPLETA_ACTA_FECHA') || 'A completar',
-    libroFolio: props.getProperty('COMPLETA_LIBRO_FOLIO') || 'A completar'
+    libroFolio: props.getProperty('COMPLETA_LIBRO_FOLIO') || 'A completar',
+    webAppUrl: props.getProperty('COMPLETA_WEBAPP_URL') || '',
+    senderEmail: props.getProperty('COMPLETA_SENDER_EMAIL') || INSTITUTIONAL_SENDER,
+    relayUrl: props.getProperty('COMPLETA_MAIL_RELAY_URL') || '',
+    relaySecret: props.getProperty('COMPLETA_MAIL_RELAY_SECRET') || ''
   };
   ['spreadsheetId','requestsFolderId','actaTemplateId','actasFolderId'].forEach(function(k) {
     if (!config[k]) throw new Error('Falta configurar ' + k + ' en Script Properties.');
@@ -64,6 +77,11 @@ function normalizeYear_(value, label) {
   return String(year);
 }
 
+function normalizeCancelToken_(value) {
+  const token = String(value || '').trim();
+  return /^[a-f0-9]{32}$/i.test(token) ? token : '';
+}
+
 function materiasDesdeFormulario_(form) {
   const out = [];
   for (let i = 1; i <= 3; i++) {
@@ -96,7 +114,7 @@ function validarSolicitudBasica_(data) {
 }
 
 function expandirSolicitudParaActas_(solicitud) {
-  if (normalizeText_(solicitud.estado, 30).toUpperCase() !== 'APROBADA' || solicitud.confirmar !== true) return [];
+  if (normalizeText_(solicitud.estado, 30).toUpperCase() !== 'INSCRIPTA' || solicitud.cancelar === true) return [];
   const materias = Array.isArray(solicitud.materias) ? solicitud.materias : [];
   return materias.map(function(m) {
     const item = {
@@ -152,6 +170,10 @@ function requestId_() {
   return 'CC-' + year + '-' + shortId;
 }
 
+function cancelToken_() {
+  return Utilities.getUuid().replace(/-/g, '');
+}
+
 function sanitizeFileName_(value) {
   return normalizeText_(value || 'archivo', 160).replace(/[\\/:*?"<>|]/g, '_');
 }
@@ -183,28 +205,78 @@ function getSheet_(config) {
   return sheet;
 }
 
-function enviarConfirmacion_(email, fechaRecepcion, idSolicitud) {
+function cancellationUrl_(config, token) {
+  const base = normalizeText_(config.webAppUrl || ScriptApp.getService().getUrl(), 1000);
+  if (!base) throw new Error('Falta configurar la URL pública del formulario para generar el enlace de cancelación.');
+  return base + (base.indexOf('?') === -1 ? '?' : '&') + 'cancel=' + encodeURIComponent(token);
+}
+
+function enviarCorreoInstitucional_(to, subject, body, htmlBody) {
+  const config = getConfig_();
+  const sender = normalizeEmail_(config.senderEmail || INSTITUTIONAL_SENDER);
+  const aliases = GmailApp.getAliases().map(function(v) { return String(v).toLowerCase(); });
+  if (aliases.indexOf(sender.toLowerCase()) !== -1) {
+    GmailApp.sendEmail(to, subject, body, {
+      from: sender,
+      name: 'E.E.S. Nº 18 “Próspero Alemandri”',
+      htmlBody: htmlBody || undefined
+    });
+    return 'ALIAS';
+  }
+  if (!config.relayUrl || !config.relaySecret) {
+    throw new Error('El correo institucional no está configurado como alias ni mediante relay. No se envió desde tu cuenta personal.');
+  }
+  const response = UrlFetchApp.fetch(config.relayUrl, {
+    method: 'post',
+    contentType: 'application/json',
+    muteHttpExceptions: true,
+    payload: JSON.stringify({
+      secret: config.relaySecret,
+      to: to,
+      subject: subject,
+      body: body,
+      htmlBody: htmlBody || ''
+    })
+  });
+  const code = response.getResponseCode();
+  if (code < 200 || code >= 300) throw new Error('Relay institucional respondió HTTP ' + code + '.');
+  let result = {};
+  try { result = JSON.parse(response.getContentText() || '{}'); } catch (_) {}
+  if (result.ok !== true) throw new Error(result.message || 'El relay institucional rechazó el correo.');
+  return 'RELAY';
+}
+
+function enviarConfirmacionInscripcion_(email, fechaRecepcion, idSolicitud, cancelUrl) {
   const tz = Session.getScriptTimeZone() || 'America/Argentina/Buenos_Aires';
   const fecha = Utilities.formatDate(fechaRecepcion, tz, 'dd/MM/yyyy HH:mm');
-  const subject = 'E.E.S. Nº 18 · Solicitud Completa Carrera recibida';
+  const subject = 'E.E.S. Nº 18 · Inscripción a Completa Carrera confirmada';
   const body = [
-    'Tu solicitud de inscripción a Completa Carrera fue recibida.',
+    'Tu inscripción a Completa Carrera fue registrada.',
     'Solicitud: ' + idSolicitud,
-    'Fecha de recepción: ' + fecha + '.',
-    'La solicitud queda PENDIENTE de revisión de Secretaría. El envío del formulario no confirma la inscripción ni genera automáticamente un acta.',
-    'La escuela se comunicará si necesita una aclaración.'
+    'Fecha de inscripción: ' + fecha + '.',
+    'La inscripción fue incorporada a la organización de la mesa y al acta correspondiente.',
+    'Si necesitás cancelar tu inscripción, usá este enlace:',
+    cancelUrl,
+    'La cancelación retira tu inscripción de la mesa activa.'
   ].join('\n\n');
-  MailApp.sendEmail({to:email, subject:subject, body:body});
+  const htmlBody = '<p>Tu inscripción a <b>Completa Carrera</b> fue registrada.</p>' +
+    '<p><b>Solicitud:</b> ' + idSolicitud + '<br><b>Fecha:</b> ' + fecha + '</p>' +
+    '<p>La inscripción fue incorporada a la organización de la mesa y al acta correspondiente.</p>' +
+    '<p><a href="' + cancelUrl + '" style="display:inline-block;padding:12px 18px;background:#8b1e1e;color:#fff;text-decoration:none;border-radius:4px">Cancelar inscripción</a></p>' +
+    '<p>La cancelación retira tu inscripción de la mesa activa.</p>';
+  return enviarCorreoInstitucional_(email, subject, body, htmlBody);
 }
 
 function crearSolicitudDesdeFormulario(form) {
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   let folder = null;
+  let rowNumber = 0;
   try {
     const config = getConfig_();
     const fechaRecepcion = new Date();
     const id = requestId_();
+    const token = cancelToken_();
     const data = {
       apellido: normalizeText_(form.apellido, 100),
       nombre: normalizeText_(form.nombre, 100),
@@ -235,46 +307,62 @@ function crearSolicitudDesdeFormulario(form) {
     const orientacionGuardada = data.orientacion === 'Otra' ? 'Otra' : data.orientacion;
     const planGuardado = data.planEstudios === 'Otro' ? 'Otro / ' + data.planOtro : data.planEstudios;
     const row = [
-      id, fechaRecepcion, 'PENDIENTE', data.apellido, data.nombre, data.dni, data.telefono, data.email,
+      id, fechaRecepcion, 'INSCRIPTA', data.apellido, data.nombre, data.dni, data.telefono, data.email,
       data.ultimoAnio, data.turno, data.anioEgreso, orientacionGuardada, data.otraOrientacion, planGuardado,
       materias[0] ? materias[0].anio : '', materias[0] ? materias[0].materia : '',
       materias[1] ? materias[1].anio : '', materias[1] ? materias[1].materia : '',
       materias[2] ? materias[2].anio : '', materias[2] ? materias[2].materia : '',
-      frente.getUrl(), dorso.getUrl(), folder.getUrl(), data.observaciones, '', '', false, ''
+      frente.getUrl(), dorso.getUrl(), folder.getUrl(), data.observaciones, fechaRecepcion, 'AUTOMÁTICO',
+      false, '', '', token, '', 'PENDIENTE'
     ];
     const sheet = getSheet_(config);
     sheet.appendRow(row);
-    const rowNumber = sheet.getLastRow();
+    rowNumber = sheet.getLastRow();
     sheet.getRange(rowNumber, 27).insertCheckboxes();
-    try { enviarConfirmacion_(data.email, fechaRecepcion, id); } catch (mailError) { console.error(mailError); }
-    return {ok:true, idSolicitud:id, message:'Tu solicitud fue recibida y quedó pendiente de revisión.'};
+    sincronizarActasSinLock_();
+
+    try {
+      const cancelUrl = cancellationUrl_(config, token);
+      const via = enviarConfirmacionInscripcion_(data.email, fechaRecepcion, id, cancelUrl);
+      sheet.getRange(rowNumber, 32).setValue('ENVIADO · ' + via + ' · ' + new Date());
+    } catch (mailError) {
+      console.error(mailError);
+      sheet.getRange(rowNumber, 32).setValue('PENDIENTE: ' + mailError.message);
+    }
+    return {ok:true, idSolicitud:id, message:'Tu inscripción fue registrada y agregada a la mesa correspondiente.'};
   } catch (error) {
     console.error(error);
-    if (folder) { try { folder.setTrashed(true); } catch (cleanupError) { console.error(cleanupError); } }
-    return {ok:false, message:error.message || 'No se pudo registrar la solicitud.'};
+    if (rowNumber) {
+      try {
+        const config = getConfig_();
+        const sheet = getSheet_(config);
+        sheet.getRange(rowNumber, 3).setValue('ERROR');
+        sheet.getRange(rowNumber, 29).setValue('ERROR: ' + (error.message || 'No se pudo sincronizar el acta.'));
+      } catch (_) {}
+    } else if (folder) {
+      try { folder.setTrashed(true); } catch (cleanupError) { console.error(cleanupError); }
+    }
+    return {ok:false, message:error.message || 'No se pudo registrar la inscripción.'};
   } finally {
     lock.releaseLock();
   }
 }
 
-function leerSolicitudesConfirmadas_(sheet) {
+function leerSolicitudes_(sheet) {
   const lastRow = sheet.getLastRow();
   if (lastRow < 2) return [];
   const values = sheet.getRange(2, 1, lastRow - 1, SOLICITUD_HEADERS.length).getValues();
-  const out = [];
-  values.forEach(function(row, offset) {
-    const solicitud = {
+  return values.map(function(row, offset) {
+    return {
       id: row[0], estado: row[2], apellido: row[3], nombre: row[4], dni: row[5], turno: row[9],
-      orientacion: row[11] === 'Otra' && row[12] ? row[12] : row[11], confirmar: row[26] === true, sheetRow: offset + 2,
+      orientacion: row[11] === 'Otra' && row[12] ? row[12] : row[11], cancelar: row[26] === true, sheetRow: offset + 2,
       materias: [
         {anio:String(row[14] || ''), materia:row[15]},
         {anio:String(row[16] || ''), materia:row[17]},
         {anio:String(row[18] || ''), materia:row[19]}
       ].filter(function(m) { return normalizeText_(m.anio, 10) && normalizeMateria_(m.materia); })
     };
-    out.push(solicitud);
   });
-  return out;
 }
 
 function getRegistrySheet_(ss) {
@@ -375,53 +463,94 @@ function actualizarDocumentoActa_(acta, group, alumnos, config) {
   doc.saveAndClose();
 }
 
+function sincronizarActasSinLock_() {
+  const config = getConfig_();
+  const sheet = getSheet_(config);
+  const ss = sheet.getParent();
+  const solicitudes = leerSolicitudes_(sheet);
+  const items = [];
+  solicitudes.forEach(function(s) { Array.prototype.push.apply(items, expandirSolicitudParaActas_(s)); });
+  const groups = agruparItemsActa_(items);
+  const registrySheet = getRegistrySheet_(ss);
+  const registry = registryMap_(registrySheet);
+  const activePartKeys = {};
+  const urlsByRow = {};
+
+  Object.keys(groups).sort().forEach(function(groupKey) {
+    const group = groups[groupKey];
+    const chunks = dividirEnBloques_(group.alumnos, MAX_ALUMNOS_ACTA);
+    chunks.forEach(function(alumnos, idx) {
+      const parte = idx + 1;
+      const acta = getOrCreateActa_(config, registrySheet, registry, group, parte);
+      actualizarDocumentoActa_(acta, group, alumnos, config);
+      activePartKeys[acta.claveParte] = true;
+      registrySheet.getRange(acta.registryRow, 7, 1, 2).setValues([[new Date(), 'ACTIVA']]);
+      alumnos.forEach(function(a) {
+        if (!urlsByRow[a.sheetRow]) urlsByRow[a.sheetRow] = [];
+        if (urlsByRow[a.sheetRow].indexOf(acta.url) === -1) urlsByRow[a.sheetRow].push(acta.url);
+      });
+    });
+  });
+
+  Object.keys(registry).forEach(function(key) {
+    if (!activePartKeys[key] && registry[key].row) registrySheet.getRange(registry[key].row, 8).setValue('SIN ALUMNOS INSCRIPTOS');
+  });
+
+  solicitudes.forEach(function(s) {
+    if (normalizeText_(s.estado,30).toUpperCase() === 'INSCRIPTA' && s.cancelar !== true) {
+      const urls = urlsByRow[s.sheetRow] || [];
+      sheet.getRange(s.sheetRow, 29).setValue(urls.length ? 'EN ACTA: ' + urls.join(' | ') : 'SIN MATERIAS VÁLIDAS');
+    } else if (normalizeText_(s.estado,30).toUpperCase() === 'CANCELADA' || s.cancelar === true) {
+      sheet.getRange(s.sheetRow, 29).setValue('CANCELADA · RETIRADA DEL ACTA');
+    } else {
+      sheet.getRange(s.sheetRow, 29).setValue('FUERA DE ACTA · ESTADO ' + normalizeText_(s.estado,30).toUpperCase());
+    }
+  });
+  return {ok:true, grupos:Object.keys(groups).length, alumnos:items.length};
+}
+
 function sincronizarActas_() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    return sincronizarActasSinLock_();
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function cancelarFila_(sheet, row, motivo) {
+  if (row < 2) throw new Error('Fila inválida.');
+  sheet.getRange(row, 3).setValue('CANCELADA');
+  sheet.getRange(row, 27).setValue(true);
+  const actual = normalizeText_(sheet.getRange(row, 28).getDisplayValue(), 500);
+  sheet.getRange(row, 28).setValue(actual || normalizeText_(motivo || 'Cancelación administrativa', 500));
+  sheet.getRange(row, 31).setValue(new Date());
+}
+
+function cancelarPorToken(token) {
+  const cleanToken = normalizeCancelToken_(token);
+  if (!cleanToken) return {ok:false, message:'El enlace de cancelación no es válido.'};
   const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     const config = getConfig_();
     const sheet = getSheet_(config);
-    const ss = sheet.getParent();
-    const solicitudes = leerSolicitudesConfirmadas_(sheet);
-    const items = [];
-    solicitudes.forEach(function(s) { Array.prototype.push.apply(items, expandirSolicitudParaActas_(s)); });
-    const groups = agruparItemsActa_(items);
-    const registrySheet = getRegistrySheet_(ss);
-    const registry = registryMap_(registrySheet);
-    const activePartKeys = {};
-    const urlsByRow = {};
-
-    Object.keys(groups).sort().forEach(function(groupKey) {
-      const group = groups[groupKey];
-      const chunks = dividirEnBloques_(group.alumnos, MAX_ALUMNOS_ACTA);
-      chunks.forEach(function(alumnos, idx) {
-        const parte = idx + 1;
-        const acta = getOrCreateActa_(config, registrySheet, registry, group, parte);
-        actualizarDocumentoActa_(acta, group, alumnos, config);
-        activePartKeys[acta.claveParte] = true;
-        registrySheet.getRange(acta.registryRow, 7, 1, 2).setValues([[new Date(), 'ACTIVA']]);
-        alumnos.forEach(function(a) {
-          if (!urlsByRow[a.sheetRow]) urlsByRow[a.sheetRow] = [];
-          if (urlsByRow[a.sheetRow].indexOf(acta.url) === -1) urlsByRow[a.sheetRow].push(acta.url);
-        });
-      });
-    });
-
-    Object.keys(registry).forEach(function(key) {
-      if (!activePartKeys[key] && registry[key].row) registrySheet.getRange(registry[key].row, 8).setValue('SIN ALUMNOS CONFIRMADOS');
-    });
-
-    solicitudes.forEach(function(s) {
-      if (s.confirmar === true && normalizeText_(s.estado,30).toUpperCase() === 'APROBADA') {
-        const urls = urlsByRow[s.sheetRow] || [];
-        sheet.getRange(s.sheetRow, 28).setValue(urls.length ? 'EN ACTA: ' + urls.join(' | ') : 'SIN MATERIAS VÁLIDAS');
-      } else if (s.confirmar === true) {
-        sheet.getRange(s.sheetRow, 28).setValue('NO PROCESADA: cambiar Estado a APROBADA');
-      } else {
-        sheet.getRange(s.sheetRow, 28).clearContent();
-      }
-    });
-    return {ok:true, grupos:Object.keys(groups).length, alumnos:items.length};
+    if (sheet.getLastRow() < 2) return {ok:false, message:'No se encontró la inscripción.'};
+    const found = sheet.getRange(2, 30, sheet.getLastRow() - 1, 1)
+      .createTextFinder(cleanToken).matchEntireCell(true).findNext();
+    if (!found) return {ok:false, message:'No se encontró la inscripción o el enlace ya no es válido.'};
+    const row = found.getRow();
+    if (normalizeText_(sheet.getRange(row, 3).getDisplayValue(), 30).toUpperCase() === 'CANCELADA') {
+      return {ok:true, already:true, message:'Esta inscripción ya estaba cancelada.'};
+    }
+    cancelarFila_(sheet, row, 'Cancelación solicitada por el egresado mediante enlace');
+    sincronizarActasSinLock_();
+    limpiarActasSinInscriptos_();
+    return {ok:true, message:'Tu inscripción fue cancelada y retirada de la mesa activa.'};
+  } catch (error) {
+    console.error(error);
+    return {ok:false, message:error.message || 'No se pudo cancelar la inscripción.'};
   } finally {
     lock.releaseLock();
   }
@@ -435,10 +564,14 @@ function alEditarSolicitudes(e) {
     const config = getConfig_();
     const sheet = range.getSheet();
     if (sheet.getName() !== config.sheetName || sheet.getParent().getId() !== config.spreadsheetId) return;
-    if (range.getColumn() !== 3 && range.getColumn() !== 27) return;
+    const col = range.getColumn();
+    if (col !== 3 && col !== 27 && col !== 28) return;
+    if (col === 27 && range.getValue() === true) {
+      cancelarFila_(sheet, range.getRow(), 'Cancelación administrativa');
+    }
     sincronizarActas_();
   } catch (error) {
     console.error(error);
-    try { if (e && e.range) e.range.getSheet().getRange(e.range.getRow(), 28).setValue('ERROR: ' + error.message); } catch (_) {}
+    try { if (e && e.range) e.range.getSheet().getRange(e.range.getRow(), 29).setValue('ERROR: ' + error.message); } catch (_) {}
   }
 }
