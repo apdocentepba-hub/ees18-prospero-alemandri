@@ -26,4 +26,19 @@ assert.match(source, /dst\.clearContent\(\)/);
 assert.doesNotMatch(source, /PASTE_VALUES/);
 assert.match(source, /PASTE_DATA_VALIDATION/);
 
+// Los tres índices derivados deben refrescarse desde la hoja base Índice.
+assert.equal(typeof h.asOrdenarFilasIndice_, 'function');
+const muestra = [
+  ['ZETA ANA', '50000002', '10', '2', '', '', '', '', ''],
+  ['ALFA BERTA', '40000001', '2', '10', '', '', '', '', ''],
+  ['BETA CARLA', '30000003', '2', '3', '', '', '', '', '']
+];
+assert.deepEqual(h.asOrdenarFilasIndice_(muestra, 'alfabetico').map(r => r[0]), ['ALFA BERTA', 'BETA CARLA', 'ZETA ANA']);
+assert.deepEqual(h.asOrdenarFilasIndice_(muestra, 'dni').map(r => r[1]), ['30000003', '40000001', '50000002']);
+assert.deepEqual(h.asOrdenarFilasIndice_(muestra, 'libro-folio').map(r => `${r[2]}/${r[3]}`), ['2/3', '2/10', '10/2']);
+assert.match(source, /Orden alfabético/);
+assert.match(source, /Orden por DNI/);
+assert.match(source, /Orden por Libro y Folio/);
+assert.match(source, /asRefrescarVistasIndice_/);
+
 console.log('libro-folio-sync OK');
