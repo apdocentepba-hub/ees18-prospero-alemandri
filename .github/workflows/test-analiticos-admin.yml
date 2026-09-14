@@ -16,4 +16,5 @@ jobs:
       - name: Run analiticos regression tests
         run: |
           node tests/admin-seguimiento.test.cjs
+          node tests/libro-folio-sync.test.cjs
           node tests/envios-inspectora.test.cjs
