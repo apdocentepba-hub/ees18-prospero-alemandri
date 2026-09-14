@@ -234,16 +234,17 @@
 
 .ingreso-page-cta {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(320px, .8fr) minmax(0, 1.2fr);
   gap: 30px;
   align-items: center;
   padding: 34px;
   color: #fff;
   background: #0f3f62;
 }
+.ingreso-page-cta > div { min-width: 0; }
 .ingreso-page-cta h2 { margin: 0; color: #fff; font-family: "Libre Baskerville", Georgia, serif; }
 .ingreso-page-cta p { margin: 10px 0 0; color: #d6e6ee; }
-.ingreso-page-cta__links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; }
+.ingreso-page-cta__links { display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end; min-width: 0; }
 .ingreso-page-cta a { display: inline-flex; min-height: 46px; align-items: center; padding: 0 18px; color: #0f3f62; background: #fff; font-weight: 800; text-decoration: none; }
 .ingreso-page-cta a:last-child { color: #fff; background: transparent; border: 1px solid rgba(255,255,255,.35); }
 .ingreso-privacy-note {
