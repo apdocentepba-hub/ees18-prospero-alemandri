@@ -1,0 +1,12 @@
+const fs = require('node:fs');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+const file = path.join(__dirname, '..', 'apps-script', 'analiticos-pases', 'EnviosInspectora_SHEETS.gs');
+const source = fs.readFileSync(file, 'utf8');
+assert.match(source, /const EI_COL_REFERENCIA_ANALITICO = 32;\s*\/\/ AF/);
+assert.doesNotMatch(source, /EI_COL_REFERENCIA_ANALITICO = 30/);
+assert.match(source, /Columna AF "Referencia analítico"/);
+const h = require(file);
+assert.equal(h.extraerIdDrive_('https://docs.google.com/spreadsheets/d/1E03D2kWzjTeXnfGKi3VTcIeCZeQ-m9U0QLbIV4UPI0U/edit'), '1E03D2kWzjTeXnfGKi3VTcIeCZeQ-m9U0QLbIV4UPI0U');
+assert.equal(h.esSi_('Sí'), true);
+console.log('envios-inspectora: 5/5 OK');
