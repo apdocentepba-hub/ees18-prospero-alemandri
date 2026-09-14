@@ -10,6 +10,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Check Apps Script syntax
-        run: node --check < apps-script/analiticos-pases/AdminSeguimiento.gs
-      - name: Run analiticos sync regression tests
-        run: node tests/admin-seguimiento.test.cjs
+        run: |
+          node --check < apps-script/analiticos-pases/AdminSeguimiento.gs
+          node --check < apps-script/analiticos-pases/EnviosInspectora_SHEETS.gs
+      - name: Run analiticos regression tests
+        run: |
+          node tests/admin-seguimiento.test.cjs
+          node tests/envios-inspectora.test.cjs
