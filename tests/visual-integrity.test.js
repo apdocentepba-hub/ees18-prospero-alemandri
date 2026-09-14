@@ -11,6 +11,7 @@ const mainJs = read('assets/js/main.js');
 const stylesCss = read('assets/css/styles.css');
 const carouselCss = read('assets/css/novedades-carousel.css');
 const actualidadCss = read('assets/css/actualidad.css');
+const ingresoCss = read('assets/css/ingreso-2027.css');
 const canonicalLogo = 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg';
 
 assert(fs.existsSync(path.join(root, 'assets/img/logo-ees18.jpg')), 'local fallback JPG logo must exist');
@@ -32,6 +33,11 @@ rootHtmlFiles.forEach((name) => {
 
 assert(/\.enspa-logo\s*\{[^}]*object-fit:\s*contain/s.test(stylesCss), 'logos must render complete without cropping');
 assert(/\.enspa-logo--hero\s*\{[^}]*object-fit:\s*contain/s.test(stylesCss), 'hero logo must render complete without cropping');
+
+const ingresoCtaRule = ingresoCss.match(/\.ingreso-page-cta\s*\{[^}]*\}/s);
+assert(ingresoCtaRule, 'Ingreso 2027 must define the final CTA layout');
+assert(!/grid-template-columns:\s*minmax\(0,\s*1fr\)\s+auto/.test(ingresoCtaRule[0]), 'Ingreso 2027 CTA must not let the links auto-size and crush the copy column');
+assert(/grid-template-columns:\s*minmax\(320px,\s*\.8fr\)\s+minmax\(0,\s*1\.2fr\)/.test(ingresoCtaRule[0]), 'Ingreso 2027 CTA must reserve readable width for copy and links');
 
 assert(carouselCss.includes('aspect-ratio: 16 / 10;'), 'home banners must use a controlled landscape ratio');
 assert(carouselCss.includes('object-fit: cover;'), 'home banner images must crop cleanly instead of letterboxing');
