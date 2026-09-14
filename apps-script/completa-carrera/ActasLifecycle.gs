@@ -13,7 +13,6 @@ function vaciarDocumentoActa_(docId) {
   tables[3].getCell(0, 1).setText('APROBADOS  ______');
   tables[3].getCell(0, 2).setText('DESAPROBADOS  ______');
   tables[3].getCell(0, 3).setText('AUSENTES  ______');
-  body.insertParagraph(0, 'ACTA SIN ALUMNOS CONFIRMADOS').setBold(true);
   doc.saveAndClose();
 }
 
