@@ -12,15 +12,45 @@
 <footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Av. Manuel Belgrano 355 · Avellaneda</span><br><a href="mailto:secundaria18avellaneda@abc.gob.ar">secundaria18avellaneda@abc.gob.ar</a></div><nav aria-label="Enlaces del pie"><a href="index.html">Inicio</a><a href="nuestra-escuela.html">Nuestra escuela</a><a href="estudiantes-familias.html">Estudiantes y familias</a><a href="docentes.html">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="contacto.html">Contacto</a><a href="https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l">WhatsApp</a></nav><span>© <span id="current-year">2026</span></span></div></footer><script src="assets/js/main.js"></script><script>
 (function(){
   const WEBAPP='https://script.google.com/macros/s/AKfycbyOZtxw5pfuq5RwkjdzZyOCjPvuboFSbvH23RlKgj5yiPeq23YAaqfSr6M6hHLvsoOv/exec';
+  const MAX_ATTEMPTS=3;
   const status=document.querySelector('[data-completa-status]');
   const period=document.querySelector('[data-completa-period]');
   const action=document.querySelector('[data-completa-action]');
   if(!status||!period||!action)return;
 
+  let attempt=0;
+  let resolved=false;
+  let activeScript=null;
+  let activeTimer=null;
+
+  function cleanup(){
+    if(activeTimer){clearTimeout(activeTimer);activeTimer=null;}
+    if(activeScript){activeScript.remove();activeScript=null;}
+  }
+
+  function showError(){
+    cleanup();
+    status.textContent='No se pudo consultar el estado';
+    status.dataset.state='error';
+    period.textContent='Abrí el formulario para verificar el período vigente.';
+    action.hidden=false;
+    action.textContent='Consultar Completa Carrera →';
+  }
+
+  function scheduleRetry(){
+    cleanup();
+    if(resolved)return;
+    if(attempt>=MAX_ATTEMPTS){showError();return;}
+    status.textContent='Consultando período…';
+    status.dataset.state='loading';
+    setTimeout(loadStatus,700*attempt);
+  }
+
   window.completaCarreraStatus=function(data){
-    if(!data||data.ok!==true){
-      status.textContent='Estado no disponible';status.dataset.state='error';period.textContent='Consultá el formulario para verificar el período vigente.';action.hidden=false;action.textContent='Consultar Completa Carrera →';return;
-    }
+    if(resolved)return;
+    if(!data||data.ok!==true){scheduleRetry();return;}
+    resolved=true;
+    cleanup();
     status.textContent=data.abierto?'Inscripción abierta':'Inscripción cerrada';
     status.dataset.state=data.abierto?'open':'closed';
     period.textContent=data.texto||((data.desde&&data.hasta)?('Período: '+data.desde+' al '+data.hasta+'.'):'Período aún no informado.');
@@ -28,10 +58,19 @@
     if(data.abierto)action.textContent='Inscribirme →';
   };
 
-  const script=document.createElement('script');
-  script.src=WEBAPP+'?status=1&callback=completaCarreraStatus&_='+Date.now();
-  script.async=true;
-  script.onerror=function(){window.completaCarreraStatus({ok:false});};
-  document.head.appendChild(script);
+  function loadStatus(){
+    if(resolved)return;
+    attempt++;
+    const script=document.createElement('script');
+    activeScript=script;
+    script.src=WEBAPP+'?status=1&callback=completaCarreraStatus&_='+Date.now()+'&try='+attempt;
+    script.async=true;
+    script.referrerPolicy='no-referrer';
+    script.onerror=function(){if(script===activeScript)scheduleRetry();};
+    activeTimer=setTimeout(function(){if(script===activeScript&&!resolved)scheduleRetry();},6500);
+    document.head.appendChild(script);
+  }
+
+  loadStatus();
 })();
 </script></body></html>
