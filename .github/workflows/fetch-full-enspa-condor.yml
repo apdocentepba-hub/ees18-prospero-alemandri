@@ -31,7 +31,7 @@ jobs:
 
       - name: Validate and restore full-resolution logo
         run: |
-          python -c "from PIL import Image; im=Image.open('/tmp/enspa-condor.bmp'); print(f'Original ENSPA shield: {im.width}x{im.height} mode={im.mode} format={im.format}'); assert im.width >= 80 and im.height >= 80; rgb=im.convert('RGB').resize((500,580), Image.Resampling.LANCZOS); rgb.save('assets/img/logo-ees18.jpg','JPEG',quality=96,subsampling=0,optimize=True); check=Image.open('assets/img/logo-ees18.jpg'); print(f'Restored local logo: {check.width}x{check.height}')"
+          python -c "from PIL import Image; im=Image.open('/tmp/enspa-condor.bmp'); print(f'Original ENSPA shield: {im.width}x{im.height} mode={im.mode} format={im.format}'); assert im.width >= 80 and im.height >= 80; rgb=im.convert('RGB'); rgb.save('assets/img/logo-ees18.jpg','JPEG',quality=96,subsampling=0,optimize=True); check=Image.open('assets/img/logo-ees18.jpg'); print(f'Restored local logo: {check.width}x{check.height}')"
 
       - name: Commit restored logo
         run: |
