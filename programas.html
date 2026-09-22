@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Programas de materias de la E.E.S. Nº 18 Próspero Alemandri organizados por ciclo, año y orientación.">
+  <meta name="theme-color" content="#0f3f62">
+  <title>Programas de materias · E.E.S. Nº 18</title>
+  <link rel="canonical" href="https://ees18avellaneda.edu.ar/programas.html">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Source+Sans+3:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/styles.css">
+  <link rel="stylesheet" href="assets/css/multipage.css?v=20260908-3">
+  <style>
+    .program-shell{max-width:1120px}
+    .program-tools{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(180px,.6fr);gap:1rem;margin:1.4rem 0 1rem}
+    .program-search,.program-select{width:100%;min-height:48px;border:1px solid #cbd6dc;border-radius:12px;background:#fff;padding:.75rem .9rem;font:inherit;color:#183645}
+    .program-search:focus,.program-select:focus{outline:3px solid rgba(28,114,164,.18);border-color:#287aa5}
+    .program-summary{display:flex;flex-wrap:wrap;gap:.65rem;margin:0 0 1.5rem}
+    .summary-pill{display:inline-flex;align-items:center;gap:.35rem;padding:.42rem .72rem;border-radius:999px;background:#edf3f6;color:#315266;font-weight:700;font-size:.88rem}
+    .summary-pill--ok{background:#e7f5eb;color:#17663a}.summary-pill--missing{background:#fff4df;color:#865900}
+    .program-cycle{margin-top:2.2rem}
+    .program-cycle__head{display:flex;align-items:end;justify-content:space-between;gap:1rem;border-bottom:1px solid #dbe4e8;padding-bottom:.75rem;margin-bottom:1rem}
+    .program-cycle__head h2{margin:0}.program-cycle__head p{margin:0;color:#607786}
+    .orientation-block{margin:1.6rem 0 2rem}
+    .orientation-block>h3{font-family:"Libre Baskerville",serif;margin:.2rem 0 1rem;color:#123e5b}
+    .year-block{margin:1.25rem 0 1.8rem}
+    .year-title{display:flex;align-items:center;gap:.6rem;margin-bottom:.8rem}
+    .year-title h4{margin:0;font-size:1.15rem}
+    .year-count{font-size:.78rem;font-weight:800;border-radius:999px;background:#eef3f6;padding:.25rem .55rem;color:#4c6573}
+    .program-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.8rem}
+    .program-card{border:1px solid #dce5e9;border-radius:14px;background:#fff;padding:1rem;display:flex;flex-direction:column;min-height:150px;box-shadow:0 4px 16px rgba(15,63,98,.045)}
+    .program-card small{font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:#6a7e89}
+    .program-card h5{font-size:1rem;margin:.45rem 0 .7rem;line-height:1.3}
+    .program-card a{margin-top:auto;font-weight:800;color:#0e5f8c;text-decoration:none}
+    .program-card a:hover{text-decoration:underline}
+    .program-card--missing{background:#fafbfc;border-style:dashed}
+    .program-card--missing .program-state{margin-top:auto;color:#816327;font-weight:700;font-size:.88rem}
+    .program-state--ok{display:inline-flex;align-items:center;gap:.35rem;color:#17663a;font-weight:700;font-size:.84rem;margin-bottom:.25rem}
+    .program-state--ok::before{content:"";width:.5rem;height:.5rem;border-radius:50%;background:#2b9156}
+    .program-card[hidden],.year-block[hidden],.orientation-block[hidden],.program-cycle[hidden]{display:none!important}
+    .empty-search{padding:1.2rem;border:1px dashed #cbd6dc;border-radius:14px;background:#fafcfd;color:#536c7a;margin:1rem 0 0}
+    .program-note{margin-top:1.2rem;padding:1rem 1.1rem;border-left:4px solid #2d779f;background:#f2f7fa;border-radius:0 12px 12px 0;color:#365564}
+    @media(max-width:900px){.program-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:640px){.program-tools{grid-template-columns:1fr}.program-grid{grid-template-columns:1fr}.program-cycle__head{align-items:start;flex-direction:column}}
+  </style>
+</head>
+<body>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+<div class="government-bar"><div class="container government-bar__inner"><span>Educación Pública · Provincia de Buenos Aires</span><span>Avellaneda · Nivel Secundario</span></div></div>
+<header class="site-header"><div class="container header-shell"><a class="brand" href="index.html" aria-label="Inicio - E.E.S. Nº 18 Próspero Alemandri"><span class="brand-logo"><img class="enspa-logo" src="assets/img/logo-ees18.jpg" alt="Emblema histórico de la institución"></span><span class="brand-copy"><span class="brand-copy__legacy">Escuela secundaria estatal · Avellaneda</span><strong>ESCUELA DE EDUCACIÓN SECUNDARIA Nº 18</strong><span class="brand-copy__name">“PRÓSPERO ALEMANDRI”</span></span></a><button class="menu-toggle" id="menu-toggle" type="button" aria-controls="primary-nav" aria-expanded="false" aria-label="Abrir menú de navegación"><span></span><span></span><span></span></button><nav class="primary-nav" id="primary-nav" aria-label="Navegación principal"><a href="index.html">Inicio</a><a href="nuestra-escuela.html">Nuestra escuela</a><a href="propuesta-educativa.html">Propuesta educativa</a><a href="estudiantes-familias.html" aria-current="page">Estudiantes y familias</a><a href="docentes.html">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="ingreso-2027.html">Ingreso 2027</a><a href="contacto.html" class="nav-cta">Contacto</a></nav></div></header>
+
+<main id="contenido">
+<nav class="breadcrumbs container" aria-label="Ruta de navegación"><a href="index.html">Inicio</a><span aria-hidden="true">›</span><a href="estudiantes-familias.html">Estudiantes y familias</a><span aria-hidden="true">›</span><span aria-current="page">Programas de materias</span></nav>
+
+<section class="page-hero"><div class="container page-hero__grid"><div><span class="page-kicker">Material académico</span><h1>Programas de materias</h1><p>Consultá los contenidos y programas disponibles de Ciclo Básico y Ciclo Superior, organizados por año y orientación.</p></div><aside class="page-note"><small>Acceso</small><strong>Consulta en línea</strong><span>Los documentos publicados se abren en modo lectura desde el Drive institucional de programas.</span></aside></div></section>
+
+<section class="page-section"><div class="container program-shell">
+  <div class="section-heading"><span>Buscador</span><h2>Encontrá tu materia.</h2><p>Podés buscar por nombre o filtrar directamente por año y orientación.</p></div>
+  <div class="program-tools">
+    <label><span class="sr-only">Buscar materia</span><input id="program-search" class="program-search" type="search" placeholder="Ej.: Matemática, Biología, Literatura…" autocomplete="off"></label>
+    <label><span class="sr-only">Filtrar programas</span><select id="program-filter" class="program-select"><option value="all">Todos los cursos</option><option value="basico-1">1.º año · Ciclo Básico</option><option value="basico-2">2.º año · Ciclo Básico</option><option value="basico-3">3.º año · Ciclo Básico</option><option value="com-4">4.º · Comunicación</option><option value="com-5">5.º · Comunicación</option><option value="com-6">6.º · Comunicación</option><option value="soc-4">4.º · Ciencias Sociales</option><option value="soc-5">5.º · Ciencias Sociales</option><option value="soc-6">6.º · Ciencias Sociales</option><option value="len-4">4.º · Lenguas Extranjeras</option><option value="len-5">5.º · Lenguas Extranjeras</option><option value="len-6">6.º · Lenguas Extranjeras</option><option value="nat-4">4.º · Ciencias Naturales</option><option value="nat-5">5.º · Ciencias Naturales</option><option value="nat-6">6.º · Ciencias Naturales</option></select></label>
+  </div>
+  <div class="program-summary" aria-live="polite"><span class="summary-pill" id="count-visible">158 espacios curriculares</span><span class="summary-pill summary-pill--ok">111 programas disponibles</span><span class="summary-pill summary-pill--missing">47 pendientes</span></div>
+  <div id="programs-root"></div>
+  <div id="empty-search" class="empty-search" hidden>No encontramos materias con esos filtros. Probá con otro nombre o seleccioná otro curso.</div>
+  <p class="program-note">Si una materia figura como <strong>Programa todavía no disponible</strong>, significa que el espacio curricular pertenece al plan de estudios pero el archivo correspondiente aún no fue incorporado a esta biblioteca.</p>
+</div></section>
+</main>
+
+<footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Av. Manuel Belgrano 355 · Avellaneda</span><br><a href="mailto:secundaria18avellaneda@abc.gob.ar">secundaria18avellaneda@abc.gob.ar</a></div><nav aria-label="Enlaces del pie"><a href="index.html">Inicio</a><a href="nuestra-escuela.html">Nuestra escuela</a><a href="estudiantes-familias.html">Estudiantes y familias</a><a href="programas.html">Programas</a><a href="docentes.html">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="contacto.html">Contacto</a><a href="https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l">WhatsApp</a></nav><span>© <span id="current-year">2026</span></span></div></footer>
+<script src="assets/js/main.js"></script>
+<script>
+const V=id=>'https://drive.google.com/file/d/'+id+'/view?usp=sharing';
+const DATA=[
+{cycle:'Ciclo Básico',orientation:'',key:'basico',years:{
+'1':[
+['Ciencias Naturales','1o6HLekUk7D5C3lsDDk9GBZ8LW6iMDjER'],['Ciencias Sociales','1PrP8ccydIdtY_E54P3xcbU1-JqZeee9c'],['Educación Artística',null],['Educación Física','1Ygw7c5B8-EU9Ya7OhL9M9Ri7N8HrBX9n'],['Inglés','1q7QajQqfm6gnAZsAaq917rYPn-KsaQs4'],['Matemática','1LQa0qyLfE3onHW0JxUVCaLu4Op8YVZw_'],['Prácticas del Lenguaje','1ZJbXDpZsHWfHDfKgu6HIPvK81Jl0SdF5'],['Construcción de Ciudadanía',null]],
+'2':[
+['Biología',null],['Construcción de Ciudadanía',null],['Educación Artística',null],['Educación Física','1RPP6Xj6euz3bQgdGukY2sXUpWSwX6yr7'],['Físico-Química','1RssifEbpH7AroHNep6uMuYU8oCKiZl1u'],['Geografía','1MBw8qxv-xR2VE1adGwYI-4RE-bQ65OfL'],['Historia','1LbvV2YUnrZS0q2AgBEUMGsMk3zTlPMHl'],['Inglés','1Sk9GdQrcl2cIZepKxzS24IHW3F_e9E52'],['Matemática','1geuP6j7kgIYos3dtGijgVtPkDYI8FBIe'],['Prácticas del Lenguaje','1WQfWdt7kUkD7E4e1I1QrB6mV3Y6zmsLk']],
+'3':[
+['Biología',null],['Construcción de Ciudadanía',null],['Educación Artística',null],['Educación Física','15Dh6x0Huh__pTo8-eP-Xj8-cb2nb8Jqs'],['Físico-Química','1Z0Iy3ccNAUgfU3qtFDeXlqRVoJGd4kV1'],['Geografía','11qyD9vvjlix1eIW6lxAku0RKBS3hrru8'],['Historia',null],['Inglés','1c3WD0ZQZhyybcTdKPddBXieBTpd5satd'],['Matemática','13HBZ8rGcnUOp66CqZH7qTvTwEZiq4W0I'],['Prácticas del Lenguaje','1Ngqq9jmWcIuEuXcPrrT7Xsb1_9HWwk1E']]
+}},
+{cycle:'Ciclo Superior',orientation:'Comunicación',key:'com',years:{
+'4':[
+['Literatura','1zd8vVdSFyH3MHwNMHHq47MNpCrwIgUNi'],['Matemática Ciclo Superior','1S0Z1SQfGe8uEpbqjBjFAESqeHFdjTP0C'],['Educación Física','1SMOFr1neEj7UQS0noHWTGbaz8oSHDQjO'],['Inglés','1VM70GCvv-zO6i6zmRymuM5CtaBGexjLv'],['NTICx',null],['Salud y Adolescencia','1J34vf92fSOSvpS2NrdDDRs8TLCHzkPiV'],['Introducción a la Física','1qyJVCI3chknFhWkTG6WSUp8fFmhsi2Ca'],['Biología',null],['Historia','1HN0cWjuIr9V1YjacUBWvq3BOWkW5RJbZ'],['Geografía','17PsLChKLSlvLC1EAm5VvmoWle5-EFVCZ'],['Psicología','1mlU5acOU3_aqXGW_is6iegfbB1fqpJF9'],['Introducción a la Comunicación','1HvTz9oYrgwEnaP1Ad0fUhieTLwTYvLVW']],
+'5':[
+['Literatura','191P4xIcbwv6f_rQHJuHCmFVfGJAX-YcU'],['Matemática Ciclo Superior','1JXhVuz6CTtG49WoVik_0J5pvhHKNAsIN'],['Educación Física','1ZB-7qJeFHn0GdkN-tFkssOJu2u5KUAhn'],['Inglés','1MD6po9nZzFDi8LJYQofSWCzYvdeh0mqr'],['Política y Ciudadanía',null],['Introducción a la Química',null],['Historia','1mQM96ydsxE_jTdj_O4oMGJ-bTuRZHj2e'],['Geografía','1aBrTjuXmN_mv3sWFZ3VJQVAzHUKE_akt'],['Comunicación y Culturas del Consumo','1T1yWFil8NHYPfjCUzkhXsDq1zRE577qa'],['Observatorio de Comunicación, Cultura y Sociedad','1dRvhTGeTpX11RNMLZ2XQDRC65eo1eD0S'],['Observatorio de Medios',null]],
+'6':[
+['Literatura','14OgTzMimcBEEx474WYUlN_gPsnb0MDhz'],['Matemática Ciclo Superior','1Z3geOYiwqAcVTEAd1-RDtkY_xMuhxYdO'],['Educación Física','1nu1RkOZ5wwrPTUYi9zrmaKBl2q8yTE1K'],['Inglés',null],['Trabajo y Ciudadanía','1qpPAZ-5n56ctYPcy7QYpcsaoTK1dHgxp'],['Arte',null],['Filosofía','1FesWUiHA5SWOlUcuurYXh-pLVWohd982'],['Comunicación y Transformaciones Socioculturales del Siglo XXI','1rBzKZPVvrgSBsJYX1cPf7TNhS_NC1S3l'],['Taller de Comunicación Institucional y Comunitaria','1tl0FvTq4Q7HyDDHq7xRwrGid0x4G6LDF'],['Taller de Producción en Lenguajes','18891pBL-krSmKPV0RLQ4VHIZ_MAbtl86']]
+}},
+{cycle:'Ciclo Superior',orientation:'Ciencias Sociales',key:'soc',years:{
+'4':[
+['Literatura','1HJa42gbdolv8jM_kWZpuj05WeDmxQcLO'],['Matemática Ciclo Superior','1l6-e8zghveX-aB8v4xX83VQRLDWtLwWA'],['Educación Física','1hWdzCC6XbVbZpI8vgCJWQsGqgMDVz9tm'],['Inglés','1lszbI6X3YijIj5pHngQLwFW5CD41J0dv'],['NTICx',null],['Salud y Adolescencia','1WyeshwvtZ2_mFuMJDFRPAceawbN1QiM4'],['Introducción a la Física','1sYHfuJyX2xVRopd00fDL_3EyCwk-YKit'],['Biología',null],['Historia','1hv1H5my3fPJIV3hMhtTtTEeKEtQ9ijy9'],['Geografía','1IJlUI7EoSUok7l8d5KR-7-2B5uDouPdu'],['Psicología','1BFHQLFNh3cb5oRDfXHj5DHZwjdWVncDH']],
+'5':[
+['Literatura','1cfEbl1-_7pkwv3SmWo2Rzbed6JxRWlYC'],['Matemática Ciclo Superior','1N-Y_Z5IZxKkYCGkjtPHm820FnRsUHupY'],['Educación Física','1A8E0cSyf2GIzS2UoMAePWeUAV-PYzaWP'],['Inglés','1BDbABo_foFKQMKut7VctaN56JfoSgmBc'],['Política y Ciudadanía',null],['Introducción a la Química',null],['Historia','1GUiGnfhWWc5AN8etiHmzm2Yk-nh5gcA-'],['Geografía','1rI40MfcwQ-exrIaldcm_Ojycd4D8qHYz'],['Comunicación, Cultura y Sociedad',null],['Economía Política',null],['Sociología',null]],
+'6':[
+['Literatura','15wn-Kbc0auklxTF3D2d60nSbafjKtEhT'],['Matemática Ciclo Superior','1mcuoRYBkG5UOTKzYMmyX5SYYTu-hhJQm'],['Educación Física','1f3TcCB8EAQrjC1L-D7MuOk8gl0Z_DB87'],['Inglés',null],['Trabajo y Ciudadanía','1Vu2ZD-yY8UvSo0tosptn9pdKhDAoV_nh'],['Filosofía','1x4r8oVkB2BQOZ0v6bNfK-R3sqcK9vq_Y'],['Arte',null],['Historia',null],['Geografía','1Go5F-9KEpZYP_A9irLd0z8KKVeM0hN-d'],['Proyecto de Investigación en Ciencias Sociales',null]]
+}},
+{cycle:'Ciclo Superior',orientation:'Lenguas Extranjeras',key:'len',years:{
+'4':[
+['Literatura','1KR0YbxGxc0XeVOcpPnesQJlNqVT4jiNK'],['Matemática Ciclo Superior','1RdjiAyd0pZRLc-7a5BpxliX_aeh8vjxl'],['Educación Física','18F_L_6w7YMh481a-LsTB-16JWSfC5Gt9'],['Inglés','15iHZHbu3xJkLQ_qNrCAcW0B_TEwv4Fsv'],['NTICx',null],['Salud y Adolescencia','14JsdQUJ-CY-QgwOqWLyFGbhMlzoYjWDy'],['Introducción a la Física','1k4SxP4_9518qu3WeNEJqXgdzdbbPf8ls'],['Biología',null],['Historia','1gGUyGzLoWA68d6Lz8ahBU-J41Ji23Dad'],['Geografía','1c-gJzgkEzUBxACEs7nJDP_fVvJqiGbVq'],['Portugués I','1_ckCcc7v-1eTifDe61UbF95l9pgo6SpY'],['Francés I','1E-Li3VM4oJVEW_i3LXS80e8F_q63T1Lh']],
+'5':[
+['Literatura','1wte-oDoHJ-X51meHTIDe7LHnHD_9pU_M'],['Matemática Ciclo Superior','1GIfpQ0Ty7-HSV7XUywayrN_KNlVRoRdQ'],['Educación Física','1xT3nN5JMGxa_JB0szb74m-ezYhpvYv8S'],['Inglés','1MM69F8by7CeaQZ6tOvT36bJstyMj9SSi'],['Política y Ciudadanía',null],['Introducción a la Química',null],['Historia','1e2lU7_HFFOu44k6cNBKoxtJH8NVHXOnV'],['Estudios Interculturales en Inglés I',null],['Portugués II','1sy_JvBwYx1TT0vRj1z4zmq4lgKQmERjE'],['Francés II','1gi6iDA1YGnnYrSRcwUhej9LBZGLJOKRk']],
+'6':[
+['Literatura','1EXl8BPYW4f3AVbHOHTKlR5vxScEbuTDx'],['Matemática Ciclo Superior','1Xsj3Jaz35iRxoMARx5xHXAw9xggA0SFE'],['Educación Física','1pAkaaPOCln9i0q9nsUkcuFa_0t4mqZ5K'],['Inglés',null],['Trabajo y Ciudadanía','1g9HekXpKRMDmf0nvERu5V0tYPs5VfS36'],['Arte',null],['Filosofía','1e9MNdoulY4RmHMzVkgvsb3BoU-1Knily'],['Estudios Interculturales en Inglés II',null],['Portugués III','1zXoP_wL5tBQZfKOWRe29mahx-idPpM4W'],['Francés III','1BHe8Ewtuw46cjQ_-R9f-oeVE7n8d0MMw']]
+}},
+{cycle:'Ciclo Superior',orientation:'Ciencias Naturales',key:'nat',years:{
+'4':[
+['Literatura','13kPyqLmErey2fQ3OdNnMHacIYXhmEhij'],['Matemática Ciclo Superior','1m5mPrFPDwDPyNHyTm5FinITwz49Smb5W'],['Educación Física','1jHSh6IDwROmbWWiYILc_lsGQe91VikJV'],['Inglés','1Aqs-1jdHSbG_Be6NVXyp5Pq6D7wLBvzp'],['NTICx',null],['Salud y Adolescencia','16wbpWi-KADNiuc2TF6_4nC4EpsTTdpdw'],['Introducción a la Física','1HoVdFDmSQyTAAl7PM7dKwUWuxTz7Gmtj'],['Biología',null],['Historia','1maaATav9JFpLnODkTcXdZN5y7XaIwJen'],['Geografía','1tSTo8-O9MEN_rNIjrZw6KbkFrCnbn1dy'],['Introducción a la Química',null]],
+'5':[
+['Literatura','1KTy1Wsa9WiWjJRny8N3sIO9TgOZD_041'],['Matemática Ciclo Superior','1oJbzyGed6qMlAdTbqNeG2mBQgSAsEbXu'],['Educación Física','1Nh9BhnAMpEQwa61jDaDcY-O5vK3taq6n'],['Inglés','1R3-2XzjxxhEB3oAQdYu5TtunNGtHmMKR'],['Política y Ciudadanía',null],['Historia','1MlxY-bNvRT3DMFfxQTI-aFKo6t2zXqeS'],['Geografía','1nhu11q6gltEigIIFbPuRIvw2MUfeitQD'],['Arte',null],['Fundamentos de la Química','1SL1aJfVBJq6TSFo7AYIVkcTLsPr-6gqj'],['Biología',null],['Física',null],['Ciencias de la Tierra','1DiuChfEfct4xsJuqJ3fS5tZYuYhvcM-p']],
+'6':[
+['Literatura','1PoR7F2I_kOGYQ2S2Mghk7yB3zgFeJUW6'],['Matemática Ciclo Superior','1G-jG4wijaZAXJOtbWTA1sap8LDDSD_-D'],['Educación Física','1VRyQGtx0oEEoFUlWKb8-qTGkbTE54LeP'],['Inglés',null],['Trabajo y Ciudadanía','1EeJ33FsXlJ-PjfuozydSuF65bJgLNsvh'],['Filosofía e Historia de la Ciencia y la Tecnología',null],['Química del Carbono','1uOGZndCczd8N3G18Om-3OVXh5S6BCt-J'],['Biología, Genética y Sociedad',null],['Física Clásica y Moderna',null],['Ambiente, Desarrollo y Sociedad',null]]
+}}
+];
+
+const root=document.getElementById('programs-root');
+function norm(s){return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();}
+function render(){
+  root.innerHTML='';
+  for(const group of DATA){
+    const cycle=document.createElement('section');
+    cycle.className='program-cycle';
+    cycle.dataset.cycle=group.key==='basico'?'basico':'superior';
+    if(group.key==='basico'){
+      cycle.innerHTML='<div class="program-cycle__head"><div><span class="page-kicker">Trayectoria común</span><h2>Ciclo Básico</h2></div><p>1.º, 2.º y 3.º año</p></div>';
+    }else{
+      cycle.innerHTML='<div class="program-cycle__head"><div><span class="page-kicker">Ciclo orientado</span><h2>'+group.orientation+'</h2></div><p>4.º, 5.º y 6.º año</p></div>';
+    }
+    const orientation=document.createElement('div');orientation.className='orientation-block';orientation.dataset.orientation=group.key;
+    for(const [year,subjects] of Object.entries(group.years)){
+      const y=document.createElement('section');y.className='year-block';y.dataset.filter=group.key+'-'+year;
+      const available=subjects.filter(x=>x[1]).length;
+      y.innerHTML='<div class="year-title"><h4>'+year+'.º año</h4><span class="year-count">'+available+' de '+subjects.length+' disponibles</span></div>';
+      const grid=document.createElement('div');grid.className='program-grid';
+      subjects.forEach(([name,id],index)=>{
+        const card=document.createElement('article');card.className='program-card'+(id?'':' program-card--missing');
+        card.dataset.name=norm(name);card.dataset.filter=group.key+'-'+year;
+        const context=group.key==='basico'?'Ciclo Básico':group.orientation;
+        card.innerHTML='<small>'+context+' · '+year+'.º</small><h5>'+(index+1)+'. '+name+'</h5>'+(id?'<span class="program-state--ok">Programa disponible</span><a href="'+V(id)+'" target="_blank" rel="noopener noreferrer">Ver programa →</a>':'<span class="program-state">Programa todavía no disponible</span>');
+        grid.appendChild(card);
+      });
+      y.appendChild(grid);orientation.appendChild(y);
+    }
+    cycle.appendChild(orientation);root.appendChild(cycle);
+  }
+}
+render();
+
+const search=document.getElementById('program-search');
+const filter=document.getElementById('program-filter');
+const empty=document.getElementById('empty-search');
+const count=document.getElementById('count-visible');
+
+function applyFilters(){
+  const q=norm(search.value.trim()), f=filter.value;
+  let visible=0;
+  document.querySelectorAll('.program-card').forEach(card=>{
+    const okName=!q||card.dataset.name.includes(q);
+    const okFilter=f==='all'||card.dataset.filter===f;
+    card.hidden=!(okName&&okFilter);
+    if(!card.hidden)visible++;
+  });
+  document.querySelectorAll('.year-block').forEach(y=>y.hidden=![...y.querySelectorAll('.program-card')].some(c=>!c.hidden));
+  document.querySelectorAll('.orientation-block').forEach(o=>o.hidden=![...o.querySelectorAll('.year-block')].some(y=>!y.hidden));
+  document.querySelectorAll('.program-cycle').forEach(c=>c.hidden=![...c.querySelectorAll('.orientation-block')].some(o=>!o.hidden));
+  empty.hidden=visible!==0;
+  count.textContent=visible+' espacio'+(visible===1?'':'s')+' curricular'+(visible===1?'':'es');
+}
+search.addEventListener('input',applyFilters);filter.addEventListener('change',applyFilters);
+</script>
+</body>
+</html>
