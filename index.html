@@ -26,6 +26,25 @@
   <link rel="stylesheet" href="assets/css/novedades-carousel.css?v=20260909-1">
   <link rel="stylesheet" href="assets/css/multipage.css?v=20260908-3">
   <link rel="stylesheet" href="assets/css/visitor-counter.css">
+  <style>
+    .home-alerts{padding:1.15rem 0 1.35rem;background:#fff}
+    .home-alerts__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+    .home-alert{position:relative;overflow:hidden;border:1px solid #d8e4ea;border-radius:18px;padding:1.25rem 1.35rem;background:#fff;box-shadow:0 8px 28px rgba(15,63,98,.07)}
+    .home-alert--open{border-color:#b8dfc5;background:linear-gradient(135deg,#f1fbf4 0%,#fff 74%)}
+    .home-alert--programs{background:linear-gradient(135deg,#f1f7fb 0%,#fff 74%)}
+    .home-alert__eyebrow{display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#507080}
+    .home-alert__dot{width:.58rem;height:.58rem;border-radius:50%;background:#2b9156;box-shadow:0 0 0 5px rgba(43,145,86,.12)}
+    .home-alert h2{margin:.15rem 0 .55rem;font-size:1.45rem;line-height:1.2;color:#123e5b}
+    .home-alert p{margin:.2rem 0 .95rem;color:#4d6877;max-width:62ch}
+    .home-alert__meta{display:inline-flex;align-items:center;padding:.32rem .62rem;border-radius:999px;background:#e8f6ed;color:#176b3b;font-weight:800;font-size:.82rem;margin-bottom:.85rem}
+    .home-alert__meta[data-state="closed"]{background:#fff4df;color:#8a5b00}
+    .home-alert__meta[data-state="error"]{background:#eef2f4;color:#59656c}
+    .home-alert__actions{display:flex;flex-wrap:wrap;gap:.55rem}
+    .home-alert__actions a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:.65rem .9rem;border-radius:10px;background:#0f4f75;color:#fff;text-decoration:none;font-weight:800}
+    .home-alert__actions a.secondary{background:#fff;color:#0f4f75;border:1px solid #b9ccd7}
+    .home-alert__actions a[hidden]{display:none!important}
+    @media(max-width:760px){.home-alerts__grid{grid-template-columns:1fr}.home-alert{padding:1.05rem}}
+  </style>
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -79,6 +98,32 @@
       <a href="vida-escolar.html"><small>04</small><strong>Vida escolar</strong><span>Proyectos, jornadas, actividades y producciones.</span></a>
     </div></section>
 
+
+    <section class="home-alerts" aria-labelledby="avisos-importantes">
+      <div class="container">
+        <div class="section-heading reveal"><span>Ahora en la escuela</span><h2 id="avisos-importantes">Avisos importantes.</h2><p>Accesos directos a lo que está vigente y a los materiales académicos.</p></div>
+        <div class="home-alerts__grid">
+          <article class="home-alert home-alert--open reveal" data-home-completa>
+            <div class="home-alert__eyebrow"><span class="home-alert__dot" aria-hidden="true"></span>Completa Carrera</div>
+            <h2>Inscripción a mesas</h2>
+            <span class="home-alert__meta" data-home-completa-status data-state="open">Inscripción abierta</span>
+            <p data-home-completa-period>Inscripción abierta del 21/09/2026 al 25/09/2026 inclusive.</p>
+            <div class="home-alert__actions">
+              <a data-home-completa-action href="https://script.google.com/macros/s/AKfycbyOZtxw5pfuq5RwkjdzZyOCjPvuboFSbvH23RlKgj5yiPeq23YAaqfSr6M6hHLvsoOv/exec">Inscribirme ahora →</a>
+              <a class="secondary" href="estudiantes-familias.html">Ver información</a>
+            </div>
+          </article>
+          <article class="home-alert home-alert--programs reveal">
+            <div class="home-alert__eyebrow">Material académico</div>
+            <h2>Programas de materias</h2>
+            <span class="home-alert__meta">133 programas disponibles</span>
+            <p>Consultá los programas por año y orientación. Están en <strong>Estudiantes y familias → Programas de materias</strong> y se abren en modo lectura.</p>
+            <div class="home-alert__actions"><a href="programas.html">Ver programas →</a></div>
+          </article>
+        </div>
+      </div>
+    </section>
+
     <section class="page-section page-section--soft" aria-labelledby="news-title"><div class="container">
       <div class="section-heading reveal"><span>Novedades destacadas</span><h2 id="news-title">Vida escolar e información institucional</h2><p>Noticias, proyectos y comunicaciones destacadas de la E.E.S. Nº 18.</p></div>
       <div class="news-carousel reveal" data-news-section="inicio" aria-live="polite" role="region" aria-label="Novedades destacadas" tabindex="0">
@@ -99,5 +144,31 @@
 
   <footer class="site-footer"><div class="container site-footer__inner"><div><strong>E.E.S. Nº 18 “PRÓSPERO ALEMANDRI”</strong><br><span>Av. Manuel Belgrano 355 · Avellaneda</span><br><a href="mailto:secundaria18avellaneda@abc.gob.ar">secundaria18avellaneda@abc.gob.ar</a></div><nav aria-label="Enlaces del pie"><a href="index.html">Inicio</a><a href="nuestra-escuela.html">Nuestra escuela</a><a href="estudiantes-familias.html">Estudiantes y familias</a><a href="docentes.html">Docentes</a><a href="vida-escolar.html">Vida escolar</a><a href="contacto.html">Contacto</a><a href="https://whatsapp.com/channel/0029Vb7rBLn8kyyFXGBB2d1l">WhatsApp</a></nav><div class="visitor-counter" data-visitor-counter hidden aria-live="polite"><span class="visitor-counter__icon" aria-hidden="true">👥</span><span>Visitas al sitio: <strong id="visitor-count">0</strong></span></div><span>© <span id="current-year">2026</span></span></div></footer>
   <script src="assets/js/novedades-config.js"></script><script src="assets/js/novedades.js?v=20260908-4"></script><script src="assets/js/main.js"></script><script src="assets/js/visitor-counter.js"></script>
+
+  <script>
+  (function(){
+    const WEBAPP='https://script.google.com/macros/s/AKfycbyOZtxw5pfuq5RwkjdzZyOCjPvuboFSbvH23RlKgj5yiPeq23YAaqfSr6M6hHLvsoOv/exec';
+    const status=document.querySelector('[data-home-completa-status]');
+    const period=document.querySelector('[data-home-completa-period]');
+    const action=document.querySelector('[data-home-completa-action]');
+    if(!status||!period||!action)return;
+    let attempt=0;
+    window.homeCompletaCarreraStatus=function(data){
+      if(!data||data.ok===false){ status.textContent='Consultar estado'; status.dataset.state='error'; return; }
+      status.textContent=data.abierto?'Inscripción abierta':'Inscripción cerrada';
+      status.dataset.state=data.abierto?'open':'closed';
+      period.textContent=data.texto||'Consultá el período vigente de inscripción.';
+      action.hidden=!data.abierto;
+    };
+    function load(){
+      attempt++;
+      const s=document.createElement('script');
+      s.src=WEBAPP+'?status=1&callback=homeCompletaCarreraStatus&_='+Date.now()+'&try='+attempt;
+      s.onerror=function(){ if(attempt<3)setTimeout(load,700*attempt); else {status.textContent='Consultar estado';status.dataset.state='error';} };
+      document.body.appendChild(s);
+    }
+    load();
+  })();
+  </script>
 </body>
 </html>
