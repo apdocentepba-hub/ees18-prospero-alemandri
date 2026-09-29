@@ -7,6 +7,7 @@ const appDir = path.join(root, 'apps-script', 'preinscripcion-2027');
 const mode = process.argv[2] || 'all';
 const has = file => fs.existsSync(file);
 const read = file => fs.readFileSync(file, 'utf8');
+const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx7Q2JdDdo8LshoWIf2AHSde80TUYM5MTBEezGCatdPuwFQYMKo7RmNRnzlRujJka_dYQ/exec';
 
 function checkCatalog() {
   const catalogPath = path.join(appDir, 'Catalogos.gs');
@@ -44,8 +45,16 @@ function checkBackend() {
   assert.match(code, /correoEnviado/);
   assert.match(code, /normalizarDni_/);
   assert.match(code, /normalizarEmail_/);
-  assert.match(setup, /function configurarPreinscripcion2027\s*\(/);
-  assert.match(setup, /function prepararHojaPreinscripciones2027\s*\(/);
+  assert.match(code, /function controlarAbuso_\s*\(/, 'Debe existir control anti-abuso server-side');
+  assert.match(code, /Session\.getTemporaryActiveUserKey\s*\(/, 'Debe limitar por visitante anónimo');
+  assert.match(code, /CacheService\.getScriptCache\s*\(/, 'Debe usar cache para rate limiting');
+  assert.match(code, /function valorLiteralHoja_\s*\(/, 'Debe neutralizar fórmulas antes de escribir en Sheets');
+  assert.match(code, /\^\[=\+\\-@\]/, 'Debe neutralizar prefijos de fórmula');
+  assert.match(setup, /function configurarPreinscripcion2027_\s*\(/, 'La configuración administrativa debe ser privada');
+  assert.match(setup, /function prepararHojaPreinscripciones2027_\s*\(/, 'La preparación administrativa debe ser privada');
+  assert.match(setup, /function actualizarCatalogoPrimarias2027_\s*\(/, 'La actualización de catálogo debe ser privada');
+  assert.doesNotMatch(setup, /function configurarPreinscripcion2027\s*\(/, 'No debe existir RPC público de configuración');
+  assert.doesNotMatch(setup, /function actualizarCatalogoPrimarias2027\s*\(/, 'No debe existir RPC público que reescriba el catálogo');
   assert.strictEqual(manifest.timeZone, 'America/Argentina/Buenos_Aires');
 }
 
@@ -55,6 +64,7 @@ function checkForm() {
   const form = read(formPath);
   for (const field of ['alumnoNombre','alumnoDni','distritoCodigo','escuelaId','adultoNombre','adultoDni','vinculo','telefono','email']) assert.match(form, new RegExp(`name=["']${field}["']`), `Falta campo ${field}`);
   for (const value of ['Padre', 'Madre', 'Tutor']) assert.match(form, new RegExp(`value=["']${value}["']`), `Falta vínculo ${value}`);
+  assert.match(form, /name=["']website["']/, 'Debe existir honeypot anti-bot');
   assert.match(form, /OTRA \/ NO APARECE EN LA LISTA/);
   assert.match(form, /escuelaManual\.required\s*=\s*esOtra/);
   assert.match(form, /schoolSelect\.disabled\s*=\s*!codigo|escuela[^\n]+disabled/i);
@@ -70,7 +80,8 @@ function checkPage() {
   const warning = 'LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE';
   assert.ok(ingreso.includes(warning), 'Falta aviso de vacante en página Ingreso 2027');
   assert.match(ingreso, /Preinscripci[oó]n.*2027/i);
-  assert.match(ingreso, /script\.google\.com\/macros\/s\/[^"']+\/exec|PREINSCRIPCION_WEB_APP_URL/);
+  assert.ok(ingreso.includes(WEB_APP_URL), 'Ingreso 2027 debe apuntar a la Web App productiva');
+  assert.ok(!ingreso.includes('PREINSCRIPCION_WEB_APP_URL'), 'No debe quedar el placeholder de la Web App');
 }
 
 if (mode === 'catalog') checkCatalog();
