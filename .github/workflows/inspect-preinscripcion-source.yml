@@ -1,0 +1,44 @@
+name: Inspect preinscripcion source
+
+on:
+  push:
+    branches:
+      - feat/preinscripcion-2027
+    paths:
+      - .github/workflows/inspect-preinscripcion-source.yml
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install openpyxl
+        run: python -m pip install openpyxl
+      - name: Download official DGCyE 2026 nomina
+        run: |
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 2 \
+            'https://abc.gob.ar/secretarias/sites/default/files/2026-06/N%C3%B3mina%20de%20Establecimientos%20con%20Matr%C3%ADcula%20Inicial%202026.xlsx' \
+            --output /tmp/nomina2026.xlsx
+          ls -lh /tmp/nomina2026.xlsx
+          file /tmp/nomina2026.xlsx
+      - name: Inspect workbook schema
+        run: |
+          python - <<'PY'
+          from openpyxl import load_workbook
+          p='/tmp/nomina2026.xlsx'
+          wb=load_workbook(p, read_only=True, data_only=True)
+          print('SHEETS', wb.sheetnames)
+          for ws in wb.worksheets:
+              print('SHEET', ws.title, 'ROWS', ws.max_row, 'COLS', ws.max_column)
+              for i,row in enumerate(ws.iter_rows(values_only=True), start=1):
+                  vals=[str(v) if v is not None else '' for v in row]
+                  if any(vals):
+                      print('ROW', i, vals[:40])
+                  if i >= 8:
+                      break
+          PY
