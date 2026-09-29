@@ -19,6 +19,11 @@ const PREINSCRIPCION_HEADERS = [
   'Correo de recepción'
 ];
 
+const PREINSCRIPCION_RATE_VISITOR_MAX = 5;
+const PREINSCRIPCION_RATE_VISITOR_SECONDS = 600;
+const PREINSCRIPCION_RATE_EMAIL_MAX = 5;
+const PREINSCRIPCION_RATE_EMAIL_SECONDS = 3600;
+
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Formulario')
     .setTitle('Preinscripción 1.º año 2027 · E.E.S. Nº 18')
@@ -81,6 +86,66 @@ function normalizarVinculo_(value) {
   return vinculo;
 }
 
+function hashRateLimit_(value) {
+  const bytes = Utilities.computeDigest(
+    Utilities.DigestAlgorithm.SHA_256,
+    String(value || ''),
+    Utilities.Charset.UTF_8
+  );
+  return bytes.map(function(byte) {
+    return ('0' + ((byte + 256) % 256).toString(16)).slice(-2);
+  }).join('');
+}
+
+function incrementarLimite_(cache, key, max, ttlSeconds, message) {
+  const current = Number(cache.get(key) || '0');
+  if (current >= max) throw new Error(message);
+  cache.put(key, String(current + 1), ttlSeconds);
+}
+
+function controlarAbuso_(form) {
+  if (!form) throw new Error('No se recibieron datos del formulario.');
+
+  const honeypot = normalizarTexto_(form.website, 200);
+  if (honeypot) throw new Error('No se pudo procesar la preinscripción.');
+
+  const cache = CacheService.getScriptCache();
+  const lock = LockService.getScriptLock();
+  lock.waitLock(5000);
+
+  try {
+    const visitorKey = Session.getTemporaryActiveUserKey();
+    if (visitorKey) {
+      incrementarLimite_(
+        cache,
+        'preinscripcion-rate-visitor-' + hashRateLimit_(visitorKey),
+        PREINSCRIPCION_RATE_VISITOR_MAX,
+        PREINSCRIPCION_RATE_VISITOR_SECONDS,
+        'Se realizaron demasiados intentos desde este navegador. Esperá 10 minutos e intentá nuevamente.'
+      );
+    }
+
+    const emailKey = normalizarTexto_(form.email, 160).toLowerCase();
+    if (emailKey) {
+      incrementarLimite_(
+        cache,
+        'preinscripcion-rate-email-' + hashRateLimit_(emailKey),
+        PREINSCRIPCION_RATE_EMAIL_MAX,
+        PREINSCRIPCION_RATE_EMAIL_SECONDS,
+        'Ese correo realizó varios intentos recientes. Esperá una hora e intentá nuevamente.'
+      );
+    }
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+function valorLiteralHoja_(value) {
+  if (value instanceof Date) return value;
+  const text = String(value == null ? '' : value);
+  return /^[=+\-@]/.test(text) ? "'" + text : text;
+}
+
 function validarFormularioPreinscripcion_(form) {
   if (!form) throw new Error('No se recibieron datos del formulario.');
   const escuela = resolverEscuela_(form.distritoCodigo, form.escuelaId, form.escuelaManual);
@@ -115,6 +180,7 @@ function buscarDuplicadoDni_(sheet, dni) {
 }
 
 function crearPreinscripcionDesdeFormulario(form) {
+  controlarAbuso_(form);
   const data = validarFormularioPreinscripcion_(form);
   const sheet = getPreinscripcionSheet_();
   const lock = LockService.getScriptLock();
@@ -134,19 +200,19 @@ function crearPreinscripcionDesdeFormulario(form) {
     const now = new Date();
     const row = [
       now,
-      data.alumnoNombre,
-      data.alumnoDni,
+      valorLiteralHoja_(data.alumnoNombre),
+      valorLiteralHoja_(data.alumnoDni),
       data.escuela.distritoCodigo,
-      data.escuela.distrito,
-      data.escuela.id,
-      data.escuela.nombre,
-      data.escuela.gestion,
-      data.escuela.localidad || '',
-      data.adultoNombre,
-      data.adultoDni,
-      data.vinculo,
-      data.telefono,
-      data.email,
+      valorLiteralHoja_(data.escuela.distrito),
+      valorLiteralHoja_(data.escuela.id),
+      valorLiteralHoja_(data.escuela.nombre),
+      valorLiteralHoja_(data.escuela.gestion),
+      valorLiteralHoja_(data.escuela.localidad || ''),
+      valorLiteralHoja_(data.adultoNombre),
+      valorLiteralHoja_(data.adultoDni),
+      valorLiteralHoja_(data.vinculo),
+      valorLiteralHoja_(data.telefono),
+      valorLiteralHoja_(data.email),
       'RECIBIDA',
       '',
       'PENDIENTE'
