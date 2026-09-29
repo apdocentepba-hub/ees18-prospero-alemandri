@@ -4,9 +4,11 @@
 from __future__ import annotations
 
 import csv
+import http.client
 import io
 import json
 import re
+import time
 import unicodedata
 import urllib.request
 from datetime import datetime, timezone
@@ -53,12 +55,20 @@ def decode_payload(payload: bytes) -> str:
 
 
 def fetch_source() -> str:
-    request = urllib.request.Request(
-        SOURCE_URL,
-        headers={"User-Agent": "EES18-Preinscripcion-2027/1.0"},
-    )
-    with urllib.request.urlopen(request, timeout=60) as response:
-        return decode_payload(response.read())
+    last_error = None
+    for attempt in range(1, 5):
+        request = urllib.request.Request(
+            SOURCE_URL,
+            headers={"User-Agent": "EES18-Preinscripcion-2027/1.0"},
+        )
+        try:
+            with urllib.request.urlopen(request, timeout=60) as response:
+                return decode_payload(response.read())
+        except http.client.IncompleteRead as error:
+            last_error = error
+            if attempt < 4:
+                time.sleep(0.5 * attempt)
+    raise RuntimeError("La fuente oficial interrumpió la descarga luego de 4 intentos.") from last_error
 
 
 def detect_delimiter(text: str) -> str:
@@ -73,7 +83,6 @@ def parse_district_code(clave: str, valid_codes: set[int]) -> int | None:
         match = re.search(pattern, compact)
         if match:
             candidates.append(match.group(1))
-    # Last resort: the first three-digit block that maps to one of the 137 districts.
     candidates.extend(re.findall(r"\d{3}", compact[:8]))
     for value in candidates:
         code = int(value)
