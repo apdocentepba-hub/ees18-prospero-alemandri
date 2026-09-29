@@ -1,6 +1,6 @@
 const DEFAULT_CATALOGO_PRIMARIAS_URL = 'https://raw.githubusercontent.com/apdocentepba-hub/ees18-prospero-alemandri/main/data/preinscripcion-2027-primarias.json';
 
-function configurarPreinscripcion2027(spreadsheetId, catalogUrl) {
+function configurarPreinscripcion2027_(spreadsheetId, catalogUrl) {
   const cleanSpreadsheetId = normalizarTexto_(spreadsheetId, 200);
   if (!cleanSpreadsheetId) throw new Error('Debés indicar el ID de la planilla de Google Sheets.');
 
@@ -13,12 +13,12 @@ function configurarPreinscripcion2027(spreadsheetId, catalogUrl) {
     PREINSCRIPCION_CATALOGO_URL: normalizarTexto_(catalogUrl, 500) || DEFAULT_CATALOGO_PRIMARIAS_URL
   }, false);
 
-  prepararHojaPreinscripciones2027();
-  actualizarCatalogoPrimarias2027();
+  prepararHojaPreinscripciones2027_();
+  actualizarCatalogoPrimarias2027_();
   return 'Configuración guardada. Hoja de preinscripciones y catálogo de primarias preparados.';
 }
 
-function prepararHojaPreinscripciones2027() {
+function prepararHojaPreinscripciones2027_() {
   const config = getPreinscripcionConfig_();
   const spreadsheet = SpreadsheetApp.openById(config.spreadsheetId);
   let sheet = spreadsheet.getSheetByName(config.sheetName);
@@ -59,7 +59,7 @@ function prepararEncabezadosEstricto_(sheet, headers, label) {
   sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
 }
 
-function actualizarCatalogoPrimarias2027(catalogUrl) {
+function actualizarCatalogoPrimarias2027_(catalogUrl) {
   const config = getPreinscripcionConfig_();
   const props = PropertiesService.getScriptProperties();
   const url = normalizarTexto_(catalogUrl, 500) || props.getProperty('PREINSCRIPCION_CATALOGO_URL') || DEFAULT_CATALOGO_PRIMARIAS_URL;
@@ -128,4 +128,10 @@ function actualizarCatalogoPrimarias2027(catalogUrl) {
   props.setProperty('PREINSCRIPCION_CATALOGO_ACTUALIZADO', new Date().toISOString());
   CacheService.getScriptCache().removeAll(getDistritos().map(function(item) { return 'primarias-2027-distrito-' + item.codigo; }));
   return 'Catálogo actualizado: ' + rows.length + ' escuelas primarias.';
+}
+
+function usarCatalogoPrincipalPreinscripcion2027_() {
+  const props = PropertiesService.getScriptProperties();
+  props.setProperty('PREINSCRIPCION_CATALOGO_URL', DEFAULT_CATALOGO_PRIMARIAS_URL);
+  return actualizarCatalogoPrimarias2027_(DEFAULT_CATALOGO_PRIMARIAS_URL);
 }
