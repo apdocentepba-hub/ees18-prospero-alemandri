@@ -1,0 +1,42 @@
+name: Build preinscripcion 2027 catalog
+
+on:
+  push:
+    branches:
+      - feat/preinscripcion-2027
+    paths:
+      - scripts/build_preinscripcion_catalog.py
+      - data/preinscripcion-2027-distritos.json
+      - .github/workflows/build-preinscripcion-catalog.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/preinscripcion-2027
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download and filter official DGCyE school register
+        run: python scripts/build_preinscripcion_catalog.py
+      - name: Verify generated catalog
+        run: node tests/preinscripcion-2027.test.js catalog
+      - name: Commit generated snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/preinscripcion-2027-primarias.json data/preinscripcion-2027-source.json
+          if git diff --cached --quiet; then
+            echo "Catalog snapshot unchanged."
+          else
+            git commit -m "data: refresh official primary school snapshot"
+            git push
+          fi
