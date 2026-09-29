@@ -19,14 +19,27 @@ jobs:
           python-version: '3.12'
       - name: Install openpyxl
         run: python -m pip install openpyxl
-      - name: Download official DGCyE 2026 nomina
+      - name: Try weekly CKAN CSV with curl
+        id: csv
+        continue-on-error: true
+        run: |
+          curl --fail --location --http1.1 --retry 8 --retry-all-errors --retry-delay 1 \
+            'https://catalogo.datos.gba.gob.ar/dataset/4becb4b7-0a21-4fef-8f2c-30df7f345a01/resource/3951210e-7e0e-4fed-bbf1-0183e704c9ae/download/establecimientos-educativos-14092026.csv' \
+            --output /tmp/establecimientos.csv
+          wc -c /tmp/establecimientos.csv
+          head -n 2 /tmp/establecimientos.csv | cut -c1-500
+      - name: Try DGCyE 2026 XLSX with legacy-compatible TLS for this host
+        id: xlsx
+        continue-on-error: true
         run: |
           curl --fail --location --retry 5 --retry-all-errors --retry-delay 2 \
+            --ciphers 'DEFAULT:@SECLEVEL=1' \
             'https://abc.gob.ar/secretarias/sites/default/files/2026-06/N%C3%B3mina%20de%20Establecimientos%20con%20Matr%C3%ADcula%20Inicial%202026.xlsx' \
             --output /tmp/nomina2026.xlsx
           ls -lh /tmp/nomina2026.xlsx
           file /tmp/nomina2026.xlsx
-      - name: Inspect workbook schema
+      - name: Inspect workbook schema if XLSX succeeded
+        if: steps.xlsx.outcome == 'success'
         run: |
           python - <<'PY'
           from openpyxl import load_workbook
@@ -37,8 +50,14 @@ jobs:
               print('SHEET', ws.title, 'ROWS', ws.max_row, 'COLS', ws.max_column)
               for i,row in enumerate(ws.iter_rows(values_only=True), start=1):
                   vals=[str(v) if v is not None else '' for v in row]
-                  if any(vals):
-                      print('ROW', i, vals[:40])
-                  if i >= 8:
-                      break
+                  if any(vals): print('ROW', i, vals[:45])
+                  if i >= 8: break
           PY
+      - name: Require at least one working official source
+        if: always()
+        run: |
+          echo 'CSV outcome: ${{ steps.csv.outcome }}'
+          echo 'XLSX outcome: ${{ steps.xlsx.outcome }}'
+          if [ '${{ steps.csv.outcome }}' != 'success' ] && [ '${{ steps.xlsx.outcome }}' != 'success' ]; then
+            exit 1
+          fi
