@@ -48,8 +48,14 @@ if (prefersReducedMotion || !('IntersectionObserver' in window)) {
   revealNodes.forEach((node) => observer.observe(node));
 }
 
-/* Programas incorporados el 29/09/2026. Esta capa mantiene actualizada la
-   biblioteca pública mientras conserva la estructura histórica de programas.html. */
+const normalizeProgramName = (value) => (value || '')
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/^\d+\.\s*/, '')
+  .trim();
+
+/* Biblioteca de programas: altas y correcciones curriculares del 29/09/2026. */
 document.addEventListener('DOMContentLoaded', () => {
   if (!document.getElementById('programs-root')) return;
 
@@ -60,13 +66,6 @@ document.addEventListener('DOMContentLoaded', () => {
     'nat-6|ingles': '1xgxk0eiZcOkf641fAjW3os_dRi3KwhdC',
     'len-6|estudios interculturales en ingles ii': '18f9ePkS7Sdj-X9CsU55sPePuaVpGDLuD'
   };
-
-  const normalizeProgramName = (value) => (value || '')
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/^\d+\.\s*/, '')
-    .trim();
 
   document.querySelectorAll('.program-card').forEach((card) => {
     const title = card.querySelector('h5');
@@ -95,6 +94,34 @@ document.addEventListener('DOMContentLoaded', () => {
     link.textContent = 'Ver programa →';
   });
 
+  /* El plan oficial incluye Geografía en 5.º de Lenguas Extranjeras. */
+  const lenguas5 = document.querySelector('.year-block[data-filter="len-5"]');
+  if (lenguas5) {
+    const grid = lenguas5.querySelector('.program-grid');
+    const cards = [...lenguas5.querySelectorAll('.program-card')];
+    const hasGeografia = cards.some((card) => normalizeProgramName(card.querySelector('h5')?.textContent) === 'geografia');
+
+    if (grid && !hasGeografia) {
+      const card = document.createElement('article');
+      card.className = 'program-card program-card--missing';
+      card.dataset.name = 'geografia';
+      card.dataset.filter = 'len-5';
+      card.innerHTML = '<small>Lenguas Extranjeras · 5.º</small><h5>8. Geografía</h5><span class="program-state">Programa todavía no disponible</span>';
+
+      const interculturales = [...grid.querySelectorAll('.program-card')].find((item) =>
+        normalizeProgramName(item.querySelector('h5')?.textContent).startsWith('estudios interculturales en ingles')
+      );
+      if (interculturales) interculturales.before(card);
+      else grid.appendChild(card);
+    }
+
+    [...lenguas5.querySelectorAll('.program-card')].forEach((card, index) => {
+      const title = card.querySelector('h5');
+      if (!title) return;
+      title.textContent = `${index + 1}. ${title.textContent.replace(/^\d+\.\s*/, '')}`;
+    });
+  }
+
   document.querySelectorAll('.year-block').forEach((year) => {
     const cards = [...year.querySelectorAll('.program-card')];
     const available = cards.filter((card) => card.querySelector('.program-state--ok')).length;
@@ -102,8 +129,45 @@ document.addEventListener('DOMContentLoaded', () => {
     if (badge) badge.textContent = `${available} de ${cards.length} disponibles`;
   });
 
+  const totalPill = document.getElementById('count-visible');
   const availablePill = document.querySelector('.summary-pill--ok');
   const missingPill = document.querySelector('.summary-pill--missing');
+  if (totalPill) totalPill.textContent = '159 espacios curriculares';
   if (availablePill) availablePill.textContent = '143 programas disponibles';
-  if (missingPill) missingPill.textContent = '15 pendientes';
+  if (missingPill) missingPill.textContent = '16 pendientes';
+});
+
+/* Plan de estudios: completar 5.º Lenguas y distinguir Interculturales I/II. */
+document.addEventListener('DOMContentLoaded', () => {
+  const lenguas = document.querySelector('#lenguas .orientation-years');
+  if (!lenguas) return;
+
+  const years = [...lenguas.querySelectorAll('.oriented-year')];
+  const year5 = years.find((year) => year.querySelector('h3')?.textContent.trim().startsWith('5'));
+  const year6 = years.find((year) => year.querySelector('h3')?.textContent.trim().startsWith('6'));
+
+  if (year5) {
+    const list = year5.querySelector('.subject-list');
+    const items = [...year5.querySelectorAll('li')];
+    if (list && !items.some((li) => li.textContent.trim() === 'Geografía')) {
+      const geografia = document.createElement('li');
+      geografia.textContent = 'Geografía';
+      const historia = items.find((li) => li.textContent.trim() === 'Historia');
+      if (historia) historia.insertAdjacentElement('afterend', geografia);
+      else list.appendChild(geografia);
+    }
+    [...year5.querySelectorAll('li')].forEach((li) => {
+      if (li.textContent.trim() === 'Estudios Interculturales en Inglés') {
+        li.textContent = 'Estudios Interculturales en Inglés I';
+      }
+    });
+  }
+
+  if (year6) {
+    [...year6.querySelectorAll('li')].forEach((li) => {
+      if (li.textContent.trim() === 'Estudios Interculturales en Inglés') {
+        li.textContent = 'Estudios Interculturales en Inglés II';
+      }
+    });
+  }
 });
