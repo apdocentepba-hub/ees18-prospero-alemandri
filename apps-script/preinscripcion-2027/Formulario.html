@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root {
+      --azul-profundo:#0f3f62;
+      --azul:#1e6fa8;
+      --celeste:#5ab8eb;
+      --papel:#f4f9fc;
+      --linea:#d2e2eb;
+      --texto:#294858;
+      --muted:#687f8b;
+      --ok:#225b34;
+      --ok-bg:#edf9f1;
+      --ok-border:#9bcfa9;
+      --error:#7b2929;
+      --error-bg:#fff1f1;
+      --error-border:#e4b0b0;
+      --warning:#6b3f00;
+      --warning-bg:#fff7df;
+      --warning-border:#e1b648;
+    }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--papel); color:var(--texto); font-family:Arial,Helvetica,sans-serif; }
+    .top { background:linear-gradient(135deg,#0f3f62,#165a88); color:#fff; padding:32px 18px; }
+    .wrap { width:min(900px,calc(100% - 28px)); margin:0 auto; }
+    .eyebrow { display:block; color:#bde6fb; font-size:.79rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase; }
+    h1 { margin:8px 0 9px; font-family:Georgia,serif; font-size:clamp(2rem,7vw,3.25rem); line-height:1.08; }
+    .top p { margin:0; max-width:720px; color:#e3f0f6; line-height:1.6; }
+    form { margin:24px auto 54px; padding:clamp(20px,4vw,38px); background:#fff; border:1px solid var(--linea); box-shadow:0 18px 48px rgba(15,63,98,.09); }
+    fieldset { border:0; border-top:1px solid var(--linea); margin:0; padding:30px 0 8px; }
+    fieldset:first-of-type { border-top:0; padding-top:0; }
+    legend { padding:0 0 17px; color:var(--azul-profundo); font-family:Georgia,serif; font-size:1.35rem; font-weight:700; }
+    .grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; }
+    .full { grid-column:1 / -1; }
+    .field { display:flex; flex-direction:column; gap:7px; min-width:0; }
+    label,.label { color:var(--azul-profundo); font-weight:700; }
+    .required { color:#9d2f2f; }
+    input,select { width:100%; min-height:47px; border:1px solid #a9c3d2; border-radius:4px; background:#fff; color:#253f4e; padding:11px 12px; font:inherit; }
+    input:focus,select:focus { outline:3px solid rgba(90,184,235,.22); border-color:var(--azul); }
+    select[disabled] { background:#eef3f6; color:#7a8b95; cursor:not-allowed; }
+    .hint { color:var(--muted); font-size:.9rem; line-height:1.45; }
+    .warning { margin:26px 0 0; padding:18px 18px 18px 20px; background:var(--warning-bg); border:2px solid var(--warning-border); border-left-width:7px; color:var(--warning); line-height:1.55; }
+    .warning strong { display:block; font-size:1.02rem; }
+    .privacy { margin:15px 0 0; color:var(--muted); font-size:.9rem; line-height:1.5; }
+    .actions { margin-top:23px; display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+    button { min-height:48px; border:0; border-radius:4px; background:var(--azul-profundo); color:#fff; padding:13px 24px; font:inherit; font-weight:800; cursor:pointer; }
+    button:hover:not([disabled]) { background:#0b314d; }
+    button[disabled] { opacity:.58; cursor:wait; }
+    .status { display:none; margin-top:20px; padding:16px; border:1px solid var(--linea); line-height:1.55; }
+    .status.info { display:block; background:#edf7fc; color:#234e68; }
+    .status.ok { display:block; background:var(--ok-bg); border-color:var(--ok-border); color:var(--ok); }
+    .status.error { display:block; background:var(--error-bg); border-color:var(--error-border); color:var(--error); }
+    [hidden] { display:none !important; }
+    @media (max-width:680px) {
+      .grid { grid-template-columns:1fr; }
+      .wrap { width:min(100% - 18px,900px); }
+      form { margin-top:12px; padding:20px 17px 28px; }
+      .top { padding:26px 14px; }
+      button { width:100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div class="wrap">
+      <span class="eyebrow">E.E.S. Nº 18 “Próspero Alemandri” · Avellaneda</span>
+      <h1>Preinscripción a 1.º año 2027</h1>
+      <p>Completá los datos del ingresante y del adulto responsable. Este formulario registra la preinscripción para que la institución organice el proceso de ingreso.</p>
+    </div>
+  </header>
+
+  <form id="preinscripcion" class="wrap" onsubmit="enviarPreinscripcion(this); return false;" novalidate>
+    <fieldset>
+      <legend>1. Datos del ingresante</legend>
+      <div class="grid">
+        <div class="field full">
+          <label for="alumnoNombre">Apellido y nombre <span class="required">*</span></label>
+          <input id="alumnoNombre" name="alumnoNombre" autocomplete="name" maxlength="120" required>
+        </div>
+        <div class="field">
+          <label for="alumnoDni">DNI <span class="required">*</span></label>
+          <input id="alumnoDni" name="alumnoDni" inputmode="numeric" autocomplete="off" pattern="[0-9. ]{6,12}" maxlength="12" required>
+          <span class="hint">Podés escribirlo con o sin puntos.</span>
+        </div>
+        <div class="field">
+          <label for="distritoCodigo">Distrito de la escuela de procedencia <span class="required">*</span></label>
+          <select id="distritoCodigo" name="distritoCodigo" required onchange="cargarEscuelas()" disabled>
+            <option value="">Cargando distritos…</option>
+          </select>
+        </div>
+        <div class="field full">
+          <label for="escuelaId">Escuela primaria de procedencia <span class="required">*</span></label>
+          <select id="escuelaId" name="escuelaId" required disabled onchange="actualizarOtraEscuela()">
+            <option value="">Primero seleccioná el distrito</option>
+          </select>
+          <span class="hint">La lista incluye escuelas primarias de gestión estatal y privada.</span>
+        </div>
+        <div class="field full" id="escuela-manual-wrap" hidden>
+          <label for="escuelaManual">Nombre de la escuela <span class="required">*</span></label>
+          <input id="escuelaManual" name="escuelaManual" maxlength="180" placeholder="Escribí el nombre completo de la escuela">
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Datos del adulto responsable</legend>
+      <div class="grid">
+        <div class="field full">
+          <label for="adultoNombre">Apellido y nombre <span class="required">*</span></label>
+          <input id="adultoNombre" name="adultoNombre" autocomplete="name" maxlength="120" required>
+        </div>
+        <div class="field">
+          <label for="adultoDni">DNI <span class="required">*</span></label>
+          <input id="adultoDni" name="adultoDni" inputmode="numeric" autocomplete="off" pattern="[0-9. ]{6,12}" maxlength="12" required>
+        </div>
+        <div class="field">
+          <label for="vinculo">Vínculo con el/la estudiante <span class="required">*</span></label>
+          <select id="vinculo" name="vinculo" required>
+            <option value="">Seleccionar</option>
+            <option value="Padre">Padre</option>
+            <option value="Madre">Madre</option>
+            <option value="Tutor">Tutor</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="telefono">Teléfono <span class="required">*</span></label>
+          <input id="telefono" name="telefono" type="tel" inputmode="tel" autocomplete="tel" maxlength="40" required>
+          <span class="hint">Preferentemente un número de celular con WhatsApp.</span>
+        </div>
+        <div class="field">
+          <label for="email">Correo electrónico <span class="required">*</span></label>
+          <input id="email" name="email" type="email" autocomplete="email" maxlength="160" required>
+          <span class="hint">Ahí llegará el aviso de recepción.</span>
+        </div>
+      </div>
+    </fieldset>
+
+    <div class="warning" role="note">
+      <strong>IMPORTANTE: LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE.</strong>
+      <span>LA INSTITUCIÓN INFORMARÁ POSTERIORMENTE CÓMO CONTINUAR CON EL PROCESO DE INSCRIPCIÓN.</span>
+    </div>
+    <p class="privacy">Los datos se solicitan únicamente para organizar la preinscripción a 1.º año 2027. No se solicitan archivos ni documentación en esta instancia.</p>
+
+    <div class="actions">
+      <button id="enviar" type="submit">Enviar preinscripción</button>
+      <span class="hint">Revisá los datos antes de enviar.</span>
+    </div>
+    <div id="status" class="status" aria-live="polite" tabindex="-1"></div>
+  </form>
+
+  <script>
+    const form = document.getElementById('preinscripcion');
+    const districtSelect = document.getElementById('distritoCodigo');
+    const schoolSelect = document.getElementById('escuelaId');
+    const escuelaManual = document.getElementById('escuelaManual');
+    const escuelaManualWrap = document.getElementById('escuela-manual-wrap');
+    const button = document.getElementById('enviar');
+    const statusBox = document.getElementById('status');
+
+    function setStatus(message, type) {
+      statusBox.textContent = message;
+      statusBox.className = 'status ' + type;
+      if (type === 'error' || type === 'ok') statusBox.focus();
+    }
+
+    function cargarDistritos() {
+      google.script.run
+        .withSuccessHandler(function(items) {
+          districtSelect.innerHTML = '<option value="">Seleccionar distrito</option>';
+          (items || []).forEach(function(item) {
+            const option = document.createElement('option');
+            option.value = String(item.codigo);
+            option.textContent = item.nombre;
+            districtSelect.appendChild(option);
+          });
+          districtSelect.disabled = false;
+        })
+        .withFailureHandler(function(error) {
+          districtSelect.innerHTML = '<option value="">No se pudieron cargar los distritos</option>';
+          setStatus((error && error.message) || 'No se pudieron cargar los distritos. Recargá la página.', 'error');
+        })
+        .getDistritos();
+    }
+
+    function cargarEscuelas() {
+      const codigo = districtSelect.value;
+      schoolSelect.innerHTML = '<option value="">' + (codigo ? 'Cargando escuelas…' : 'Primero seleccioná el distrito') + '</option>';
+      schoolSelect.disabled = !codigo;
+      escuelaManualWrap.hidden = true;
+      escuelaManual.required = false;
+      escuelaManual.value = '';
+      if (!codigo) return;
+
+      schoolSelect.disabled = true;
+      google.script.run
+        .withSuccessHandler(function(items) {
+          schoolSelect.innerHTML = '<option value="">Seleccionar escuela</option>';
+          (items || []).forEach(function(item) {
+            const option = document.createElement('option');
+            option.value = item.id;
+            const extras = [item.localidad, item.gestion].filter(Boolean).join(' · ');
+            option.textContent = item.nombre + (extras ? ' — ' + extras : '');
+            schoolSelect.appendChild(option);
+          });
+          const other = document.createElement('option');
+          other.value = 'OTRA';
+          other.textContent = 'OTRA / NO APARECE EN LA LISTA';
+          schoolSelect.appendChild(other);
+          schoolSelect.disabled = false;
+        })
+        .withFailureHandler(function(error) {
+          schoolSelect.innerHTML = '<option value="">No se pudieron cargar las escuelas</option>';
+          schoolSelect.disabled = true;
+          setStatus((error && error.message) || 'No se pudieron cargar las escuelas de ese distrito.', 'error');
+        })
+        .getPrimariasPorDistrito(codigo);
+    }
+
+    function actualizarOtraEscuela() {
+      const esOtra = schoolSelect.value === 'OTRA';
+      escuelaManualWrap.hidden = !esOtra;
+      escuelaManual.required = esOtra;
+      if (!esOtra) escuelaManual.value = '';
+    }
+
+    function enviarPreinscripcion(formElement) {
+      actualizarOtraEscuela();
+      if (!formElement.reportValidity()) return;
+      button.disabled = true;
+      setStatus('Registrando la preinscripción…', 'info');
+
+      google.script.run
+        .withSuccessHandler(function(result) {
+          button.disabled = false;
+          if (!result || !result.ok) {
+            setStatus((result && result.message) || 'No se pudo registrar la preinscripción.', 'error');
+            return;
+          }
+          setStatus(
+            result.message + ' IMPORTANTE: LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE. LA INSTITUCIÓN INFORMARÁ POSTERIORMENTE CÓMO CONTINUAR CON EL PROCESO DE INSCRIPCIÓN.',
+            'ok'
+          );
+          formElement.reset();
+          schoolSelect.innerHTML = '<option value="">Primero seleccioná el distrito</option>';
+          schoolSelect.disabled = true;
+          actualizarOtraEscuela();
+        })
+        .withFailureHandler(function(error) {
+          button.disabled = false;
+          setStatus((error && error.message) || 'No se pudo registrar la preinscripción. Revisá los datos e intentá nuevamente.', 'error');
+        })
+        .crearPreinscripcionDesdeFormulario(formElement);
+    }
+
+    cargarDistritos();
+  </script>
+</body>
+</html>
