@@ -47,3 +47,63 @@ if (prefersReducedMotion || !('IntersectionObserver' in window)) {
 
   revealNodes.forEach((node) => observer.observe(node));
 }
+
+/* Programas incorporados el 29/09/2026. Esta capa mantiene actualizada la
+   biblioteca pública mientras conserva la estructura histórica de programas.html. */
+document.addEventListener('DOMContentLoaded', () => {
+  if (!document.getElementById('programs-root')) return;
+
+  const programUpdates = {
+    'com-6|ingles': '1KqcBHfZ0suDfaoIC2SRGSWgQT18IOzqU',
+    'soc-6|ingles': '1X64o8VlnRZASxnFSk8bIPF-KolVDaAZn',
+    'len-6|ingles': '10_H4fjWK_hONkUMng-t5mfWwAsCbfKbn',
+    'nat-6|ingles': '1xgxk0eiZcOkf641fAjW3os_dRi3KwhdC',
+    'len-6|estudios interculturales en ingles ii': '18f9ePkS7Sdj-X9CsU55sPePuaVpGDLuD'
+  };
+
+  const normalizeProgramName = (value) => (value || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/^\d+\.\s*/, '')
+    .trim();
+
+  document.querySelectorAll('.program-card').forEach((card) => {
+    const title = card.querySelector('h5');
+    if (!title) return;
+    const key = `${card.dataset.filter}|${normalizeProgramName(title.textContent)}`;
+    const id = programUpdates[key];
+    if (!id) return;
+
+    card.classList.remove('program-card--missing');
+    let state = card.querySelector('.program-state, .program-state--ok');
+    if (!state) {
+      state = document.createElement('span');
+      title.insertAdjacentElement('afterend', state);
+    }
+    state.className = 'program-state--ok';
+    state.textContent = 'Programa disponible';
+
+    let link = card.querySelector('a');
+    if (!link) {
+      link = document.createElement('a');
+      card.appendChild(link);
+    }
+    link.href = `https://drive.google.com/file/d/${id}/view?usp=sharing`;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    link.textContent = 'Ver programa →';
+  });
+
+  document.querySelectorAll('.year-block').forEach((year) => {
+    const cards = [...year.querySelectorAll('.program-card')];
+    const available = cards.filter((card) => card.querySelector('.program-state--ok')).length;
+    const badge = year.querySelector('.year-count');
+    if (badge) badge.textContent = `${available} de ${cards.length} disponibles`;
+  });
+
+  const availablePill = document.querySelector('.summary-pill--ok');
+  const missingPill = document.querySelector('.summary-pill--missing');
+  if (availablePill) availablePill.textContent = '143 programas disponibles';
+  if (missingPill) missingPill.textContent = '15 pendientes';
+});
