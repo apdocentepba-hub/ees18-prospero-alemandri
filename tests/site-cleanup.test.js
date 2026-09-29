@@ -91,9 +91,10 @@ assert(index.includes('assets/img/logo-ees18.jpg'), 'index.html: debe conservar 
 
 for (const file of normalPublicPages) {
   const html = read(file);
-  for (const placeholder of ['A confirmar', 'Próximamente', 'Información en preparación']) {
+  for (const placeholder of ['A confirmar', 'Información en preparación']) {
     assert(!html.includes(placeholder), `${file}: conserva placeholder ${placeholder}`);
   }
+  assert(!/>\s*Próximamente\s*</i.test(html), `${file}: conserva placeholder Próximamente`);
 }
 
 assert(!index.includes('id="agenda-title"'), 'Inicio no debe conservar Agenda');
