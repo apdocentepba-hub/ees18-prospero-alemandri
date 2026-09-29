@@ -11,6 +11,9 @@ Formulario público de la E.E.S. Nº 18 “Próspero Alemandri” para registrar
 - Impide una segunda preinscripción con el mismo DNI del ingresante.
 - Envía un acuse de recepción al correo del adulto responsable.
 - Distrito y escuela de procedencia se validan también en servidor.
+- Aplica rate limiting por visitante/correo y un honeypot anti-bot.
+- Neutraliza valores que podrían interpretarse como fórmulas en Google Sheets.
+- Las funciones administrativas terminan en `_` para que no sean invocables mediante `google.script.run` desde el formulario público.
 
 ## Archivos del proyecto Apps Script
 
@@ -35,10 +38,10 @@ El catálogo publicado en el repositorio se genera a partir de la **Nómina de E
 
 1. Crear o elegir una planilla de Google Sheets destinada a Secretaría.
 2. En Apps Script, copiar los archivos de este directorio.
-3. Ejecutar una vez:
+3. Desde el editor de Apps Script ejecutar una vez la función privada:
 
 ```javascript
-configurarPreinscripcion2027('ID_DE_LA_PLANILLA');
+configurarPreinscripcion2027_('ID_DE_LA_PLANILLA');
 ```
 
 La función:
@@ -49,31 +52,37 @@ La función:
 - descarga la instantánea del catálogo desde el repositorio institucional;
 - crea/actualiza `CatalogoPrimarias`.
 
-Mientras el catálogo esté todavía en una rama de desarrollo puede pasarse una URL alternativa:
+Mientras el catálogo esté todavía en una rama de desarrollo puede pasarse una URL alternativa desde el editor:
 
 ```javascript
-configurarPreinscripcion2027(
+configurarPreinscripcion2027_(
   'ID_DE_LA_PLANILLA',
   'URL_RAW_DEL_JSON_DE_PRIMARIAS'
 );
 ```
 
-Luego de publicar en `main`, `actualizarCatalogoPrimarias2027()` usa por defecto:
+Luego de publicar en `main`, la función privada `actualizarCatalogoPrimarias2027_()` usa por defecto:
 
 `https://raw.githubusercontent.com/apdocentepba-hub/ees18-prospero-alemandri/main/data/preinscripcion-2027-primarias.json`
+
+También puede ejecutarse `usarCatalogoPrincipalPreinscripcion2027_()` para forzar la propiedad y recargar el catálogo publicado en `main`.
 
 ## Despliegue
 
 En Apps Script:
 
-1. `Implementar` → `Nueva implementación`.
+1. `Implementar` → `Nueva implementación` para la primera publicación, o `Administrar implementaciones` → editar para actualizar una implementación existente.
 2. Tipo: `Aplicación web`.
-3. `Ejecutar como`: la cuenta institucional/propietaria que tiene acceso a la planilla.
+3. `Ejecutar como`: la cuenta propietaria que tiene acceso a la planilla.
 4. Acceso: `Cualquier persona`.
-5. Implementar y conservar la URL final `/exec`.
-6. Reemplazar `PREINSCRIPCION_WEB_APP_URL` en `ingreso-2027.html` por esa URL.
+5. En una actualización, seleccionar **Nueva versión** para conservar la misma URL `/exec`.
+6. Conservar la URL final `/exec` y usarla en `ingreso-2027.html`.
 
-No publicar el botón del sitio apuntando a una URL provisoria `/dev`.
+URL productiva actual:
+
+`https://script.google.com/macros/s/AKfycbx7Q2JdDdo8LshoWIf2AHSde80TUYM5MTBEezGCatdPuwFQYMKo7RmNRnzlRujJka_dYQ/exec`
+
+No publicar una URL provisoria `/dev`.
 
 ## Datos guardados
 
@@ -99,10 +108,10 @@ La instantánea del repositorio se genera mediante:
 - `scripts/build_preinscripcion_catalog.py`
 - `.github/workflows/build-preinscripcion-catalog.yml`
 
-Luego de actualizar el JSON publicado, ejecutar en Apps Script:
+Luego de actualizar el JSON publicado, ejecutar desde el editor de Apps Script:
 
 ```javascript
-actualizarCatalogoPrimarias2027();
+actualizarCatalogoPrimarias2027_();
 ```
 
 El formulario no consulta DGCyE en tiempo real: usa esta copia controlada para evitar que una caída o cambio del sitio oficial interrumpa las preinscripciones.
@@ -118,6 +127,8 @@ El formulario no consulta DGCyE en tiempo real: usa esta copia controlada para e
 7. Probar un correo inválido y un DNI inválido.
 8. Probar desde celular.
 9. Confirmar que el aviso de no asignación de vacante se vea antes del botón de envío, en la confirmación y en el correo.
+10. Verificar que un envío con el honeypot `website` informado sea rechazado.
+11. Verificar que valores que comiencen con `=`, `+`, `-` o `@` se guarden como texto y no como fórmula.
 
 ## Mensaje institucional obligatorio
 
