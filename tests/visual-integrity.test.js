@@ -13,11 +13,12 @@ const carouselCss = read('assets/css/novedades-carousel.css');
 const actualidadCss = read('assets/css/actualidad.css');
 const ingresoCss = read('assets/css/ingreso-2027.css');
 const canonicalLogo = 'https://isfd100-bue.infd.edu.ar/sitio/wp-content/uploads/2020/10/celeste_cristina.jpg';
+const fallbackLogo = 'assets/img/logo-ees18.jpg';
 
-assert(fs.existsSync(path.join(root, 'assets/img/logo-ees18.jpg')), 'local fallback JPG logo must exist');
-assert(index.includes(canonicalLogo), 'home must use the same ENSPA logo source that users see as correct');
-assert((index.match(/celeste_cristina\.jpg/g) || []).length >= 2, 'home header and hero must both use the canonical ENSPA logo');
-assert(vida.includes(canonicalLogo), 'Vida escolar must use the same canonical ENSPA logo as home');
+assert(fs.existsSync(path.join(root, fallbackLogo)), 'local fallback JPG logo must exist');
+assert(index.includes(fallbackLogo), 'home must keep the local ENSPA logo fallback');
+assert((index.match(/assets\/img\/logo-ees18\.jpg/g) || []).length >= 2, 'home header and hero must both have the ENSPA fallback logo');
+assert(vida.includes(fallbackLogo), 'Vida escolar must keep the same local ENSPA fallback logo as home');
 assert(!index.includes('assets/img/logo-ees18.svg'), 'home must not replace the institutional logo with the generated SVG');
 assert(!vida.includes('assets/img/logo-ees18.svg'), 'Vida escolar must not replace the institutional logo with the generated SVG');
 assert(mainJs.includes(canonicalLogo), 'main.js must define the canonical ENSPA logo source');

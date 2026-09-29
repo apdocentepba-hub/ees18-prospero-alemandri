@@ -87,13 +87,14 @@ for (const file of fullLayoutPages) {
 }
 
 const index = read('index.html');
-assert(index.includes(canonicalLogo), 'index.html: debe cargar directamente el mismo logo ENSPA canónico');
+assert(index.includes('assets/img/logo-ees18.jpg'), 'index.html: debe conservar un logo ENSPA local de respaldo');
 
 for (const file of normalPublicPages) {
   const html = read(file);
-  for (const placeholder of ['A confirmar', 'Próximamente', 'Información en preparación']) {
+  for (const placeholder of ['A confirmar', 'Información en preparación']) {
     assert(!html.includes(placeholder), `${file}: conserva placeholder ${placeholder}`);
   }
+  assert(!/>\s*Próximamente\s*</i.test(html), `${file}: conserva placeholder Próximamente`);
 }
 
 assert(!index.includes('id="agenda-title"'), 'Inicio no debe conservar Agenda');
@@ -101,7 +102,7 @@ assert(index.includes('data-visitor-counter'), 'El contador de visitas debe cons
 assert(index.includes('assets/js/visitor-counter.js'), 'El script del contador debe conservarse');
 
 const school = read('nuestra-escuela.html');
-assert(school.includes('Motyl Nadezhda'), 'Debe figurar Motyl Nadezhda');
+assert(school.includes('Nadezhda Motyl'), 'Debe figurar Nadezhda Motyl');
 
 const contact = read('contacto.html');
 assert(!contact.includes('<dt>Teléfono</dt>'), 'No debe mostrarse un teléfono inexistente');

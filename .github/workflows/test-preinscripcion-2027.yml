@@ -1,0 +1,33 @@
+name: Test preinscripcion 2027
+
+on:
+  push:
+    branches:
+      - feat/preinscripcion-2027
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  preinscripcion-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install pytest openpyxl
+      - name: Run catalog builder unit tests
+        run: python -m pytest -q tests/test_preinscripcion_catalog.py
+      - name: Verify catalog contracts
+        run: node tests/preinscripcion-2027.test.js catalog
+      - name: Verify backend contracts
+        run: node tests/preinscripcion-2027.test.js backend
+      - name: Verify form contracts
+        run: node tests/preinscripcion-2027.test.js form
+      - name: Verify page integration
+        run: node tests/preinscripcion-2027.test.js page

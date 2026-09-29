@@ -1,0 +1,54 @@
+name: Build preinscripcion 2027 catalog
+
+on:
+  push:
+    branches:
+      - feat/preinscripcion-2027
+    paths:
+      - scripts/build_preinscripcion_catalog.py
+      - data/preinscripcion-2027-distritos.json
+      - tests/test_preinscripcion_catalog.py
+      - .github/workflows/build-preinscripcion-catalog.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-catalog:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: feat/preinscripcion-2027
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install pytest openpyxl
+      - name: Test catalog builder
+        run: python -m pytest -q tests/test_preinscripcion_catalog.py
+      - name: Download official DGCyE 2026 school register
+        run: |
+          curl --fail --location --retry 5 --retry-all-errors --retry-delay 2 \
+            --ciphers 'DEFAULT:@SECLEVEL=1' \
+            'https://abc.gob.ar/secretarias/sites/default/files/2026-06/N%C3%B3mina%20de%20Establecimientos%20con%20Matr%C3%ADcula%20Inicial%202026.xlsx' \
+            --output /tmp/nomina2026.xlsx
+          test -s /tmp/nomina2026.xlsx
+      - name: Generate primary-school snapshot
+        run: python scripts/build_preinscripcion_catalog.py --source-file /tmp/nomina2026.xlsx
+      - name: Verify generated catalog
+        run: node tests/preinscripcion-2027.test.js catalog
+      - name: Commit generated snapshot
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/preinscripcion-2027-primarias.json data/preinscripcion-2027-source.json
+          if git diff --cached --quiet; then
+            echo "Catalog snapshot unchanged."
+          else
+            git commit -m "data: refresh official primary school snapshot"
+            git push
+          fi

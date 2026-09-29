@@ -78,7 +78,7 @@ def test_nuestra_escuela_reune_informacion_institucional():
         "061097100",
         "Ana Lanni",
         "Adriana Celeste Caceres",
-        "Motyl Nadezhda",
+        "Nadezhda Motyl",
         "Anabella Centurión",
         "María de los Ángeles Dimola",
         "Biblioteca",
