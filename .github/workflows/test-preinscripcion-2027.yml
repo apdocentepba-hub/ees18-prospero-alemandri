@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - feat/preinscripcion-2027
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
 
 jobs:
