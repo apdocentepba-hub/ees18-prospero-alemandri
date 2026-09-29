@@ -4,7 +4,7 @@ const DISTRITOS_PREINSCRIPCION_2027 = [
 
 const OTRA_ESCUELA_ID = 'OTRA';
 const CATALOGO_PRIMARIAS_HEADERS = [
-  'Código distrito','Distrito','ID escuela','Escuela','Gestión','Clave','CUE-anexo','Nº escuela','Modalidad','Municipio'
+  'Código distrito','Distrito','ID escuela','Escuela','Gestión','Clave','CUE-anexo','Nº escuela','Modalidad','Localidad'
 ];
 
 function getDistritos() {
@@ -63,7 +63,7 @@ function getPrimariasPorDistrito(codigoDistrito) {
       cueAnexo: String(row[6] || '').trim(),
       nroEscuela: String(row[7] || '').trim(),
       modalidad: String(row[8] || '').trim(),
-      municipio: String(row[9] || '').trim()
+      localidad: String(row[9] || '').trim()
     };
   }).filter(function(item) {
     return item.id && item.nombre;
@@ -93,7 +93,7 @@ function resolverEscuela_(codigoDistrito, escuelaId, escuelaManual) {
       cueAnexo: '',
       nroEscuela: '',
       modalidad: '',
-      municipio: ''
+      localidad: ''
     };
   }
 
