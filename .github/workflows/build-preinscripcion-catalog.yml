@@ -27,8 +27,8 @@ jobs:
         with:
           python-version: '3.12'
       - name: Install test dependencies
-        run: python -m pip install pytest
-      - name: Test interrupted-download recovery
+        run: python -m pip install pytest openpyxl
+      - name: Test catalog builder
         run: python -m pytest -q tests/test_preinscripcion_catalog.py
       - name: Download and filter official DGCyE school register
         run: python scripts/build_preinscripcion_catalog.py
