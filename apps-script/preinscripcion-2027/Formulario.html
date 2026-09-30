@@ -69,8 +69,8 @@
   <header class="top">
     <div class="wrap">
       <span class="eyebrow">E.E.S. Nº 18 “Próspero Alemandri” · Avellaneda</span>
-      <h1>Preinscripción a 1.º año 2027</h1>
-      <p>Completá los datos del ingresante y del adulto responsable. Este formulario registra la preinscripción para que la institución organice el proceso de ingreso.</p>
+      <h1>Ingreso a 1.º año 2027</h1>
+      <p>Completá los datos del ingresante y del adulto responsable. La institución se comunicará posteriormente para informar cómo continuar.</p>
     </div>
   </header>
 
@@ -146,13 +146,14 @@
     </fieldset>
 
     <div class="warning" role="note">
-      <strong>IMPORTANTE: LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE.</strong>
-      <span>LA INSTITUCIÓN INFORMARÁ POSTERIORMENTE CÓMO CONTINUAR CON EL PROCESO DE INSCRIPCIÓN.</span>
+      <strong>IMPORTANTE: COMPLETAR ESTE FORMULARIO NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE.</strong>
+      <span>LA INSTITUCIÓN SE COMUNICARÁ POSTERIORMENTE PARA INFORMAR CÓMO CONTINUAR CON EL PROCESO.</span>
     </div>
-    <p class="privacy">Los datos se solicitan únicamente para organizar la preinscripción a 1.º año 2027. No se solicitan archivos ni documentación en esta instancia.</p>
+
+    <p class="privacy">Los datos se solicitan únicamente para organizar el proceso de Ingreso 2027. No se solicitan archivos ni documentación en esta etapa.</p>
 
     <div class="actions">
-      <button id="enviar" type="submit">Enviar preinscripción</button>
+      <button id="enviar" type="submit">Enviar datos</button>
       <span class="hint">Revisá los datos antes de enviar.</span>
     </div>
     <div id="status" class="status" aria-live="polite" tabindex="-1"></div>
@@ -237,17 +238,17 @@
       actualizarOtraEscuela();
       if (!formElement.reportValidity()) return;
       button.disabled = true;
-      setStatus('Registrando la preinscripción…', 'info');
+      setStatus('Registrando los datos…', 'info');
 
       google.script.run
         .withSuccessHandler(function(result) {
           button.disabled = false;
           if (!result || !result.ok) {
-            setStatus((result && result.message) || 'No se pudo registrar la preinscripción.', 'error');
+            setStatus((result && result.message) || 'No se pudieron registrar los datos.', 'error');
             return;
           }
           setStatus(
-            result.message + ' IMPORTANTE: LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE. LA INSTITUCIÓN INFORMARÁ POSTERIORMENTE CÓMO CONTINUAR CON EL PROCESO DE INSCRIPCIÓN.',
+            result.message + ' IMPORTANTE: COMPLETAR ESTE FORMULARIO NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE. LA INSTITUCIÓN SE COMUNICARÁ POSTERIORMENTE PARA INFORMAR CÓMO CONTINUAR CON EL PROCESO.',
             'ok'
           );
           formElement.reset();
@@ -257,7 +258,7 @@
         })
         .withFailureHandler(function(error) {
           button.disabled = false;
-          setStatus((error && error.message) || 'No se pudo registrar la preinscripción. Revisá los datos e intentá nuevamente.', 'error');
+          setStatus((error && error.message) || 'No se pudieron registrar los datos. Revisá la información e intentá nuevamente.', 'error');
         })
         .crearPreinscripcionDesdeFormulario(formElement);
     }
