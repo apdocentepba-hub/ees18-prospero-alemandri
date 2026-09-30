@@ -69,17 +69,19 @@ function checkForm() {
   assert.match(form, /escuelaManual\.required\s*=\s*esOtra/);
   assert.match(form, /schoolSelect\.disabled\s*=\s*!codigo|escuela[^\n]+disabled/i);
   assert.match(form, /button\.disabled\s*=\s*true|disabled\s*=\s*true/);
-  const warning = 'LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE';
+  const warning = 'COMPLETAR ESTE FORMULARIO NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE';
   assert.ok(form.includes(warning), 'Falta aviso de vacante en formulario');
+  assert.doesNotMatch(form, /preinscripci[oó]n/i, 'El formulario público no debe mostrar la palabra preinscripción');
 }
 
 function checkPage() {
   const ingresoPath = path.join(root, 'ingreso-2027.html');
   assert.ok(has(ingresoPath), 'Falta ingreso-2027.html');
   const ingreso = read(ingresoPath);
-  const warning = 'LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE';
+  const warning = 'COMPLETAR ESTE FORMULARIO NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE';
   assert.ok(ingreso.includes(warning), 'Falta aviso de vacante en página Ingreso 2027');
-  assert.match(ingreso, /Preinscripci[oó]n.*2027/i);
+  assert.match(ingreso, /Ingreso.*2027/i);
+  assert.doesNotMatch(ingreso, /preinscripci[oó]n/i, 'La página pública no debe mostrar la palabra preinscripción');
   assert.ok(ingreso.includes(WEB_APP_URL), 'Ingreso 2027 debe apuntar a la Web App productiva');
   assert.ok(!ingreso.includes('PREINSCRIPCION_WEB_APP_URL'), 'No debe quedar el placeholder de la Web App');
 }
