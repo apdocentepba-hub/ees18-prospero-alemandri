@@ -65,6 +65,7 @@ jobs:
           node tests/novedades-pages.test.js
           node tests/visual-integrity.test.js
           node tests/completa-carrera-octubre-2026.test.js
+          node tests/site-maintenance.test.js
       - name: Probe deployed reservation Web App
         run: python tests/probe_reservas_live.py
       - name: Probe deployed novedades Web App
