@@ -26,14 +26,14 @@ const PREINSCRIPCION_RATE_EMAIL_SECONDS = 3600;
 
 function doGet() {
   return HtmlService.createHtmlOutputFromFile('Formulario')
-    .setTitle('Preinscripción 1.º año 2027 · E.E.S. Nº 18')
+    .setTitle('Ingreso a 1.º año 2027 · E.E.S. Nº 18')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function getPreinscripcionConfig_() {
   const props = PropertiesService.getScriptProperties();
   const spreadsheetId = props.getProperty('PREINSCRIPCION_SPREADSHEET_ID');
-  if (!spreadsheetId) throw new Error('La preinscripción todavía no fue configurada por Secretaría.');
+  if (!spreadsheetId) throw new Error('El formulario de Ingreso 2027 todavía no fue configurado por Secretaría.');
   return {
     spreadsheetId: spreadsheetId,
     sheetName: props.getProperty('PREINSCRIPCION_SHEET_NAME') || PREINSCRIPCION_SHEET_NAME,
@@ -44,7 +44,7 @@ function getPreinscripcionConfig_() {
 function getPreinscripcionSheet_() {
   const config = getPreinscripcionConfig_();
   const sheet = SpreadsheetApp.openById(config.spreadsheetId).getSheetByName(config.sheetName);
-  if (!sheet) throw new Error('No se encontró la hoja de preinscripciones.');
+  if (!sheet) throw new Error('No se encontró la hoja de registros de Ingreso 2027.');
   return sheet;
 }
 
@@ -107,7 +107,7 @@ function controlarAbuso_(form) {
   if (!form) throw new Error('No se recibieron datos del formulario.');
 
   const honeypot = normalizarTexto_(form.website, 200);
-  if (honeypot) throw new Error('No se pudo procesar la preinscripción.');
+  if (honeypot) throw new Error('No se pudo procesar el formulario.');
 
   const cache = CacheService.getScriptCache();
   const lock = LockService.getScriptLock();
@@ -193,7 +193,7 @@ function crearPreinscripcionDesdeFormulario(form) {
       return {
         ok: false,
         code: 'DUPLICATE',
-        message: 'Ya existe una preinscripción registrada para ese DNI. Si necesitás corregir algún dato, comunicate con Secretaría.'
+        message: 'Ya existe un registro para ese DNI. Si necesitás corregir algún dato, comunicate con Secretaría.'
       };
     }
 
@@ -242,21 +242,21 @@ function crearPreinscripcionDesdeFormulario(form) {
     ok: true,
     correoEnviado: correoEnviado,
     message: correoEnviado
-      ? 'La preinscripción fue recibida. También enviamos un aviso al correo informado.'
-      : 'La preinscripción fue recibida. No pudimos enviar el correo de aviso, pero el registro quedó guardado correctamente.'
+      ? 'Tus datos fueron recibidos. También enviamos un aviso al correo informado.'
+      : 'Tus datos fueron recibidos. No pudimos enviar el correo de aviso, pero el registro quedó guardado correctamente.'
   };
 }
 
 function enviarCorreoRecepcion_(email, alumnoNombre) {
-  const subject = 'Preinscripción 1.º año 2027 recibida · E.E.S. Nº 18';
-  const warning = 'LA PREINSCRIPCIÓN NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE.';
+  const subject = 'Ingreso 2027 · Datos recibidos · E.E.S. Nº 18';
+  const warning = 'COMPLETAR ESTE FORMULARIO NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE.';
   const body = [
     'E.E.S. Nº 18 “Próspero Alemandri”',
     '',
-    'Recibimos la preinscripción para 1.º año 2027 correspondiente a ' + alumnoNombre + '.',
+    'Recibimos los datos para Ingreso 2027 correspondientes a ' + alumnoNombre + '.',
     '',
     warning,
-    'La institución informará posteriormente cómo continuar con el proceso de inscripción.',
+    'La institución se comunicará posteriormente para informar cómo continuar con el proceso.',
     '',
     'Este correo es únicamente un acuse de recepción.'
   ].join('\n');
