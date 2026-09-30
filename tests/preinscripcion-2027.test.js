@@ -9,6 +9,15 @@ const has = file => fs.existsSync(file);
 const read = file => fs.readFileSync(file, 'utf8');
 const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbx7Q2JdDdo8LshoWIf2AHSde80TUYM5MTBEezGCatdPuwFQYMKo7RmNRnzlRujJka_dYQ/exec';
 
+function visibleText(html) {
+  return html
+    .replace(/<script\b[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<style\b[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function checkCatalog() {
   const catalogPath = path.join(appDir, 'Catalogos.gs');
   const distritosPath = path.join(root, 'data', 'preinscripcion-2027-distritos.json');
@@ -62,6 +71,7 @@ function checkForm() {
   const formPath = path.join(appDir, 'Formulario.html');
   assert.ok(has(formPath), `Falta archivo requerido: ${path.relative(root, formPath)}`);
   const form = read(formPath);
+  const text = visibleText(form);
   for (const field of ['alumnoNombre','alumnoDni','distritoCodigo','escuelaId','adultoNombre','adultoDni','vinculo','telefono','email']) assert.match(form, new RegExp(`name=["']${field}["']`), `Falta campo ${field}`);
   for (const value of ['Padre', 'Madre', 'Tutor']) assert.match(form, new RegExp(`value=["']${value}["']`), `Falta vínculo ${value}`);
   assert.match(form, /name=["']website["']/, 'Debe existir honeypot anti-bot');
@@ -70,18 +80,21 @@ function checkForm() {
   assert.match(form, /schoolSelect\.disabled\s*=\s*!codigo|escuela[^\n]+disabled/i);
   assert.match(form, /button\.disabled\s*=\s*true|disabled\s*=\s*true/);
   const warning = 'COMPLETAR ESTE FORMULARIO NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE';
-  assert.ok(form.includes(warning), 'Falta aviso de vacante en formulario');
-  assert.doesNotMatch(form, /preinscripci[oó]n/i, 'El formulario público no debe mostrar la palabra preinscripción');
+  assert.ok(text.includes(warning), 'Falta aviso de vacante en formulario');
+  assert.doesNotMatch(text, /preinscripci[oó]n/i, 'El formulario público no debe mostrar la palabra preinscripción');
+  assert.doesNotMatch(text, /interesad[oa]s?/i, 'El formulario público no debe usar interesado/interesada');
 }
 
 function checkPage() {
   const ingresoPath = path.join(root, 'ingreso-2027.html');
   assert.ok(has(ingresoPath), 'Falta ingreso-2027.html');
   const ingreso = read(ingresoPath);
+  const text = visibleText(ingreso);
   const warning = 'COMPLETAR ESTE FORMULARIO NO IMPLICA LA ASIGNACIÓN AUTOMÁTICA DE UNA VACANTE';
-  assert.ok(ingreso.includes(warning), 'Falta aviso de vacante en página Ingreso 2027');
-  assert.match(ingreso, /Ingreso.*2027/i);
-  assert.doesNotMatch(ingreso, /preinscripci[oó]n/i, 'La página pública no debe mostrar la palabra preinscripción');
+  assert.ok(text.includes(warning), 'Falta aviso de vacante en página Ingreso 2027');
+  assert.match(text, /Ingreso.*2027/i);
+  assert.doesNotMatch(text, /preinscripci[oó]n/i, 'La página pública no debe mostrar la palabra preinscripción');
+  assert.doesNotMatch(text, /interesad[oa]s?/i, 'La página pública no debe usar interesado/interesada');
   assert.ok(ingreso.includes(WEB_APP_URL), 'Ingreso 2027 debe apuntar a la Web App productiva');
   assert.ok(!ingreso.includes('PREINSCRIPCION_WEB_APP_URL'), 'No debe quedar el placeholder de la Web App');
 }
