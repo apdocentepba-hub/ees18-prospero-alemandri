@@ -30,13 +30,17 @@
     .home-alerts{padding:1.15rem 0 1.35rem;background:#fff}
     .home-alerts__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
     .home-alert{position:relative;overflow:hidden;border:1px solid #d8e4ea;border-radius:18px;padding:1.25rem 1.35rem;background:#fff;box-shadow:0 8px 28px rgba(15,63,98,.07)}
-    .home-alert--open{border-color:#b8dfc5;background:linear-gradient(135deg,#f1fbf4 0%,#fff 74%)}
+    .home-alert--closed{border-color:#d6dfe7;background:linear-gradient(135deg,#f3f6f9 0%,#fff 78%);box-shadow:0 5px 16px rgba(34,64,88,.045)}
     .home-alert--programs{background:linear-gradient(135deg,#f1f7fb 0%,#fff 74%)}
     .home-alert__eyebrow{display:flex;align-items:center;gap:.5rem;margin-bottom:.55rem;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:#507080}
     .home-alert__dot{width:.58rem;height:.58rem;border-radius:50%;background:#2b9156;box-shadow:0 0 0 5px rgba(43,145,86,.12)}
+    .home-alert--closed .home-alert__dot{background:#879bad;box-shadow:0 0 0 5px rgba(108,133,151,.11)}
     .home-alert h2{margin:.15rem 0 .55rem;font-size:1.45rem;line-height:1.2;color:#123e5b}
     .home-alert p{margin:.2rem 0 .95rem;color:#4d6877;max-width:62ch}
     .home-alert__meta{display:inline-flex;align-items:center;padding:.32rem .62rem;border-radius:999px;background:#e8f6ed;color:#176b3b;font-weight:800;font-size:.82rem;margin-bottom:.85rem}
+    .home-alert--closed .home-alert__meta{background:#e4ebf0;color:#536b7b}
+    .home-alert--closed .home-alert__actions a:not(.secondary){background:#486b84}
+    .home-alert--closed .home-alert__eyebrow{color:#697f8f}
     .home-alert__actions{display:flex;flex-wrap:wrap;gap:.55rem}
     .home-alert__actions a{display:inline-flex;align-items:center;justify-content:center;min-height:42px;padding:.65rem .9rem;border-radius:10px;background:#0f4f75;color:#fff;text-decoration:none;font-weight:800}
     .home-alert__actions a.secondary{background:#fff;color:#0f4f75;border:1px solid #b9ccd7}
@@ -97,15 +101,15 @@
 
     <section class="home-alerts" aria-labelledby="avisos-importantes">
       <div class="container">
-        <div class="section-heading reveal"><span>Ahora en la escuela</span><h2 id="avisos-importantes">Avisos importantes.</h2><p>Accesos directos a lo que está vigente y a los materiales académicos.</p></div>
+        <div class="section-heading reveal"><span>Ahora en la escuela</span><h2 id="avisos-importantes">Avisos importantes.</h2><p>Accesos a materiales académicos y cronogramas de consulta.</p></div>
         <div class="home-alerts__grid">
-          <article class="home-alert home-alert--open reveal">
+          <article class="home-alert home-alert--closed reveal">
             <div class="home-alert__eyebrow"><span class="home-alert__dot" aria-hidden="true"></span>Completa Carrera</div>
             <h2>Mesas de examen · Octubre 2026</h2>
-            <span class="home-alert__meta">Cronograma publicado</span>
-            <p><strong>Mesas del 5 al 9 de octubre.</strong> Consultá materias, años, días, horarios y profesores de Turno Mañana y Turno Tarde.</p>
+            <span class="home-alert__meta">Período finalizado</span>
+            <p><strong>Las fechas del 5 al 9 de octubre ya finalizaron.</strong> El cronograma permanece disponible solo como referencia de consulta.</p>
             <div class="home-alert__actions">
-              <a href="mesas-completa-carrera-octubre-2026.html">Ver días y horarios →</a>
+              <a href="mesas-completa-carrera-octubre-2026.html">Ver cronograma →</a>
               <a class="secondary" href="estudiantes-familias.html">Más información</a>
             </div>
           </article>
