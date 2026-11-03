@@ -72,6 +72,21 @@ def test_navegacion_comun_y_misma_pestana():
         assert 'target="_blank"' not in html, f"{name} abre una pestaña nueva"
 
 
+def test_acceso_permanente_a_comunicados():
+    for name in PRINCIPAL + DETAIL + [
+        "noticia-ingreso-2027.html",
+        "noticia-hermanos-docentes-2027.html",
+    ]:
+        html = read(name)
+        assert 'class="utility-comunicados"' in html or 'aria-current="page" class="utility-comunicados"' in html, f"{name} sin acceso a Comunicados"
+        assert 'href="comunicados.html"' in html
+    home = read("index.html")
+    assert 'class="news-permanent-link reveal"' in home
+    assert home.index('class="news-permanent-link reveal"') < home.index('data-news-section="inicio"')
+    css = read("assets/css/styles.css")
+    assert '.utility-comunicados' in css and '.news-permanent-link' in css
+
+
 def test_nuestra_escuela_reune_informacion_institucional():
     html = read("nuestra-escuela.html")
     for item in [

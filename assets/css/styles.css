@@ -1034,3 +1034,11 @@ h1 span { color: #bde7fa; }
   }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* Acceso permanente a Comunicados oficiales: independiente del carrusel de noticias. */
+.government-bar__inner .utility-comunicados{display:inline-flex;align-items:center;justify-content:center;margin-left:auto;min-height:28px;padding:4px 12px;color:#fff;background:#176a99;border:1px solid rgba(255,255,255,.28);border-radius:999px;font-weight:800;text-decoration:none;letter-spacing:0;white-space:nowrap}
+.government-bar__inner .utility-comunicados:hover,.government-bar__inner .utility-comunicados:focus-visible,.government-bar__inner .utility-comunicados[aria-current="page"]{background:#fff;color:#0f3f62}
+.government-bar__inner .utility-comunicados:focus-visible{outline:3px solid #aee8ff;outline-offset:2px}
+.news-permanent-link{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px 22px;margin:-12px 0 22px;padding:16px 20px;border-left:4px solid #176a99;border-radius:10px;background:#eaf5fa;color:#0f3f62;font-weight:700}
+.news-permanent-link .simple-button{flex:0 0 auto}
+@media(max-width:640px){.government-bar__inner>span{display:none}.government-bar__inner{justify-content:center;gap:0;padding:3px 0}.government-bar__inner .utility-comunicados{margin:0}.news-permanent-link{align-items:stretch;flex-direction:column;margin-top:-4px;padding:14px}.news-permanent-link .simple-button{width:100%;justify-content:center}}
