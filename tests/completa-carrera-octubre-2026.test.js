@@ -74,8 +74,8 @@ for (const row of [...morningRows, ...afternoonRows]) {
 
 assert(home.includes('mesas-completa-carrera-octubre-2026.html'), 'home must link to the published schedule');
 assert(estudiantes.includes('mesas-completa-carrera-octubre-2026.html'), 'student/family hub must link to the published schedule');
-assert(home.includes('Cronograma publicado'), 'home must announce that the schedule is published');
-assert(estudiantes.includes('Cronograma publicado'), 'student/family hub must announce that the schedule is published');
+assert(home.includes('Período finalizado'), 'home must identify the October 2026 exam period as completed');
+assert(estudiantes.includes('Período finalizado'), 'student/family hub must identify the October 2026 exam period as completed');
 assert(!home.includes('Próximamente se publicarán los días y horarios de las mesas de examen.'), 'home must remove the old upcoming-schedule message');
 assert(!estudiantes.includes('Próximamente se publicarán los días y horarios de las mesas de examen.'), 'student/family hub must remove the old upcoming-schedule message');
 assert(!/Imprimir|Guardar como PDF/i.test(text), 'schedule page must not include print/PDF controls');
