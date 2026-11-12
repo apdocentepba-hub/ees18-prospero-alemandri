@@ -63,7 +63,7 @@
     <label><span class="sr-only">Buscar materia</span><input id="program-search" class="program-search" type="search" placeholder="Ej.: Matemática, Biología, Literatura…" autocomplete="off"></label>
     <label><span class="sr-only">Filtrar programas</span><select id="program-filter" class="program-select"><option value="all">Todos los cursos</option><option value="basico-1">1.º año · Ciclo Básico</option><option value="basico-2">2.º año · Ciclo Básico</option><option value="basico-3">3.º año · Ciclo Básico</option><option value="com-4">4.º · Comunicación</option><option value="com-5">5.º · Comunicación</option><option value="com-6">6.º · Comunicación</option><option value="soc-4">4.º · Ciencias Sociales</option><option value="soc-5">5.º · Ciencias Sociales</option><option value="soc-6">6.º · Ciencias Sociales</option><option value="len-4">4.º · Lenguas Extranjeras</option><option value="len-5">5.º · Lenguas Extranjeras</option><option value="len-6">6.º · Lenguas Extranjeras</option><option value="nat-4">4.º · Ciencias Naturales</option><option value="nat-5">5.º · Ciencias Naturales</option><option value="nat-6">6.º · Ciencias Naturales</option></select></label>
   </div>
-  <div class="program-summary" aria-live="polite"><span class="summary-pill" id="count-visible">158 espacios curriculares</span><span class="summary-pill summary-pill--ok">144 programas disponibles</span><span class="summary-pill summary-pill--missing">14 pendientes</span></div>
+  <div class="program-summary" aria-live="polite"><span class="summary-pill" id="count-visible">158 espacios curriculares</span><span class="summary-pill summary-pill--ok" id="count-available">147 programas disponibles</span><span class="summary-pill summary-pill--missing" id="count-pending">11 pendientes</span></div>
   <div id="programs-root"></div>
   <div id="empty-search" class="empty-search" hidden>No encontramos materias con esos filtros. Probá con otro nombre o seleccioná otro curso.</div>
   <p class="program-note">Si una materia figura como <strong>Programa todavía no disponible</strong>, significa que el espacio curricular pertenece al plan de estudios pero el archivo correspondiente aún no fue incorporado a esta biblioteca.</p>
@@ -95,7 +95,7 @@ const DATA=[
 '4':[
 ['Literatura','1HJa42gbdolv8jM_kWZpuj05WeDmxQcLO'],['Matemática Ciclo Superior','1l6-e8zghveX-aB8v4xX83VQRLDWtLwWA'],['Educación Física','1hWdzCC6XbVbZpI8vgCJWQsGqgMDVz9tm'],['Inglés','1lszbI6X3YijIj5pHngQLwFW5CD41J0dv'],['NTICx','1JpK5bUdJn3dRBVaRGvEw-SGE9oW7jycs'],['Salud y Adolescencia','1WyeshwvtZ2_mFuMJDFRPAceawbN1QiM4'],['Introducción a la Física','1sYHfuJyX2xVRopd00fDL_3EyCwk-YKit'],['Biología','1yaWTmdSu_R6vZevOxaTCRk2NJY8zeJUZ'],['Historia','1hv1H5my3fPJIV3hMhtTtTEeKEtQ9ijy9'],['Geografía','1IJlUI7EoSUok7l8d5KR-7-2B5uDouPdu'],['Psicología','1BFHQLFNh3cb5oRDfXHj5DHZwjdWVncDH']],
 '5':[
-['Literatura','1cfEbl1-_7pkwv3SmWo2Rzbed6JxRWlYC'],['Matemática Ciclo Superior','1N-Y_Z5IZxKkYCGkjtPHm820FnRsUHupY'],['Educación Física','1A8E0cSyf2GIzS2UoMAePWeUAV-PYzaWP'],['Inglés','1BDbABo_foFKQMKut7VctaN56JfoSgmBc'],['Política y Ciudadanía',null],['Introducción a la Química','1nexdfGjpekCFAkIE2UlS1rj9WCUwDd6A'],['Historia','1GUiGnfhWWc5AN8etiHmzm2Yk-nh5gcA-'],['Geografía','1rI40MfcwQ-exrIaldcm_Ojycd4D8qHYz'],['Comunicación, Cultura y Sociedad','1hP5nxY_X5Q1rDJIX_AQv60QSZPV0P43g'],['Economía Política',null],['Sociología',null]],
+['Literatura','1cfEbl1-_7pkwv3SmWo2Rzbed6JxRWlYC'],['Matemática Ciclo Superior','1N-Y_Z5IZxKkYCGkjtPHm820FnRsUHupY'],['Educación Física','1A8E0cSyf2GIzS2UoMAePWeUAV-PYzaWP'],['Inglés','1BDbABo_foFKQMKut7VctaN56JfoSgmBc'],['Política y Ciudadanía',null],['Introducción a la Química','1nexdfGjpekCFAkIE2UlS1rj9WCUwDd6A'],['Historia','1GUiGnfhWWc5AN8etiHmzm2Yk-nh5gcA-'],['Geografía','1rI40MfcwQ-exrIaldcm_Ojycd4D8qHYz'],['Comunicación, Cultura y Sociedad','1hP5nxY_X5Q1rDJIX_AQv60QSZPV0P43g'],['Economía Política',null],['Sociología','1Y8YhkrD3rt9TEntVpJHJg8KNX7mcD3b9']],
 '6':[
 ['Literatura','15wn-Kbc0auklxTF3D2d60nSbafjKtEhT'],['Matemática Ciclo Superior','1mcuoRYBkG5UOTKzYMmyX5SYYTu-hhJQm'],['Educación Física','1f3TcCB8EAQrjC1L-D7MuOk8gl0Z_DB87'],['Inglés','1X64o8VlnRZASxnFSk8bIPF-KolVDaAZn'],['Trabajo y Ciudadanía','1Vu2ZD-yY8UvSo0tosptn9pdKhDAoV_nh'],['Filosofía','1x4r8oVkB2BQOZ0v6bNfK-R3sqcK9vq_Y'],['Arte','1LzdU2tD_flN6ff3ODFhcHSKKhvhyFqAX'],['Historia',null],['Geografía','1Go5F-9KEpZYP_A9irLd0z8KKVeM0hN-d'],['Proyecto de Investigación en Ciencias Sociales',null]]
 }},
@@ -113,7 +113,7 @@ const DATA=[
 '5':[
 ['Literatura','1KTy1Wsa9WiWjJRny8N3sIO9TgOZD_041'],['Matemática Ciclo Superior','1oJbzyGed6qMlAdTbqNeG2mBQgSAsEbXu'],['Educación Física','1Nh9BhnAMpEQwa61jDaDcY-O5vK3taq6n'],['Inglés','1R3-2XzjxxhEB3oAQdYu5TtunNGtHmMKR'],['Política y Ciudadanía',null],['Historia','1MlxY-bNvRT3DMFfxQTI-aFKo6t2zXqeS'],['Geografía','1nhu11q6gltEigIIFbPuRIvw2MUfeitQD'],['Arte','1UjuWItacP-TqiBP4abEhxrCco8fXjyn8'],['Fundamentos de la Química','1SL1aJfVBJq6TSFo7AYIVkcTLsPr-6gqj'],['Biología','1Icf5e0eGTZT20dPyo2HipdFRCLYPyBgI'],['Física','1tTL8_yALQ0dtCewe-B_BsrqIYnDcYd0N'],['Ciencias de la Tierra','1DiuChfEfct4xsJuqJ3fS5tZYuYhvcM-p']],
 '6':[
-['Literatura','1PoR7F2I_kOGYQ2S2Mghk7yB3zgFeJUW6'],['Matemática Ciclo Superior','1G-jG4wijaZAXJOtbWTA1sap8LDDSD_-D'],['Educación Física','1VRyQGtx0oEEoFUlWKb8-qTGkbTE54LeP'],['Inglés','1xgxk0eiZcOkf641fAjW3os_dRi3KwhdC'],['Trabajo y Ciudadanía','1EeJ33FsXlJ-PjfuozydSuF65bJgLNsvh'],['Filosofía e Historia de la Ciencia y la Tecnología',null],['Química del Carbono','1uOGZndCczd8N3G18Om-3OVXh5S6BCt-J'],['Biología, Genética y Sociedad','1_NZ6svCJjyK6gLxM7koOnQcKkhdw9NaR'],['Física Clásica y Moderna',null],['Ambiente, Desarrollo y Sociedad',null]]
+['Literatura','1PoR7F2I_kOGYQ2S2Mghk7yB3zgFeJUW6'],['Matemática Ciclo Superior','1G-jG4wijaZAXJOtbWTA1sap8LDDSD_-D'],['Educación Física','1VRyQGtx0oEEoFUlWKb8-qTGkbTE54LeP'],['Inglés','1xgxk0eiZcOkf641fAjW3os_dRi3KwhdC'],['Trabajo y Ciudadanía','1EeJ33FsXlJ-PjfuozydSuF65bJgLNsvh'],['Filosofía e Historia de la Ciencia y la Tecnología',null],['Química del Carbono','1uOGZndCczd8N3G18Om-3OVXh5S6BCt-J'],['Biología, Genética y Sociedad','1_NZ6svCJjyK6gLxM7koOnQcKkhdw9NaR'],['Física Clásica y Moderna','12WpJnjv7Lk5HPllkmP1tU6bI_O6Y0v5m'],['Ambiente, Desarrollo y Sociedad','1bRH4qCtS8xpH3Atzdq8HNLsMi19NwD0h']]
 }}
 ];
 const root=document.getElementById('programs-root');
@@ -148,6 +148,12 @@ function render(){
   }
 }
 render();
+
+const totalCatalog=DATA.reduce((n,g)=>n+Object.values(g.years).reduce((v,subjects)=>v+subjects.length,0),0);
+const availableCatalog=DATA.reduce((n,g)=>n+Object.values(g.years).reduce((v,subjects)=>v+subjects.filter(subject=>Boolean(subject[1])).length,0),0);
+document.getElementById('count-visible').textContent=totalCatalog+' espacios curriculares';
+document.getElementById('count-available').textContent=availableCatalog+' programas disponibles';
+document.getElementById('count-pending').textContent=(totalCatalog-availableCatalog)+' pendientes';
 
 const search=document.getElementById('program-search');
 const filter=document.getElementById('program-filter');
