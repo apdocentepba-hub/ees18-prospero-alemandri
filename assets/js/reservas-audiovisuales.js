@@ -464,7 +464,8 @@
       caption.textContent = captionText;
       button.append(number, caption);
 
-      if (status === 'blocked' || status === 'full' || status === 'updating') button.disabled = true;
+      // Calendario en modo consulta: los días no admiten clics durante la suspensión.
+      if (RESERVATIONS_PAUSED || status === 'blocked' || status === 'full' || status === 'updating') button.disabled = true;
       if (state.selectedDate === isoDate) button.classList.add('is-selected');
       button.addEventListener('click', () => selectDate(isoDate));
       calendar.appendChild(button);
