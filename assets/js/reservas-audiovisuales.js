@@ -602,7 +602,9 @@
   function renderSelectionSummary() {
     selectionSummary.classList.remove('is-error');
     if (!state.selectedDate || state.selectedSlotIds.length === 0) {
-      selectionSummary.innerHTML = '<strong>Todavía no seleccionaste horarios.</strong><span>Podés marcar uno o varios módulos consecutivos del mismo turno.</span>';
+      selectionSummary.innerHTML = RESERVATIONS_PAUSED
+        ? '<strong>Reservas temporalmente suspendidas.</strong><span>Los horarios se muestran únicamente para consulta.</span>'
+        : '<strong>Todavía no seleccionaste horarios.</strong><span>Podés marcar uno o varios módulos consecutivos del mismo turno.</span>';
       bookingFields.disabled = true;
       confirmationSummary.innerHTML = '<strong>Revisá fecha y horario antes de confirmar.</strong>';
       return;
