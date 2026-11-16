@@ -221,6 +221,8 @@
 
   const API_URL = String(window.EES18_RESERVAS_API_URL || '').trim();
   const apiReady = Boolean(API_URL);
+  // Pausa institucional temporal: solo lectura; no ejecutar la acción 'create'.
+  const RESERVATIONS_PAUSED = true;
   const MONTH_SNAPSHOT_PREFIX = 'EES18_RESERVAS_MONTH_SNAPSHOT_';
   const REQUEST_TIMEOUT_MS = 45000;
   const MONTH_RETRY_DELAY_MS = 4000;
@@ -486,14 +488,14 @@
       input.type = 'checkbox';
       input.value = slot.id;
       input.checked = selected;
-      input.disabled = occupied || !state.selectedDate || !apiReady;
+      input.disabled = RESERVATIONS_PAUSED || occupied || !state.selectedDate || !apiReady;
       input.setAttribute('aria-label', `${slot.start} a ${slot.end}`);
       input.addEventListener('change', () => toggleSlot(slot.id, input.checked));
 
       const time = document.createElement('strong');
       time.textContent = `${slot.start}–${slot.end}`;
       const status = document.createElement('small');
-      status.textContent = occupied ? 'Ocupado' : (apiReady ? 'Disponible' : 'En preparación');
+      status.textContent = occupied ? 'Ocupado' : (RESERVATIONS_PAUSED ? 'Reservas suspendidas' : (apiReady ? 'Disponible' : 'En preparación'));
       label.append(input, time, status);
       container.appendChild(label);
     });
@@ -607,7 +609,7 @@
 
     const range = rules.buildContinuousRange(state.selectedSlotIds);
     selectionSummary.innerHTML = `<strong>${range.start} a ${range.end} · ${range.count} ${range.count === 1 ? 'módulo' : 'módulos'}</strong><span>Turno ${range.shift.toLowerCase()} · ${formatLongDate(state.selectedDate)}</span>`;
-    bookingFields.disabled = !apiReady;
+    bookingFields.disabled = RESERVATIONS_PAUSED || !apiReady;
   }
 
   function readFormData() {
@@ -699,6 +701,11 @@
     event.preventDefault();
     bookingResult.hidden = true;
 
+    if (RESERVATIONS_PAUSED) {
+      setResult('<strong>Reservas temporalmente suspendidas.</strong><span>El calendario continúa disponible para consulta. No se aceptan nuevas reservas.</span>', 'info');
+      return;
+    }
+
     if (!apiReady) {
       setResult('<strong>Sistema en preparación.</strong><span>Esta versión todavía no puede modificar la planilla ni Google Calendar.</span>', 'pilot');
       return;
@@ -766,5 +773,10 @@
   renderSlots();
   renderSelectionSummary();
   updateModeUi();
+  if (RESERVATIONS_PAUSED) {
+    bookingFields.disabled = true;
+    bookingSubmit.disabled = true;
+    bookingSubmit.textContent = 'Reservas suspendidas';
+  }
   loadMonthAvailability();
 })();
